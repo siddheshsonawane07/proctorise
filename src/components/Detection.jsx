@@ -12,30 +12,29 @@ const Detection = () => {
 
   useEffect(() => {
     const runDetection = async () => {
-      // Posenet Architecture
-      // const net = await posenet.load({
-      //   architecture: "ResNet50",
-      //   quantBytes: 2,
-      //   inputResolution: { width: 640, height: 480 },
-      //   scale: 0.6,
-      // });
       await tf.ready();
 
+      // movenet using two ears
+      // const detectorConfig = {
+      //   modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+      // };
+
+      // const detector = await poseDetection.createDetector(
+      //   poseDetection.SupportedModels.MoveNet,
+      //   detectorConfig
+      // );
+
+      //posenet using two ears
       // const detectorConfig = {
       //   architecture: "MobileNetV1",
       //   outputStride: 16,
       //   inputResolution: { width: 640, height: 480 },
       //   multiplier: 0.75,
       // };
-
-      const detectorConfig = {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
-      };
-
-      const detector = await poseDetection.createDetector(
-        poseDetection.SupportedModels.MoveNet,
-        detectorConfig
-      );
+      // const detector = await poseDetection.createDetector(
+      //   poseDetection.SupportedModels.PoseNet,
+      //   detectorConfig
+      // );
 
       const objectModel = await cocoSsd.load();
 
@@ -46,22 +45,20 @@ const Detection = () => {
 
         const video = webcamRef.current.video;
 
-        // Pose Detection using posenet
-        // const pose = await net.estimateSinglePose(video);
-        // earsDetect(pose.keypoints, 0.8);
+        // const poses = await detector.estimatePoses(video);
+        // console.log(poses.length);
+        // const firstPose = poses[0];
+        // earsDetect(poses[0].keypoints, 0.1);
 
-        //understand between single pose and multiple poses in tensorflow models
-        const poses = await detector.estimatePoses(video);
-        // if (poses.length > 0) {
-        const firstPose = poses[0];
-        earsDetect(firstPose.keypoints, 0.1);
-        // }
+        // const angle = 17;
+        // preventLookDown(poses[0].keypoints, angle);
 
         // Object Detection
         const predictions = await objectModel.detect(video);
         handleObjectDetection(predictions);
       };
 
+      //for looking sideways
       const earsDetect = (keypoints, minConfidence) => {
         const keypointEarL = keypoints[3];
         const keypointEarR = keypoints[4];
@@ -71,10 +68,40 @@ const Detection = () => {
           keypointEarR.score < minConfidence
         ) {
           console.log("error", "You looked away from the screen");
-          // updateScore(-15); // Deduct more points when the user looks away
         }
       };
 
+      //for looking down
+      // const preventLookDown = (keypoints, maxDownwardAngle) => {
+      //   if (keypoints.length >= 3) {
+      //     const leftEye = keypoints[1];
+      //     const rightEye = keypoints[2];
+      //     const nose = keypoints[0];
+
+      //     // Check confidence scores
+      //     if (
+      //       leftEye.score >= 0.1 &&
+      //       rightEye.score >= 0.1 &&
+      //       nose.score >= 0.1
+      //     ) {
+      //       // Calculate the average eye position
+      //       const avgEyeX = (leftEye.x + rightEye.x) / 2;
+      //       const avgEyeY = (leftEye.y + rightEye.y) / 2;
+
+      //       // Calculate the angle formed by the eyes and the line connecting eyes to nose
+      //       const angle =
+      //         Math.atan2(nose.y - avgEyeY, nose.x - avgEyeX) * (180 / Math.PI);
+
+      //       // Adjust the condition based on the desired angle range
+      //       if (angle < -maxDownwardAngle) {
+      //         console.log("Alert: User is looking down");
+      //         // Take appropriate action, e.g., pause the assessment
+      //       }
+      //     }
+      //   }
+      // };
+
+      //object detection using cocossd
       const handleObjectDetection = (predictions) => {
         let objectDetected = false;
 
@@ -86,26 +113,8 @@ const Detection = () => {
 
         if (objectDetected) {
           console.log("error", "Object Detected", "Action has been Recorded");
-          // updateScore(-10); // Deduct points when an object is detected
         }
       };
-
-      // const showNotification = (type, title, message) => {
-      //   switch (type) {
-      //     case "error":
-      //       NotificationManager.error(message, title, 800, () => {});
-      //       break;
-      //     default:
-      //       break;
-      //   }
-      // };
-
-      // const updateScore = (points) => {
-      //   setScore((prevScore) => Math.max(0, prevScore + points));
-      // };
-
-      // // Deduct points over time to encourage continuous engagement
-      // updateScore(-2);
 
       setInterval(detect, 500);
     };
@@ -131,19 +140,6 @@ const Detection = () => {
           height: 480,
         }}
       />
-      {/* <div
-        style={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          bottom: 1,
-          color: "white", // Set the color to black
-          fontSize: 24,
-        }}
-      >
-        Score: {score}
-      </div> */}
-      {/* <NotificationContainer /> */}
     </div>
   );
 };
