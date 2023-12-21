@@ -36,6 +36,20 @@ const Detection = () => {
       //   detectorConfig
       // );
 
+      //eye gazing using face-mask
+      // const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+      // const detectorConfig = {
+      //   runtime: "mediapipe",
+      //   solutionPath: "node_modules/@mediapipe/face_mesh",
+      //   modelConfig: {
+      //     modelType: "face_landmarks",
+      //   },
+      // };
+      // const detector = await faceLandmarksDetection.createDetector(
+      //   model,
+      //   detectorConfig
+      // );
+
       const objectModel = await cocoSsd.load();
 
       const detect = async () => {
@@ -56,18 +70,70 @@ const Detection = () => {
         // Object Detection
         const predictions = await objectModel.detect(video);
         handleObjectDetection(predictions);
+
+        // const estimationConfig = { flipHorizontal: false };
+        // const faces = await detector.estimateFaces(video, estimationConfig);
+        // eyeTracking(faces[0].keypoints);
       };
 
       //for looking sideways
-      const earsDetect = (keypoints, minConfidence) => {
-        const keypointEarL = keypoints[3];
-        const keypointEarR = keypoints[4];
+      // const earsDetect = (keypoints, minConfidence) => {
+      //   const keypointEarL = keypoints[3];
+      //   const keypointEarR = keypoints[4];
 
-        if (
-          keypointEarL.score < minConfidence ||
-          keypointEarR.score < minConfidence
-        ) {
-          console.log("error", "You looked away from the screen");
+      //   if (
+      //     keypointEarL.score < minConfidence ||
+      //     keypointEarR.score < minConfidence
+      //   ) {
+      //     console.log("error", "You looked away from the screen");
+      //   }
+      // };
+
+      //for eye tracking
+      const eyeTracking = (keypoints) => {
+        // Check if keypoints array is not empty
+        if (keypoints && keypoints.length > 0) {
+          // Get the left and right eye keypoints
+          const leftEye = keypoints.find((point) => point.label === "left_eye");
+          const rightEye = keypoints.find(
+            (point) => point.label === "right_eye"
+          );
+
+          // Check if both eyes are detected
+          if (leftEye && rightEye) {
+            // Calculate the midpoint between the eyes
+            const midPointX = (leftEye.x + rightEye.x) / 2;
+            const midPointY = (leftEye.y + rightEye.y) / 2;
+
+            // Define a region around the midpoint to represent the center of the face
+            const regionWidth = 50;
+            const regionHeight = 30;
+
+            // Define the bounding box for the center region
+            const regionLeft = midPointX - regionWidth / 2;
+            const regionRight = midPointX + regionWidth / 2;
+            const regionTop = midPointY - regionHeight / 2;
+            const regionBottom = midPointY + regionHeight / 2;
+
+            // Example: Log the coordinates of the bounding box
+            console.log("Region:", {
+              left: regionLeft,
+              right: regionRight,
+              top: regionTop,
+              bottom: regionBottom,
+            });
+
+            // Example: Check if the user is looking away from the center region
+            if (
+              midPointX < regionLeft ||
+              midPointX > regionRight ||
+              midPointY < regionTop ||
+              midPointY > regionBottom
+            ) {
+              console.log("Alert: User is looking away from the center");
+              // Take appropriate action, e.g., pause the assessment
+            }
+          }
         }
       };
 
@@ -103,16 +169,31 @@ const Detection = () => {
 
       //object detection using cocossd
       const handleObjectDetection = (predictions) => {
-        let objectDetected = false;
-
+        let faceCount = 0;
         predictions.forEach((prediction) => {
-          if (["cell phone", "book", "laptop"].includes(prediction.class)) {
-            objectDetected = true;
+          if (prediction.class === "person") {
+            faceCount++;
+          } else if (
+            prediction.class === "cell phone" ||
+            prediction.class === "book" ||
+            prediction.class === "laptop"
+          ) {
+            console.log("Object Detected", "Action has been Recorded", "error");
           }
         });
 
-        if (objectDetected) {
-          console.log("error", "Object Detected", "Action has been Recorded");
+        if (faceCount > 1) {
+          console.log(
+            "Multiple Faces Detected",
+            "Please ensure only one face is visible",
+            "error"
+          );
+        } else if (faceCount === 0) {
+          console.log(
+            "No Face Detected",
+            "Please ensure your face is visible",
+            "error"
+          );
         }
       };
 
