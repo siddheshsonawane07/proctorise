@@ -1,12 +1,10 @@
 import "./App.css";
-import Detection from "./components/Detection.jsx";
-import TestPage from "./components/Detection.jsx";
-// import Detection from "./components/Detection.jsx";
-import Test from "./components/Test.jsx";
+import Detection2 from "./components/Detection2.jsx";
+
 function App() {
   return (
     <>
-      <Detection />
+      <Detection2 />
     </>
   );
 }
