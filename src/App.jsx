@@ -1,10 +1,10 @@
 import "./App.css";
-import Detection2 from "./components/Detection2.jsx";
+import FaceVerificationComponent from "./components/Detection3.jsx";
 
 function App() {
   return (
     <>
-      <Detection2 />
+      <FaceVerificationComponent />
     </>
   );
 }

@@ -223,8 +223,8 @@ const Detection = () => {
       //   }
       // };
 
-      //for eye tracking
-      // const eyeTracking = (keypoints) => {
+      //   for eye tracking
+      //   const eyeTracking = (keypoints) => {
       //   // Check if keypoints array is not empty
       //   if (keypoints && keypoints.length > 0) {
       //     // Get the left and right eye keypoints
@@ -271,8 +271,8 @@ const Detection = () => {
       //   }
       // };
 
-      //for looking down
-      // const preventLookDown = (keypoints, maxDownwardAngle) => {
+      //   for looking down
+      //   const preventLookDown = (keypoints, maxDownwardAngle) => {
       //   if (keypoints.length >= 3) {
       //     const leftEye = keypoints[1];
       //     const rightEye = keypoints[2];

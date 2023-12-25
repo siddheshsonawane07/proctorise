@@ -84,7 +84,7 @@ const Detection2 = () => {
         }
       };
 
-      intervalId = setInterval(detect, 5000);
+      intervalId = setInterval(detect, 3000);
 
       // Cleanup function
       return () => clearInterval(intervalId);

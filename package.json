@@ -17,6 +17,7 @@
     "@tensorflow/tfjs-backend-webgpu": "^4.15.0",
     "@tensorflow/tfjs-converter": "^4.15.0",
     "@tensorflow/tfjs-core": "^4.15.0",
+    "face-api.js": "^0.22.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-webcam": "^7.2.0"
