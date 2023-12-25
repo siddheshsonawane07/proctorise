@@ -1,10 +1,10 @@
 import "./App.css";
-import FaceVerificationComponent from "./components/Detection3.jsx";
-
+import "./components/temp";
 function App() {
   return (
     <>
-      <FaceVerificationComponent />
+      {/* <FaceVerificationComponent /> */}
+      <ExamMonitoring />
     </>
   );
 }
