@@ -13,8 +13,9 @@ const firebaseConfig = {
   measurementId: "G-7GJ0JTG38T",
 };
 
-const app = initializeApp(firebaseConfig);
-const imgDB = getStorage(app);
-const txtDB = getFirestore(app);
+// const app = initializeApp(firebaseConfig);
 
-export { imgDB, txtDB };
+// const imgDB = getStorage(app);
+// const txtDB = getFirestore(app);
+
+export { firebaseConfig };

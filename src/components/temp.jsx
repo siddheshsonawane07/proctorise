@@ -1,7 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
-import "./detection.css";
-import { auth } from "firebase";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "./firebase-config";
+import { getFirestore } from "firebase/firestore"; // Import getFirestore
+import { getAuth } from "firebase/auth";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const firestore = getFirestore(app); // Get Firestore instance
 
 function ExamMonitoring() {
   const videoRef = useRef();
@@ -33,7 +39,7 @@ function ExamMonitoring() {
       faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
       faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+      // faceapi.nets.faceExpressionNet.loadFromUri("/models"),
     ]).then(() => {
       faceMyDetect();
     });
@@ -43,8 +49,8 @@ function ExamMonitoring() {
     setInterval(async () => {
       const detections = await faceapi
         .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceExpressions();
+        .withFaceLandmarks();
+      // .withFaceExpressions();
 
       canvasRef.current.innerHTML = ""; // Clear previous drawings
       canvasRef.current.appendChild(
@@ -63,7 +69,7 @@ function ExamMonitoring() {
 
       faceapi.draw.drawDetections(canvasRef.current, resized);
       faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
-      faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
+      // faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
     }, 1000);
   };
 
@@ -94,7 +100,7 @@ function ExamMonitoring() {
       if (user) {
         setUser(user); // Set user state
         setIsTakingExam(status); // Set exam status state
-        const userRef = firebase.firestore().collection("users").doc(user.uid);
+        const userRef = firestore().collection("users").doc(user.uid);
         await userRef.update({ isTakingExam: status });
         console.log(`User is ${status ? "taking" : "not taking"} an exam`);
       }
