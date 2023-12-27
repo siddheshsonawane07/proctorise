@@ -39,7 +39,7 @@ function ExamMonitoring() {
       faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
       faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      // faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+      faceapi.nets.faceExpressionNet.loadFromUri("/models"),
     ]).then(() => {
       faceMyDetect();
     });
@@ -49,8 +49,8 @@ function ExamMonitoring() {
     setInterval(async () => {
       const detections = await faceapi
         .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks();
-      // .withFaceExpressions();
+        .withFaceLandmarks()
+        .withFaceExpressions();
 
       canvasRef.current.innerHTML = ""; // Clear previous drawings
       canvasRef.current.appendChild(
@@ -69,7 +69,7 @@ function ExamMonitoring() {
 
       faceapi.draw.drawDetections(canvasRef.current, resized);
       faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
-      // faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
+      faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
     }, 1000);
   };
 
@@ -96,11 +96,11 @@ function ExamMonitoring() {
 
   const updateUserExamStatus = async (status) => {
     try {
-      const user = auth().currentUser;
+      const user = auth.currentUser;
       if (user) {
         setUser(user); // Set user state
         setIsTakingExam(status); // Set exam status state
-        const userRef = firestore().collection("users").doc(user.uid);
+        const userRef = firestore.collection("users").doc(user.uid);
         await userRef.update({ isTakingExam: status });
         console.log(`User is ${status ? "taking" : "not taking"} an exam`);
       }
@@ -111,9 +111,9 @@ function ExamMonitoring() {
 
   const checkExamStatus = async () => {
     try {
-      const user = auth().currentUser;
+      const user = auth.currentUser;
       if (user) {
-        const userRef = firebase.firestore().collection("users").doc(user.uid);
+        const userRef = firestore.collection("users").doc(user.uid);
         const userDoc = await userRef.get();
         const isTakingExam = userDoc.data()?.isTakingExam || false;
         setIsTakingExam(isTakingExam);
