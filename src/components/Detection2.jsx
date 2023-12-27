@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
@@ -8,6 +8,7 @@ import Webcam from "react-webcam";
 
 const Detection2 = () => {
   const webcamRef = useRef(null);
+  const [visibilityCount, setVisibilityCount] = useState(0);
 
   const handleObjectDetection = useCallback(async (predictions) => {
     let faceCount = 0;
@@ -86,8 +87,24 @@ const Detection2 = () => {
 
       intervalId = setInterval(detect, 3000);
 
-      // Cleanup function
-      return () => clearInterval(intervalId);
+      // Visibility change detection
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          setVisibilityCount((prevCount) => prevCount + 1);
+          console.log("Warning: Tab Changed");
+        }
+      };
+
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+      // Cleanup functions
+      return () => {
+        clearInterval(intervalId);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+      };
     };
 
     runDetection();
@@ -95,10 +112,14 @@ const Detection2 = () => {
 
   return (
     <div>
+      <div>
+        {/* <h1>Tab Change Detection</h1> */}
+        {/* <p>Visibility Count: {visibilityCount}</p> */}
+      </div>
       <Webcam
         ref={webcamRef}
         style={{
-          position: "absolute",
+          // position: "absolute",
           marginLeft: "auto",
           marginRight: "auto",
           left: 0,
@@ -107,12 +128,12 @@ const Detection2 = () => {
           top: 0,
           textAlign: "center",
           zIndex: 9,
-          width: 640, // Adjust as needed
-          height: 480, // Adjust as needed
+          width: 480, // Adjust as needed
+          height: 420 // Adjust as needed
         }}
         videoConstraints={{
-          width: 1280, // Set a larger width for a more zoomed-out view
-          height: 720, // Set a larger height for a more zoomed-out view
+          width: 1280, 
+          height: 720, 
           facingMode: "user", // Use "user" for the front camera, "environment" for the rear camera
         }}
       />

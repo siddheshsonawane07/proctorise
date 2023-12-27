@@ -1,11 +1,10 @@
 import "./App.css";
-import "./components/temp";
-import ExamMonitoring from "./components/temp";
+import Detection2 from "./components/Detection2";
 
 function App() {
   return (
     <>
-      <ExamMonitoring />
+      <Detection2 />
     </>
   );
 }
