@@ -5,7 +5,6 @@ import ExamMonitoring from "./components/temp";
 function App() {
   return (
     <>
-      {/* <FaceVerificationComponent /> */}
       <ExamMonitoring />
     </>
   );

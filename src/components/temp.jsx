@@ -1,8 +1,14 @@
 import { useRef, useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+} from "firebase/firestore";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import {
   getStorage,
   ref,
@@ -96,8 +102,8 @@ function ExamMonitoring() {
       if (currentUser) {
         setUser(currentUser); // Set user state
         setIsTakingExam(status); // Set exam status state
-        const userRef = firestore.collection("users").doc(currentUser.uid);
-        await userRef.update({ isTakingExam: status });
+        const userRef = doc(firestore, "users", currentUser.uid);
+        await updateDoc(userRef, { isTakingExam: status });
         console.log(`User is ${status ? "taking" : "not taking"} an exam`);
       }
     } catch (error) {
@@ -108,26 +114,44 @@ function ExamMonitoring() {
   const checkExamStatus = async () => {
     try {
       const currentUser = auth.currentUser;
+      console.log("Current User:", currentUser.uid); // Log current user
+
       if (currentUser) {
-        const userRef = firestore.collection("users").doc(currentUser.uid);
-        const userDoc = await userRef.get();
-        const isTakingExam = userDoc.data()?.isTakingExam || false;
-        setIsTakingExam(isTakingExam);
-        console.log(
-          `User is ${isTakingExam ? "taking" : "not taking"} an exam`
-        );
+        const userRef = doc(firestore, "users", currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const isTakingExam = userDoc.data().isTakingExam || false;
+          setIsTakingExam(isTakingExam);
+          console.log(
+            `User is ${isTakingExam ? "taking" : "not taking"} an exam`
+          );
+        } else {
+          console.log("User document not found");
+        }
       }
     } catch (error) {
       console.error("Error checking user's exam status:", error);
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Google Sign-In Successful:", user);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
   return (
     <div className="myapp">
       <h1>Face Detection</h1>
       <div className="appvide">
         <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
       </div>
+      <button onClick={handleGoogleSignIn}>Sign In with Google</button>
+
       <button onClick={faceMyDetect}>Capture and Upload Image</button>
 
       <div>
