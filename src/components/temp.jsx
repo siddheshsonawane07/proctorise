@@ -1,17 +1,23 @@
 import { useRef, useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "./firebase-config";
-import { getFirestore } from "firebase/firestore"; // Import getFirestore
+import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import {
+  getStorage,
+  ref,
+  uploadString,
+  getDownloadURL,
+} from "firebase/storage";
+import { firebaseConfig } from "./firebase-config";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app); // Get Firestore instance
+const firestore = getFirestore(app);
+const storage = getStorage(app);
 
 function ExamMonitoring() {
   const videoRef = useRef();
-  const canvasRef = useRef();
   const [isTakingExam, setIsTakingExam] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -45,45 +51,35 @@ function ExamMonitoring() {
     });
   };
 
-  const faceMyDetect = () => {
-    setInterval(async () => {
+  const faceMyDetect = async () => {
+    try {
       const detections = await faceapi
         .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceExpressions();
 
-      canvasRef.current.innerHTML = ""; // Clear previous drawings
-      canvasRef.current.appendChild(
-        faceapi.createCanvasFromMedia(videoRef.current)
-      );
-
-      faceapi.matchDimensions(canvasRef.current, {
-        width: 940,
-        height: 650,
-      });
-
-      const resized = faceapi.resizeResults(detections, {
-        width: 940,
-        height: 650,
-      });
-
-      faceapi.draw.drawDetections(canvasRef.current, resized);
-      faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
-      faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
-    }, 1000);
+      if (detections.length > 0) {
+        // Capture and upload image only if faces are detected
+        await captureAndUploadImage();
+      }
+    } catch (error) {
+      console.error("Error detecting faces:", error);
+    }
   };
 
   const captureAndUploadImage = async () => {
-    const canvas = faceapi.createCanvasFromMedia(videoRef.current);
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
     const dataURL = canvas.toDataURL("image/png");
 
     try {
-      const storageRef = firebase.storage().ref();
-      const imageRef = storageRef.child(`captured-images/${Date.now()}.png`);
-      const blob = await fetch(dataURL).then((res) => res.blob());
-      await imageRef.put(blob);
+      const storageRef = ref(storage, `captured-images/${Date.now()}.png`);
+      await uploadString(storageRef, dataURL, "data_url");
 
       console.log("Image uploaded successfully!");
 
@@ -96,11 +92,11 @@ function ExamMonitoring() {
 
   const updateUserExamStatus = async (status) => {
     try {
-      const user = auth.currentUser;
-      if (user) {
-        setUser(user); // Set user state
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        setUser(currentUser); // Set user state
         setIsTakingExam(status); // Set exam status state
-        const userRef = firestore.collection("users").doc(user.uid);
+        const userRef = firestore.collection("users").doc(currentUser.uid);
         await userRef.update({ isTakingExam: status });
         console.log(`User is ${status ? "taking" : "not taking"} an exam`);
       }
@@ -111,9 +107,9 @@ function ExamMonitoring() {
 
   const checkExamStatus = async () => {
     try {
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = firestore.collection("users").doc(user.uid);
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userRef = firestore.collection("users").doc(currentUser.uid);
         const userDoc = await userRef.get();
         const isTakingExam = userDoc.data()?.isTakingExam || false;
         setIsTakingExam(isTakingExam);
@@ -132,8 +128,7 @@ function ExamMonitoring() {
       <div className="appvide">
         <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
       </div>
-      <canvas ref={canvasRef} width="940" height="650" className="appcanvas" />
-      <button onClick={captureAndUploadImage}>Capture and Upload Image</button>
+      <button onClick={faceMyDetect}>Capture and Upload Image</button>
 
       <div>
         <h2>User Information</h2>
