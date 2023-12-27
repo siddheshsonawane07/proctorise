@@ -9,6 +9,7 @@ import Webcam from "react-webcam";
 const Detection2 = () => {
   const webcamRef = useRef(null);
   const [visibilityCount, setVisibilityCount] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const handleObjectDetection = useCallback(async (predictions) => {
     let faceCount = 0;
@@ -97,6 +98,28 @@ const Detection2 = () => {
 
       document.addEventListener("visibilitychange", handleVisibilityChange);
 
+      // Prevent copy and paste
+      document.addEventListener("copy", (event) => {
+        console.log("Copying is not allowed.");
+        event.preventDefault();
+      });
+
+      document.addEventListener("paste", (event) => {
+        console.log("Pasting is not allowed.");
+        event.preventDefault();
+      });
+
+      // Prevent certain special keys
+      const handleKeyDown = (event) => {
+        const restrictedKeys = [27, 16, 18, 17, 91, 9, 44]; // ESC, SHIFT, ALT, CONTROL, COMMAND, TAB, PRT SRC
+        if (restrictedKeys.includes(event.keyCode)) {
+          console.log("This key is restricted.");
+          event.preventDefault();
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+
       // Cleanup functions
       return () => {
         clearInterval(intervalId);
@@ -104,17 +127,46 @@ const Detection2 = () => {
           "visibilitychange",
           handleVisibilityChange
         );
+        document.removeEventListener("keydown", handleKeyDown);
       };
     };
 
     runDetection();
   }, [handleObjectDetection]);
 
+  const toggleFullScreen = () => {
+    const elem = document.documentElement;
+    if (!isFullScreen) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+    setIsFullScreen(!isFullScreen);
+  };
+
   return (
     <div>
       <div>
-        {/* <h1>Tab Change Detection</h1> */}
-        {/* <p>Visibility Count: {visibilityCount}</p> */}
+        <button onClick={toggleFullScreen}>
+          {isFullScreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+        </button>{" "}
+        <p> The text cannot be copied</p>
       </div>
       <Webcam
         ref={webcamRef}
@@ -129,11 +181,11 @@ const Detection2 = () => {
           textAlign: "center",
           zIndex: 9,
           width: 480, // Adjust as needed
-          height: 420 // Adjust as needed
+          height: 480, // Adjust as needed
         }}
         videoConstraints={{
-          width: 1280, 
-          height: 720, 
+          width: 1280,
+          height: 720,
           facingMode: "user", // Use "user" for the front camera, "environment" for the rear camera
         }}
       />
