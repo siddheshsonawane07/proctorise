@@ -10,19 +10,15 @@ import { toast } from "react-toastify";
 const Detection2 = () => {
   const webcamRef = useRef(null);
   const [visibilityCount, setVisibilityCount] = useState(0);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   const handleObjectDetection = useCallback(async (predictions) => {
     let faceCount = 0;
+
     predictions.forEach((prediction) => {
       if (prediction.class === "person") {
         faceCount++;
-      } else if (
-        prediction.class === "cell phone" ||
-        prediction.class === "book" ||
-        prediction.class === "laptop"
-      ) {
+      } else if (["cell phone", "book", "laptop"].includes(prediction.class)) {
         showToast("Action has been Recorded");
       }
     });
@@ -78,7 +74,7 @@ const Detection2 = () => {
         const predictions = await objectModel.detect(video);
         handleObjectDetection(predictions);
 
-        // Posenet detection
+        // PoseNet detection
         const poses = await detector.estimatePoses(video);
 
         if (poses.length > 0) {
@@ -101,15 +97,17 @@ const Detection2 = () => {
       document.addEventListener("visibilitychange", handleVisibilityChange);
 
       // Prevent copy and paste
-      document.addEventListener("copy", (event) => {
-        showToast("Copying is not allowed.");
+      const handleCopyPaste = (event) => {
+        showToast(
+          `${
+            event.type.charAt(0).toUpperCase() + event.type.slice(1)
+          }ing is not allowed.`
+        );
         event.preventDefault();
-      });
+      };
 
-      document.addEventListener("paste", (event) => {
-        showToast("Pasting is not allowed.");
-        event.preventDefault();
-      });
+      document.addEventListener("copy", handleCopyPaste);
+      document.addEventListener("paste", handleCopyPaste);
 
       // Prevent certain special keys
       const handleKeyDown = (event) => {
@@ -129,6 +127,8 @@ const Detection2 = () => {
           "visibilitychange",
           handleVisibilityChange
         );
+        document.removeEventListener("copy", handleCopyPaste);
+        document.removeEventListener("paste", handleCopyPaste);
         document.removeEventListener("keydown", handleKeyDown);
       };
     };
@@ -138,28 +138,15 @@ const Detection2 = () => {
 
   const toggleFullScreen = () => {
     const elem = document.documentElement;
-    if (!isFullScreen) {
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      }
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen().catch((err) => {
+        console.error(
+          `Error attempting to enable full-screen mode: ${err.message}`
+        );
+      });
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
+      document.exitFullscreen();
     }
-    setIsFullScreen(!isFullScreen);
   };
 
   const showToast = (message, type) => {
@@ -175,24 +162,24 @@ const Detection2 = () => {
     };
 
     if (toasts.length >= 2) {
-      const removedToastId = toasts.shift(); // Remove the oldest toast
-      toast.dismiss(removedToastId); // Dismiss the oldest toast
+      const removedToastId = toasts.shift();
+      toast.dismiss(removedToastId);
     }
     const newToast = toast(message, toastOptions);
     setToasts((prevToasts) => [...prevToasts, newToast]);
   };
+
   return (
     <div>
       <div>
         <button onClick={toggleFullScreen}>
-          {isFullScreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          {document.fullscreenElement ? "Exit Fullscreen" : "Enter Fullscreen"}
         </button>{" "}
-        <p> The text cannot be copied</p>
+        <p>The text cannot be copied</p>
       </div>
       <Webcam
         ref={webcamRef}
         style={{
-          // position: "absolute",
           marginLeft: "auto",
           marginRight: "auto",
           left: 0,
@@ -201,13 +188,13 @@ const Detection2 = () => {
           top: 0,
           textAlign: "center",
           zIndex: 9,
-          width: 480, // Adjust as needed
-          height: 480, // Adjust as needed
+          width: 480,
+          height: 480,
         }}
         videoConstraints={{
           width: 1280,
           height: 720,
-          facingMode: "user", // Use "user" for the front camera, "environment" for the rear camera
+          facingMode: "user",
         }}
       />
     </div>
