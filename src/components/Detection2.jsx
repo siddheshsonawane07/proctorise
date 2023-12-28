@@ -5,11 +5,13 @@ import "@tensorflow/tfjs-backend-webgl";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import Webcam from "react-webcam";
+import { toast } from "react-toastify";
 
 const Detection2 = () => {
   const webcamRef = useRef(null);
   const [visibilityCount, setVisibilityCount] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [toasts, setToasts] = useState([]);
 
   const handleObjectDetection = useCallback(async (predictions) => {
     let faceCount = 0;
@@ -21,14 +23,14 @@ const Detection2 = () => {
         prediction.class === "book" ||
         prediction.class === "laptop"
       ) {
-        console.log("Object Detected", "Action has been Recorded", "error");
+        showToast("Action has been Recorded");
       }
     });
 
     if (faceCount > 1) {
-      console.log("Multiple People Detected", "error");
+      showToast("Multiple People Detected");
     } else if (faceCount === 0) {
-      console.log(
+      showToast(
         "No Face Detected",
         "Please ensure your face is visible",
         "error"
@@ -44,7 +46,7 @@ const Detection2 = () => {
       keypointEarL.score < minConfidence ||
       keypointEarR.score < minConfidence
     ) {
-      console.log("error", "You looked away from the screen");
+      showToast("You looked away from the screen");
     }
   };
 
@@ -80,9 +82,9 @@ const Detection2 = () => {
         const poses = await detector.estimatePoses(video);
 
         if (poses.length > 0) {
-          earsDetect(poses[0].keypoints, 0.4);
+          earsDetect(poses[0].keypoints, 0.5);
         } else {
-          console.log("No one detected");
+          showToast("No one detected");
         }
       };
 
@@ -92,7 +94,7 @@ const Detection2 = () => {
       const handleVisibilityChange = () => {
         if (document.visibilityState === "visible") {
           setVisibilityCount((prevCount) => prevCount + 1);
-          console.log("Warning: Tab Changed");
+          showToast("Warning: Tab Changed");
         }
       };
 
@@ -100,12 +102,12 @@ const Detection2 = () => {
 
       // Prevent copy and paste
       document.addEventListener("copy", (event) => {
-        console.log("Copying is not allowed.");
+        showToast("Copying is not allowed.");
         event.preventDefault();
       });
 
       document.addEventListener("paste", (event) => {
-        console.log("Pasting is not allowed.");
+        showToast("Pasting is not allowed.");
         event.preventDefault();
       });
 
@@ -113,7 +115,7 @@ const Detection2 = () => {
       const handleKeyDown = (event) => {
         const restrictedKeys = [27, 16, 18, 17, 91, 9, 44]; // ESC, SHIFT, ALT, CONTROL, COMMAND, TAB, PRT SRC
         if (restrictedKeys.includes(event.keyCode)) {
-          console.log("This key is restricted.");
+          showToast("This key is restricted.");
           event.preventDefault();
         }
       };
@@ -160,6 +162,25 @@ const Detection2 = () => {
     setIsFullScreen(!isFullScreen);
   };
 
+  const showToast = (message, type) => {
+    const toastOptions = {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      type: type || "warning",
+    };
+
+    if (toasts.length >= 2) {
+      const removedToastId = toasts.shift(); // Remove the oldest toast
+      toast.dismiss(removedToastId); // Dismiss the oldest toast
+    }
+    const newToast = toast(message, toastOptions);
+    setToasts((prevToasts) => [...prevToasts, newToast]);
+  };
   return (
     <div>
       <div>
