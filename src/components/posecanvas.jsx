@@ -1,34 +1,25 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
+import * as poseDetection from "@tensorflow-models/pose-detection";
 import Webcam from "react-webcam";
-import { toast } from "react-toastify";
 
-const ObjectDetectionCanvas = () => {
+const PoseCanvas = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [visibilityCount, setVisibilityCount] = useState(0);
-  const [toasts, setToasts] = useState([]);
 
-  const handleObjectDetection = useCallback(async (predictions) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    predictions.forEach((prediction) => {
-      const [x, y, width, height] = prediction.bbox;
-      ctx.beginPath();
-      ctx.rect(x, y, width, height);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "red";
-      ctx.fillStyle = "red";
-      ctx.stroke();
-      ctx.fillText(prediction.class, x, y > 10 ? y - 5 : 10);
+  const drawPoseKeypoints = (ctx, keypoints) => {
+    keypoints.forEach((keypoint) => {
+      if (keypoint.score > 0.5) {
+        ctx.beginPath();
+        ctx.arc(keypoint.x, keypoint.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+      }
     });
-  }, []);
+  };
 
   useEffect(() => {
     let intervalId;
@@ -36,7 +27,14 @@ const ObjectDetectionCanvas = () => {
     const runDetection = async () => {
       await tf.ready();
 
-      const objectModel = await cocoSsd.load();
+      const detectorConfig = {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+      };
+
+      const detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        detectorConfig
+      );
 
       const detect = async () => {
         if (!webcamRef.current || webcamRef.current.video.readyState !== 4) {
@@ -45,21 +43,46 @@ const ObjectDetectionCanvas = () => {
 
         const video = webcamRef.current.video;
 
-        // Object Detection
-        const predictions = await objectModel.detect(video);
-        handleObjectDetection(predictions);
+        // PoseNet detection
+        const poses = await detector.estimatePoses(video);
+
+        if (poses.length > 0) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          poses.forEach((pose) => {
+            drawPoseKeypoints(ctx, pose.keypoints);
+          });
+        } else {
+          // Handle case when no pose is detected
+          console.log("no on detected");
+        }
       };
 
       intervalId = setInterval(detect, 3000);
 
-      // Cleanup function
+      // Visibility change detection
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          setVisibilityCount((prevCount) => prevCount + 1);
+          // Handle visibility change
+        }
+      };
+
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+      // Cleanup functions
       return () => {
         clearInterval(intervalId);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
       };
     };
 
     runDetection();
-  }, [handleObjectDetection]);
+  }, []);
 
   const toggleFullScreen = () => {
     const elem = document.documentElement;
@@ -75,7 +98,7 @@ const ObjectDetectionCanvas = () => {
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div>
       <div>
         <button onClick={toggleFullScreen}>
           {document.fullscreenElement ? "Exit Fullscreen" : "Enter Fullscreen"}
@@ -87,8 +110,12 @@ const ObjectDetectionCanvas = () => {
         style={{
           marginLeft: "auto",
           marginRight: "auto",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          top: 0,
+          textAlign: "center",
           zIndex: 9,
-          position: "absolute",
           width: 480,
           height: 480,
         }}
@@ -117,4 +144,4 @@ const ObjectDetectionCanvas = () => {
   );
 };
 
-export default ObjectDetectionCanvas;
+export default PoseCanvas;

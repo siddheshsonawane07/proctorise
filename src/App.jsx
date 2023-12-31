@@ -1,13 +1,13 @@
 import "./App.css";
-// import Detection2 from "./components/Detection2";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Canvas from "./components/canvas";
+import ObjectDetectionCanvas from "./components/objectcanvas";
+import PoseCanvas from "./components/posecanvas";
 
 function App() {
   return (
     <div>
-      <Canvas />
+      <PoseCanvas />
       <ToastContainer />
     </div>
   );
