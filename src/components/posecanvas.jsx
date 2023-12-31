@@ -1,114 +1,94 @@
-import React, { useRef, useEffect, useState } from "react";
-import * as tf from "@tensorflow/tfjs-core";
-import "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgl";
-import * as poseDetection from "@tensorflow-models/pose-detection";
+import React, { useRef } from "react";
+import * as tf from "@tensorflow/tfjs";
+import * as posenet from "@tensorflow-models/posenet";
 import Webcam from "react-webcam";
+import { drawKeypoints, drawSkeleton } from "./utilities_movent";
 
-const PoseCanvas = () => {
+function PoseDetectionCanvas() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const drawPoseKeypoints = (ctx, keypoints) => {
-    keypoints.forEach((keypoint) => {
-      if (keypoint.score > 0.5) {
-        ctx.beginPath();
-        ctx.arc(keypoint.x, keypoint.y, 3, 0, 2 * Math.PI);
-        ctx.fillStyle = "red";
-        ctx.fill();
-      }
+  //  Load posenet
+  const runPosenet = async () => {
+    const net = await posenet.load({
+      inputResolution: { width: 640, height: 480 },
+      scale: 0.8,
     });
+    //
+    setInterval(() => {
+      detect(net);
+    }, 100);
   };
 
-  useEffect(() => {
-    const runDetection = async () => {
-      await tf.ready();
+  const detect = async (net) => {
+    if (
+      typeof webcamRef.current !== "undefined" &&
+      webcamRef.current !== null &&
+      webcamRef.current.video.readyState === 4
+    ) {
+      // Get Video Properties
+      const video = webcamRef.current.video;
+      const videoWidth = webcamRef.current.video.videoWidth;
+      const videoHeight = webcamRef.current.video.videoHeight;
 
-      const detectorConfig = {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-      };
+      // Set video width
+      webcamRef.current.video.width = videoWidth;
+      webcamRef.current.video.height = videoHeight;
 
-      const detector = await poseDetection.createDetector(
-        poseDetection.SupportedModels.MoveNet,
-        detectorConfig
-      );
+      // Make Detections
+      const pose = await net.estimateSinglePose(video);
+      console.log(pose);
 
-      let intervalId;
+      drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
+    }
+  };
 
-      const detect = async () => {
-        if (!webcamRef.current || webcamRef.current.video.readyState !== 4) {
-          return;
-        }
+  const drawCanvas = (pose, video, videoWidth, videoHeight, canvas) => {
+    const ctx = canvas.current.getContext("2d");
+    canvas.current.width = videoWidth;
+    canvas.current.height = videoHeight;
 
-        const video = webcamRef.current.video;
+    drawKeypoints(pose["keypoints"], 0.6, ctx);
+    drawSkeleton(pose["keypoints"], 0.7, ctx);
+  };
 
-        // MoveNet detection
-        const poses = await detector.estimatePoses(video);
-
-        if (poses.length > 0) {
-          const canvas = canvasRef.current;
-          const ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          poses.forEach((pose) => {
-            drawPoseKeypoints(ctx, pose.keypoints);
-          });
-        } else {
-          // Handle case when no pose is detected
-          console.log("No one detected");
-        }
-      };
-
-      intervalId = setInterval(detect, 1000);
-
-      // Cleanup functions
-      return () => {
-        clearInterval(intervalId);
-      };
-    };
-
-    runDetection();
-  }, []);
+  runPosenet();
 
   return (
-    <div>
-      <Webcam
-        ref={webcamRef}
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          textAlign: "center",
-          zIndex: 9,
-          width: 480,
-          height: 480,
-        }}
-        videoConstraints={{
-          width: 1280,
-          height: 720,
-          facingMode: "user",
-        }}
-        screenshotFormat="image/jpeg" // Add this line
-      />
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          zIndex: 10,
-          width: 480, // Match the Webcam width
-          height: 480, // Match the Webcam height
-        }}
-      />
+    <div className="App">
+      <header className="App-header">
+        <Webcam
+          ref={webcamRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: 640,
+            height: 480,
+          }}
+        />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: 640,
+            height: 480,
+          }}
+        />
+      </header>
     </div>
   );
-};
+}
 
-export default PoseCanvas;
+export default PoseDetectionCanvas;
