@@ -8,7 +8,6 @@ import Webcam from "react-webcam";
 const PoseCanvas = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  const [visibilityCount, setVisibilityCount] = useState(0);
 
   const drawPoseKeypoints = (ctx, keypoints) => {
     keypoints.forEach((keypoint) => {
@@ -61,50 +60,17 @@ const PoseCanvas = () => {
 
       intervalId = setInterval(detect, 1000);
 
-      // Visibility change detection
-      const handleVisibilityChange = () => {
-        if (document.visibilityState === "visible") {
-          setVisibilityCount((prevCount) => prevCount + 1);
-          // Handle visibility change
-        }
-      };
-
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-
       // Cleanup functions
       return () => {
         clearInterval(intervalId);
-        document.removeEventListener(
-          "visibilitychange",
-          handleVisibilityChange
-        );
       };
     };
 
     runDetection();
   }, []);
 
-  const toggleFullScreen = () => {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-      elem.requestFullscreen().catch((err) => {
-        console.error(
-          `Error attempting to enable full-screen mode: ${err.message}`
-        );
-      });
-    } else {
-      document.exitFullscreen();
-    }
-  };
-
   return (
     <div>
-      <div>
-        <button onClick={toggleFullScreen}>
-          {document.fullscreenElement ? "Exit Fullscreen" : "Enter Fullscreen"}
-        </button>{" "}
-        <p>The text cannot be copied</p>
-      </div>
       <Webcam
         ref={webcamRef}
         style={{
