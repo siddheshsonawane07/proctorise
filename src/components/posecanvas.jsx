@@ -22,19 +22,19 @@ const PoseCanvas = () => {
   };
 
   useEffect(() => {
-    let intervalId;
-
     const runDetection = async () => {
       await tf.ready();
 
       const detectorConfig = {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
       };
 
       const detector = await poseDetection.createDetector(
         poseDetection.SupportedModels.MoveNet,
         detectorConfig
       );
+
+      let intervalId;
 
       const detect = async () => {
         if (!webcamRef.current || webcamRef.current.video.readyState !== 4) {
@@ -43,7 +43,7 @@ const PoseCanvas = () => {
 
         const video = webcamRef.current.video;
 
-        // PoseNet detection
+        // MoveNet detection
         const poses = await detector.estimatePoses(video);
 
         if (poses.length > 0) {
@@ -55,11 +55,11 @@ const PoseCanvas = () => {
           });
         } else {
           // Handle case when no pose is detected
-          console.log("no on detected");
+          console.log("No one detected");
         }
       };
 
-      intervalId = setInterval(detect, 3000);
+      intervalId = setInterval(detect, 1000);
 
       // Visibility change detection
       const handleVisibilityChange = () => {
@@ -124,6 +124,7 @@ const PoseCanvas = () => {
           height: 720,
           facingMode: "user",
         }}
+        screenshotFormat="image/jpeg" // Add this line
       />
       <canvas
         ref={canvasRef}
