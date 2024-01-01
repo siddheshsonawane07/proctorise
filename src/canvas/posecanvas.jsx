@@ -1,26 +1,26 @@
-// Import dependencies
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
-import * as cocossd from "@tensorflow-models/coco-ssd";
+import * as posenet from "@tensorflow-models/posenet";
 import Webcam from "react-webcam";
-import { drawRect } from "./utilities_coco";
+import { drawKeypoints, drawSkeleton } from "../utils/utilities_movent";
 
-function ObjectDetectionCanvas() {
+function PoseDetectionCanvas() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Main function
-  const runCoco = async () => {
-    const net = await cocossd.load();
-    console.log("Handpose model loaded.");
-    //  Loop and detect hands
+  //  Load posenet
+  const runPosenet = async () => {
+    const net = await posenet.load({
+      inputResolution: { width: 640, height: 480 },
+      scale: 0.8,
+    });
+    //
     setInterval(() => {
       detect(net);
-    }, 10);
+    }, 1000);
   };
 
   const detect = async (net) => {
-    // Check data is available
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
@@ -35,29 +35,30 @@ function ObjectDetectionCanvas() {
       webcamRef.current.video.width = videoWidth;
       webcamRef.current.video.height = videoHeight;
 
-      // Set canvas height and width
-      canvasRef.current.width = videoWidth;
-      canvasRef.current.height = videoHeight;
-
       // Make Detections
-      const obj = await net.detect(video);
+      const pose = await net.estimateSinglePose(video);
+      console.log(pose);
 
-      // Draw mesh
-      const ctx = canvasRef.current.getContext("2d");
-      drawRect(obj, ctx);
+      drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
     }
   };
 
-  useEffect(() => {
-    runCoco();
-  }, []);
+  const drawCanvas = (pose, video, videoWidth, videoHeight, canvas) => {
+    const ctx = canvas.current.getContext("2d");
+    canvas.current.width = videoWidth;
+    canvas.current.height = videoHeight;
+
+    drawKeypoints(pose["keypoints"], 0.6, ctx);
+    drawSkeleton(pose["keypoints"], 0.7, ctx);
+  };
+
+  runPosenet();
 
   return (
     <div className="App">
       <header className="App-header">
         <Webcam
           ref={webcamRef}
-          muted={true}
           style={{
             position: "absolute",
             marginLeft: "auto",
@@ -80,7 +81,7 @@ function ObjectDetectionCanvas() {
             left: 0,
             right: 0,
             textAlign: "center",
-            zindex: 8,
+            zindex: 9,
             width: 640,
             height: 480,
           }}
@@ -90,4 +91,4 @@ function ObjectDetectionCanvas() {
   );
 }
 
-export default ObjectDetectionCanvas;
+export default PoseDetectionCanvas;
