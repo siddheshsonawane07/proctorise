@@ -1,13 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
 import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  collection,
-} from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import {
   getStorage,
@@ -16,11 +9,9 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { firebaseConfig } from "../utils/firebase-config";
-import { toast } from "react-toastify";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
 const storage = getStorage(app);
 
 const FaceVerification = () => {
@@ -28,27 +19,28 @@ const FaceVerification = () => {
   const [isMatched, setIsMatched] = useState(false);
   const videoRef = useRef();
 
-  //   useEffect(() => {
-  //     // Load face-api.js models
-  //     Promise.all([
-  //       faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
-  //       faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-  //       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-  //     ]).then(() => {
-  //       console.log("Face-api.js models loaded");
-  //       // Now you can start using face-api.js functions
-  //     });
-  //   }, []);
-
   useEffect(() => {
+    // Load face-api.js models for face recognition
     Promise.all([
       faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
-      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      faceapi.nets.faceExpressionNet.loadFromUri("/models"),
-    ]);
-    // loadReferenceImage();
+    ]).then(() => {
+      console.log("Face-api.js models loaded");
+      initializeVideoStream();
+    });
   }, []);
+
+  const initializeVideoStream = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+      videoRef.current.onloadeddata = () => {
+        console.log("Video stream loaded");
+      };
+    } catch (error) {
+      console.error("Error initializing video stream:", error);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -66,9 +58,6 @@ const FaceVerification = () => {
   };
 
   const uploadReferenceImage = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoRef.current.srcObject = stream;
-
     return new Promise(async (resolve, reject) => {
       videoRef.current.onloadeddata = async () => {
         const canvas = document.createElement("canvas");
@@ -93,8 +82,6 @@ const FaceVerification = () => {
           resolve(downloadURL);
         } catch (error) {
           reject(error);
-        } finally {
-          stream.getTracks().forEach((track) => track.stop());
         }
       };
     });
@@ -102,13 +89,18 @@ const FaceVerification = () => {
 
   const verifyFace = async () => {
     try {
-        const detections = await faceapi
-        .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions({
-          inputSize: 512, // Adjust inputSize for better detection
-        }))
+      const detections = await faceapi
+        .detectAllFaces(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 512, // Adjust inputSize for better detection
+          })
+        )
         .withFaceLandmarks()
         .withFaceDescriptors();
-      
+
+      console.log("Detections:", detections);
+
       if (detections.length > 0) {
         const faceMatcher = new faceapi.FaceMatcher(detections);
         const bestMatch = faceMatcher.findBestMatch(referenceImageURL);
