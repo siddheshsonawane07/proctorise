@@ -1,139 +1,73 @@
-import { useRef, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as faceapi from "face-api.js";
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import {
-  getStorage,
-  ref,
-  uploadString,
-  getDownloadURL,
-} from "firebase/storage";
-import { firebaseConfig } from "../utils/firebase-config";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-const FaceVerification = () => {
-  const [referenceImageURL, setReferenceImageURL] = useState(null);
-  const [isMatched, setIsMatched] = useState(false);
-  const videoRef = useRef();
+const FaceRecognition = () => {
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [faceMatcher, setFaceMatcher] = useState(null);
 
   useEffect(() => {
-    // Load face-api.js models for face recognition
-    Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
-      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      faceapi.nets.faceExpressionNet.loadFromUri("/models"),
-    ]).then(() => {
-      console.log("Face-api.js models loaded");
-      initializeVideoStream();
-    });
+    // Load faceapi models
+    const loadModels = async () => {
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      setIsModelLoaded(true);
+    };
+
+    loadModels();
   }, []);
 
-  const initializeVideoStream = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
-      videoRef.current.onloadeddata = () => {
-        console.log("Video stream loaded");
-      };
-    } catch (error) {
-      console.error("Error initializing video stream:", error);
-    }
-  };
+  const handleImageLoad = async (imageUrl) => {
+    const proxyUrl = "http://localhost:3001/proxy?url="; // Update with your proxy server URL
+    const response = await fetch(`${proxyUrl}${encodeURIComponent(imageUrl)}`);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(getAuth(), provider);
-      const user = result.user;
-      console.log("Google Sign-In Successful:", user);
+    if (response.ok) {
+      // const queryImage = await response.blob();
+      const queryImage = await faceapi.fetchImage(imageUrl);
 
-      // Set the reference image URL when the user signs in
-      const referenceImageURL = await uploadReferenceImage();
-      setReferenceImageURL(referenceImageURL);
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-    }
-  };
-
-  const uploadReferenceImage = async () => {
-    return new Promise(async (resolve, reject) => {
-      videoRef.current.onloadeddata = async () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
-
-        const context = canvas.getContext("2d");
-        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-        const dataURL = canvas.toDataURL("image/png");
-
-        try {
-          const storageRef = ref(
-            getStorage(),
-            `reference-images/${Date.now()}.png`
-          );
-          await uploadString(storageRef, dataURL, "data_url");
-
-          // Get the download URL of the uploaded image
-          const downloadURL = await getDownloadURL(storageRef);
-
-          resolve(downloadURL);
-        } catch (error) {
-          reject(error);
-        }
-      };
-    });
-  };
-
-  const verifyFace = async () => {
-    try {
-      const detections = await faceapi
-        .detectAllFaces(
-          videoRef.current,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 512, // Adjust inputSize for better detection
-          })
-        )
+      const singleResult = await faceapi
+        .detectSingleFace(queryImage)
         .withFaceLandmarks()
-        .withFaceDescriptors();
+        .withFaceDescriptor();
 
-      console.log("Detections:", detections);
-
-      if (detections.length > 0) {
-        const faceMatcher = new faceapi.FaceMatcher(detections);
-        const bestMatch = faceMatcher.findBestMatch(referenceImageURL);
-
-        // You can set a threshold for face matching confidence
-        const threshold = 0.6;
-
-        if (bestMatch._distance < threshold) {
-          console.log("Face match successful!");
-          setIsMatched(true);
-        } else {
-          console.log("Face match failed.");
-          setIsMatched(false);
-        }
-      } else {
-        console.log("No faces detected.");
+      // Match with reference descriptors
+      if (singleResult && faceMatcher) {
+        const bestMatch = faceMatcher.findBestMatch(singleResult.descriptor);
+        console.log(bestMatch.toString());
+        // Do something with the result, e.g., display it on the UI
       }
-    } catch (error) {
-      console.error("Error verifying face:", error);
+    } else {
+      console.error("Failed to fetch image from proxy");
     }
   };
+
+  // Assuming you have labeled reference descriptors
+  useEffect(() => {
+    const labeledDescriptors = [
+      new faceapi.LabeledFaceDescriptors("obama", [
+        /* descriptorObama1, descriptorObama2 */
+      ]),
+      new faceapi.LabeledFaceDescriptors("trump", [
+        /* descriptorTrump */
+      ]),
+      // Add more labeled descriptors as needed
+    ];
+
+    const newFaceMatcher = new faceapi.FaceMatcher(labeledDescriptors);
+    setFaceMatcher(newFaceMatcher);
+  }, []);
 
   return (
     <div>
-      <h1>Face Verification</h1>
-      <button onClick={handleGoogleSignIn}>Sign In with Google</button>
-      <button onClick={verifyFace}>Verify Face</button>
-      {isMatched && <p>Images Matched!</p>}
-      <video ref={videoRef} autoPlay />
+      <h1>Face Recognition App</h1>
+      <input
+        type="text"
+        placeholder="Enter Image URL"
+        onChange={(e) => handleImageLoad(e.target.value)}
+      />
+      {/* Add any UI elements or feedback for the recognition result */}
     </div>
   );
 };
 
-export default FaceVerification;
+export default FaceRecognition;
