@@ -1,12 +1,12 @@
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Detection from "./components/Detection";
+import FaceRecognitionComponent from "./components/face_verification";
 
 function App() {
   return (
     <div>
-      <Detection />
+      <FaceRecognitionComponent />
       <ToastContainer />
     </div>
   );
