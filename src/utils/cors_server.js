@@ -17,7 +17,7 @@ const server = http.createServer((req, res) => {
 
   // Proxy requests to the actual Firebase Storage URL
   if (req.url.startsWith("/proxy")) {
-    req.url = req.url.replace("/proxy?url=", ""); // Remove '/proxy' from the URL
+    req.url = req.url.replace("/?url=", ""); // Remove '/proxy' from the URL
     proxy.web(req, res, { target: "https://firebasestorage.googleapis.com" });
   }
 });
