@@ -22,14 +22,14 @@ const FaceRecognitionComponent = () => {
 
     const getLabeledFaceDescriptions = async () => {
       console.log("Fetching labeled face descriptions...");
-      const labels = ["siddhesh"];
+      const labels = [""]; //put your own name
       return Promise.all(
         labels.map(async (label) => {
           const descriptions = [];
           // const img = await faceapi.fetchImage(`./labels/${label}/1.jpg`);
-          const img = await faceapi.fetchImage(
-            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
-          ); // Use a specific image (e.g., 1.jpg)
+
+          //put your own image
+          const img = await faceapi.fetchImage(""); // Use a specific image (e.g., 1.jpg)
 
           console.log("Image fetched:", img);
           const detections = await faceapi
@@ -99,9 +99,7 @@ const FaceRecognitionComponent = () => {
 
     loadModelsAndSetupFaceRecognition();
 
-    return () => {
-      // Cleanup code if needed
-    };
+    return () => {};
   }, []);
 
   return <video ref={videoRef} autoPlay playsInline muted />;
