@@ -1,111 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import * as tf from "@tensorflow/tfjs-core";
+import * as poseDetection from "@tensorflow-models/pose-detection";
+import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
-import * as tf from "@tensorflow/tfjs-core";
-import "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgl";
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
 
 const Detection = () => {
   const webcamRef = useRef(null);
-  const [isWebcamStarted, setWebcamStarted] = useState(false);
 
-  const loadModels = async () => {
-    try {
-      // Load face detection models
-      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-      console.log("SSD MobileNet loaded");
-
-      // Load face recognition models
-      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
-      console.log("Face recognition loaded");
-
-      // Load face landmark detection models
-      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-      console.log("Face landmarks loaded");
-
-      // Adjust the threshold
-      faceapi.SsdMobilenetv1Options.minConfidence = 0.5;
-    } catch (error) {
-      console.error("Error loading face recognition models:", error);
-    }
-  };
-
-  const startWebcam = async () => {
-    try {
-      console.log("Starting webcam...");
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      });
-      webcamRef.current.srcObject = stream;
-      setWebcamStarted(true);
-    } catch (error) {
-      console.error("Error starting webcam:", error);
-    }
-  };
-
-  const setupFaceRecognition = async () => {
-    console.log("Setting up face recognition...");
-
-    try {
-      const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-      console.log("Labeled face descriptors:", labeledFaceDescriptors);
-
-      const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-
-      setInterval(async () => {
-        if (isWebcamStarted) {
-          const detections = await faceapi
-            .detectAllFaces(webcamRef.current.video)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
-
-          detections.forEach((detection) => {
-            const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-
-            if (bestMatch.distance < 0.5) {
-              console.log(
-                `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
-              );
-            } else {
-              console.log("Face not recognized.");
-            }
-          });
-        }
-      }, 3000);
-    } catch (error) {
-      console.error("Error setting up face recognition:", error);
-    }
-  };
-
-  const getLabeledFaceDescriptions = async () => {
-    console.log("Fetching labeled face descriptions...");
-    const labels = ["siddhesh"]; // put your own name
-    return Promise.all(
-      labels.map(async (label) => {
-        try {
-          const descriptions = [];
-          const img = await faceapi.fetchImage(
-            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
-          );
-
-          console.log("Image fetched");
-          const detections = await faceapi
-            .detectSingleFace(img)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-          descriptions.push(detections.descriptor);
-          console.log("Labeled face descriptions fetched:", descriptions);
-          return new faceapi.LabeledFaceDescriptors(label, descriptions);
-        } catch (error) {
-          console.error("Error fetching labeled face descriptions:", error);
-        }
-      })
-    );
-  };
-
-  const handleObjectDetection = async (predictions) => {
+  const handleObjectDetection = useCallback(async (predictions) => {
     let faceCount = 0;
 
     predictions.forEach((prediction) => {
@@ -125,30 +28,139 @@ const Detection = () => {
         "error"
       );
     }
-  };
+  }, []);
 
-  const detect = async () => {
-    await tf.ready();
+  const earsDetect = (keypoints, minConfidence) => {
+    const keypointEarL = keypoints[3];
+    const keypointEarR = keypoints[4];
 
-    if (!webcamRef.current || webcamRef.current.video.readyState !== 4) {
-      return;
+    if (
+      keypointEarL.score < minConfidence ||
+      keypointEarR.score < minConfidence
+    ) {
+      console.log("You looked away from the screen");
     }
-
-    const video = webcamRef.current.video;
-
-    const objectModel = await cocoSsd.load();
-
-    // Object Detection
-    const predictions = await objectModel.detect(video);
-    handleObjectDetection(predictions);
   };
 
   useEffect(() => {
-    loadModels();
-    startWebcam();
-    setupFaceRecognition();
-    detect();
-  }, [isWebcamStarted]);
+    let intervalId;
+
+    const runDetection = async () => {
+      await tf.ready();
+
+      const objectModel = await cocoSsd.load();
+
+      const detectorConfig = {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+      };
+
+      const detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        detectorConfig
+      );
+
+      const detect = async () => {
+        if (!webcamRef.current || webcamRef.current.video.readyState !== 4) {
+          return;
+        }
+
+        const video = webcamRef.current.video;
+
+        // Object Detection
+        const predictions = await objectModel.detect(video);
+        handleObjectDetection(predictions);
+
+        // PoseNet detection
+        const poses = await detector.estimatePoses(video);
+
+        if (poses.length > 0) {
+          earsDetect(poses[0].keypoints, 0.5);
+        } else {
+          console.log("No one detected");
+        }
+      };
+
+      loadModelsAndSetupFaceRecognition();
+
+      intervalId = setInterval(detect, 6000);
+
+      // Cleanup functions
+      return () => {
+        clearInterval(intervalId);
+      };
+    };
+
+    runDetection();
+  }, [handleObjectDetection]);
+
+  const getLabeledFaceDescriptions = async () => {
+    console.log("Fetching labeled face descriptions...");
+    const labels = ["siddhesh"]; //put your own name
+    return Promise.all(
+      labels.map(async (label) => {
+        const descriptions = [];
+        // const img = await faceapi.fetchImage(`./labels/${label}/1.jpg`);
+
+        //put your own image
+        const img = await faceapi.fetchImage(
+          "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
+        ); // Use a specific image (e.g., 1.jpg)
+
+        console.log("Image fetched");
+        const detections = await faceapi
+          .detectSingleFace(img)
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+        descriptions.push(detections.descriptor);
+        console.log("Labeled face descriptions fetched:", descriptions);
+        return new faceapi.LabeledFaceDescriptors(label, descriptions);
+      })
+    );
+  };
+
+  const setupFaceRecognition = async () => {
+    console.log("Setting up face recognition...");
+    const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+    console.log("Labeled face descriptors:", labeledFaceDescriptors);
+
+    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+    setInterval(async () => {
+      const detections = await faceapi
+        .detectAllFaces()
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      // Iterate over detected faces
+      detections.forEach((detection, i) => {
+        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+        // Check if the best match has a certain level of confidence (adjust threshold as needed)
+        if (bestMatch.distance < 0.5) {
+          console.log(
+            `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
+          );
+        } else {
+          console.log("Face not recognized.");
+        }
+      });
+    }, 3000);
+  };
+
+  const loadModelsAndSetupFaceRecognition = async () => {
+    console.log("Loading models...");
+    await Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    ]);
+    console.log("Models loaded");
+
+    // Adjust the threshold
+    faceapi.SsdMobilenetv1Options.minConfidence = 0.5;
+
+    await setupFaceRecognition();
+  };
 
   return (
     <div>
