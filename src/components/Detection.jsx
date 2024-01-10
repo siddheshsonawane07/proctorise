@@ -115,32 +115,33 @@ const Detection = () => {
       // Adjust the threshold
       faceapi.SsdMobilenetv1Options.minConfidence = 0.5;
 
-      await setupFaceRecognition(webcamRef.current.video);
+      setInterval(async () => {
+        await setupFaceRecognition(webcamRef.current.video);
 
-      const objectModel = await cocoSsd.load();
+        const objectModel = await cocoSsd.load();
 
-      const detectorConfig = {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
-      };
+        const detectorConfig = {
+          modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+        };
 
-      const detector = await poseDetection.createDetector(
-        poseDetection.SupportedModels.MoveNet,
-        detectorConfig
-      );
+        const detector = await poseDetection.createDetector(
+          poseDetection.SupportedModels.MoveNet,
+          detectorConfig
+        );
 
-      const predictions = await objectModel.detect(webcamRef.current.video);
-      objectDetection(predictions);
+        const predictions = await objectModel.detect(webcamRef.current.video);
+        objectDetection(predictions);
 
-      // PoseNet detection
-      const poses = await detector.estimatePoses(webcamRef.current.video);
+        // PoseNet detection
+        const poses = await detector.estimatePoses(webcamRef.current.video);
 
-      if (poses.length > 0) {
-        earsDetect(poses[0].keypoints, 0.5);
-      } else {
-        console.log("No one detected");
-      }
+        if (poses.length > 0) {
+          earsDetect(poses[0].keypoints, 0.5);
+        } else {
+          console.log("No one detected");
+        }
+      }, 6000);
     };
-
     loadModels();
   }, []);
 
