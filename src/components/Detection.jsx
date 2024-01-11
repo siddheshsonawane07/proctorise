@@ -11,13 +11,13 @@ const Detection = () => {
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       console.log("Fetching labeled face descriptions...");
+      //put your name
       const labels = ["siddhesh"];
       return Promise.all(
         labels.map(async (label) => {
           const descriptions = [];
-          const img = await faceapi.fetchImage(
-            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
-          );
+          //put your image
+          const img = await faceapi.fetchImage("");
 
           console.log("Image fetched");
           const detections = await faceapi
@@ -54,7 +54,7 @@ const Detection = () => {
             console.log("Face not recognized.");
           }
         });
-      }, 30000);
+      }, 3000);
     };
 
     // const detect = async () => {
