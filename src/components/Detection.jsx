@@ -33,7 +33,7 @@ const Detection = () => {
     const setupFaceRecognition = async (video) => {
       console.log("Setting up face recognition...");
       const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-      console.log("Labeled face descriptors:", labeledFaceDescriptors);
+      // console.log("Labeled face descriptors:", labeledFaceDescriptors);
 
       const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
@@ -54,7 +54,7 @@ const Detection = () => {
             console.log("Face not recognized.");
           }
         });
-      }, 3000);
+      }, 30000);
     };
 
     // const detect = async () => {
@@ -139,7 +139,7 @@ const Detection = () => {
         } else {
           console.log("No one detected");
         }
-      }, 6000);
+      }, 3000);
     };
 
     loadModels();
