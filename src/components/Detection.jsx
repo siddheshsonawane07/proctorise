@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import * as faceapi from "face-api.js";
 import Webcam from "react-webcam";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
+import * as faceapi from "@vladmandic/face-api";
 
 const Detection = () => {
   const webcamRef = useRef(null);
@@ -37,24 +37,24 @@ const Detection = () => {
 
       const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
-      // setInterval(async () => {
-      const detections = await faceapi
-        .detectAllFaces(video)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
+      setInterval(async () => {
+        const detections = await faceapi
+          .detectAllFaces(video)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
 
-      detections.forEach((detection, i) => {
-        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+        detections.forEach((detection, i) => {
+          const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
-        if (bestMatch.distance < 0.5) {
-          console.log(
-            `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
-          );
-        } else {
-          console.log("Face not recognized.");
-        }
-      });
-      // }, 1000);
+          if (bestMatch.distance < 0.5) {
+            console.log(
+              `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
+            );
+          } else {
+            console.log("Face not recognized.");
+          }
+        });
+      }, 3000);
     };
 
     // const detect = async () => {
@@ -104,7 +104,6 @@ const Detection = () => {
     const loadModels = async () => {
       console.log("Loading models...");
       await tf.ready();
-
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
         faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
@@ -115,9 +114,9 @@ const Detection = () => {
       // Adjust the threshold
       faceapi.SsdMobilenetv1Options.minConfidence = 0.5;
 
-      setInterval(async () => {
-        await setupFaceRecognition(webcamRef.current.video);
+      await setupFaceRecognition(webcamRef.current.video);
 
+      setInterval(async () => {
         const objectModel = await cocoSsd.load();
 
         const detectorConfig = {
@@ -142,6 +141,7 @@ const Detection = () => {
         }
       }, 6000);
     };
+
     loadModels();
   }, []);
 
