@@ -1,9 +1,8 @@
 import React, { useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase-config";
-import UploadImage from "../components/uploadImage";
-
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { UploadImage } from "../components/UploadImage";
 
 const AuthProvider = ({ children }) => {
   const [user] = useAuthState(auth);
@@ -22,6 +21,10 @@ const AuthProvider = ({ children }) => {
 
   return (
     <div>
+      <header className="App-header">
+        <p>Welcome to Proctorise</p>
+        AI Enabled Virtual Examination System
+      </header>
       <button onClick={handleGoogleSignIn}>Sign in with Google</button>
       <UploadImage webcamRef={webcamRef} user={user} />;
     </div>

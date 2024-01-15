@@ -4,7 +4,7 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-import UploadImage from "./uploadImage";
+// import UploadImage from "./UploadImage";
 
 const Detection = (user, webcamRef) => {
   // const webcamRef = useRef(null);
