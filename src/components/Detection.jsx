@@ -6,18 +6,20 @@ import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
 import UploadImage from "./uploadImage";
 
-const Detection = () => {
-  const webcamRef = useRef(null);
+const Detection = (user, webcamRef) => {
+  // const webcamRef = useRef(null);
 
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       console.log("Fetching labeled face descriptions...");
-      const labels = ["siddhesh"];
+      //put user.email
+      const labels = [];
       const descriptions = [];
 
       // Use Promise.all to fetch images asynchronously
       await Promise.all(
-        labels.map(async (label) => {
+        labels.map(async () => {
+          //put image hyperlink
           const img = await faceapi.fetchImage();
 
           console.log("Image fetched");
@@ -54,7 +56,8 @@ const Detection = () => {
             console.log("Face not recognized.");
           }
         });
-      }, 3000);
+        console.log(user);
+      }, 6000);
     };
 
     const objectDetection = (predictions) => {
@@ -157,7 +160,7 @@ const Detection = () => {
         }}
         screenshotFormat="image/png"
       />
-      <UploadImage webcamRef={webcamRef} />
+      {/* <UploadImage webcamRef={webcamRef} /> */}
     </div>
   );
 };
