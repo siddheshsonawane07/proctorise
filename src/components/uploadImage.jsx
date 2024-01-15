@@ -6,7 +6,6 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../utils/firebase-config";
-import Webcam from "react-webcam";
 
 const UploadImage = ({ user, webcamRef }) => {
   const storage = getStorage(app);

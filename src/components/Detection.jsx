@@ -3,20 +3,22 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
+import { app } from "../utils/firebase-config";
 
 const Detection = ({ user, webcamRef }) => {
+  const storage = getStorage(app);
+
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       //put user.email
-      const labels = ["siddhesh"];
+      const labels = [`${user.email}`];
+
       const descriptions = [];
 
       await Promise.all(
         labels.map(async () => {
           //put image hyperlink
-          const img = await faceapi.fetchImage(
-            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
-          );
+          const img = await faceapi.fetchImage();
           const detections = await faceapi
             .detectSingleFace(img)
             .withFaceLandmarks()
