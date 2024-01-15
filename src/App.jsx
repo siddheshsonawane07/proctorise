@@ -7,7 +7,8 @@ import UploadImage from "./components/uploadImage";
 function App() {
   return (
     <div>
-      <UploadImage />
+      {/* <UploadImage /> */}
+      <Detection />
       <ToastContainer />
     </div>
   );

@@ -11,9 +11,8 @@ import { auth, app } from "../utils/firebase-config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const UploadImage = () => {
+const UploadImage = ({ webcamRef}) => {
   const storage = getStorage(app);
-  const webcamRef = useRef(null);
   const [user] = useAuthState(auth);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -46,12 +45,7 @@ const UploadImage = () => {
     if (image) {
       try {
         setUploading(true);
-        const timestamp = new Date()
-          .toISOString()
-          .replace(/:/g, "-")
-          .replace(/\.\d{3}/, "");
 
-        const filename = `image-${timestamp}.png`;
         const storageRef = ref(storage, `/images/${user.email}`);
 
         const imageBlob = await fetch(image);
@@ -68,7 +62,6 @@ const UploadImage = () => {
             setProgress(progress);
           },
           (error) => {
-            // Handle errors here
             console.error(error);
           },
           () => {
@@ -86,13 +79,14 @@ const UploadImage = () => {
   return (
     <div>
       <button onClick={handleGoogleSignIn}>Sign in with Google</button>
-      <Webcam ref={webcamRef} screenshotFormat="image/png" />
+      {/* <Webcam ref={webcamRef} screenshotFormat="image/png" /> */}
       <button onClick={capture}>Capture Photo</button>
       {image && (
         <>
           <button onClick={uploadImageFunction}> Upload Photo </button>
         </>
       )}
+
       {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
     </div>
   );

@@ -4,6 +4,7 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
+import UploadImage from "./uploadImage";
 
 const Detection = () => {
   const webcamRef = useRef(null);
@@ -17,9 +18,7 @@ const Detection = () => {
       // Use Promise.all to fetch images asynchronously
       await Promise.all(
         labels.map(async (label) => {
-          const img = await faceapi.fetchImage(
-            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
-          );
+          const img = await faceapi.fetchImage();
 
           console.log("Image fetched");
           const detections = await faceapi
@@ -156,7 +155,9 @@ const Detection = () => {
           height: 720,
           facingMode: "user",
         }}
+        screenshotFormat="image/png"
       />
+      <UploadImage webcamRef={webcamRef} />
     </div>
   );
 };
