@@ -1,28 +1,22 @@
-import React, { useEffect, useRef } from "react";
-import Webcam from "react-webcam";
+import React, { useEffect } from "react";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-// import UploadImage from "./UploadImage";
 
-const Detection = (user, webcamRef) => {
-  // const webcamRef = useRef(null);
-
+const Detection = ({ user, webcamRef }) => {
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
-      console.log("Fetching labeled face descriptions...");
       //put user.email
-      const labels = [];
+      const labels = ["siddhesh"];
       const descriptions = [];
 
-      // Use Promise.all to fetch images asynchronously
       await Promise.all(
         labels.map(async () => {
           //put image hyperlink
-          const img = await faceapi.fetchImage();
-
-          console.log("Image fetched");
+          const img = await faceapi.fetchImage(
+            "https://firebasestorage.googleapis.com/v0/b/compiler-15a57.appspot.com/o/1.jpg?alt=media&token=d331e175-8acf-4028-9d51-6f72ff6c1062"
+          );
           const detections = await faceapi
             .detectSingleFace(img)
             .withFaceLandmarks()
@@ -35,7 +29,6 @@ const Detection = (user, webcamRef) => {
     };
 
     const setupFaceRecognition = async (video) => {
-      console.log("Setting up face recognition...");
       const labeledFaceDescriptors = await getLabeledFaceDescriptions();
       const faceMatcher = new faceapi.FaceMatcher([labeledFaceDescriptors]);
 
@@ -56,7 +49,6 @@ const Detection = (user, webcamRef) => {
             console.log("Face not recognized.");
           }
         });
-        console.log(user);
       }, 6000);
     };
 
@@ -97,7 +89,6 @@ const Detection = (user, webcamRef) => {
     };
 
     const loadModels = async () => {
-      console.log("Loading models...");
       await tf.ready();
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
@@ -136,33 +127,6 @@ const Detection = (user, webcamRef) => {
 
     loadModels();
   }, []);
-
-  return (
-    <div>
-      <Webcam
-        ref={webcamRef}
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          textAlign: "center",
-          zIndex: 9,
-          width: 480,
-          height: 480,
-        }}
-        videoConstraints={{
-          width: 1280,
-          height: 720,
-          facingMode: "user",
-        }}
-        screenshotFormat="image/png"
-      />
-      {/* <UploadImage webcamRef={webcamRef} /> */}
-    </div>
-  );
 };
 
 export default Detection;
