@@ -9,22 +9,27 @@ import {
 } from "firebase/storage";
 import { auth, app } from "../utils/firebase-config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const UploadImage = () => {
   const storage = getStorage(app);
-  const provider = new GoogleAuthProvider();
   const webcamRef = useRef(null);
-  const [user, setUser] = useState(null);
+  const [user] = useAuthState(auth);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadError, setUploadError] = useState(null);
 
-  // const signIn = () => {
-  //   signInWithPopup(auth, provider).then().catch((error) => {
-  //     console.log(error);
-  //   });
-  // };
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      // const user = result.user;
+      console.log(user);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
 
   const capture = () => {
     const video = webcamRef.current.video;
@@ -45,8 +50,9 @@ const UploadImage = () => {
           .toISOString()
           .replace(/:/g, "-")
           .replace(/\.\d{3}/, "");
+
         const filename = `image-${timestamp}.png`;
-        const storageRef = ref(storage, `/images/${filename}`);
+        const storageRef = ref(storage, `/images/${user.email}`);
 
         const imageBlob = await fetch(image);
         const imageBytes = await imageBlob.blob();
@@ -79,12 +85,11 @@ const UploadImage = () => {
 
   return (
     <div>
-      {/* <button onClick={signIn}> Sign in </button> */}
+      <button onClick={handleGoogleSignIn}>Sign in with Google</button>
       <Webcam ref={webcamRef} screenshotFormat="image/png" />
       <button onClick={capture}>Capture Photo</button>
       {image && (
         <>
-          <img src={image} alt="Captured" />
           <button onClick={uploadImageFunction}> Upload Photo </button>
         </>
       )}
