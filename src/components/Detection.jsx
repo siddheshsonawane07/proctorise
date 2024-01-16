@@ -3,11 +3,8 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-import { app } from "../utils/firebase-config";
 
 const Detection = ({ user, webcamRef }) => {
-  const storage = getStorage(app);
-
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       //put user.email
