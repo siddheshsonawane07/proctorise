@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   getStorage,
   ref,
@@ -13,6 +13,7 @@ const UploadImage = ({ user, webcamRef }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadError, setUploadError] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
 
   const capture = () => {
     if (webcamRef.current && webcamRef.current.video) {
@@ -54,7 +55,7 @@ const UploadImage = ({ user, webcamRef }) => {
           },
           () => {
             getDownloadURL(uploadTask.task.snapshot.ref).then((downloadURL) => {
-              console.log("File available at", downloadURL);
+              setImageLink(downloadURL);
             });
           }
         );
@@ -70,6 +71,7 @@ const UploadImage = ({ user, webcamRef }) => {
       {image && (
         <>
           <button onClick={uploadImageFunction}> Upload Photo </button>
+          
         </>
       )}
       {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}

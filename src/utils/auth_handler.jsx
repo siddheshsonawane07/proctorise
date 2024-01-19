@@ -1,21 +1,39 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "./firebase-config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { auth, app } from "./firebase-config";
 import UploadImage from "../components/UploadImage";
 import Detection from "../components/Detection";
 
 const AuthProvider = () => {
   const [user] = useAuthState(auth);
   const webcamRef = useRef(null);
+  const [hasStorageRef, setHasStorageRef] = useState(false);
+  const storage = getStorage(app);
+
+  useEffect(() => {
+    const checkStorageRef = async () => {
+      const storageRef = ref(storage, `/images/${user.email}`);
+      try {
+        await getDownloadURL(storageRef);
+        setHasStorageRef(true);
+      } catch (error) {
+        setHasStorageRef(false);
+      }
+    };
+
+    if (user) {
+      checkStorageRef();
+    }
+  }, [user, storage]);
 
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // const user = result.user;
-      console.log(user.displayName);
+      console.log(result.user.displayName);
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }
@@ -29,15 +47,17 @@ const AuthProvider = () => {
       </header>
 
       {user ? (
-        //when the user is logged in
-        <Detection user={user} webcamRef={webcamRef} />
-      ) : (
-        // when the user is not logged in
-        <div>
-          <button onClick={handleGoogleSignIn}>Sign in with Google</button>
-
+        hasStorageRef ? (
+          <Detection
+            user={user}
+            webcamRef={webcamRef}
+            storageRef={storageRef}
+          />
+        ) : (
           <UploadImage user={user} webcamRef={webcamRef} />
-        </div>
+        )
+      ) : (
+        <button onClick={handleGoogleSignIn}>Sign in with Google</button>
       )}
 
       <div>

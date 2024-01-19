@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
 
-const Detection = ({ user, webcamRef }) => {
+const Detection = ({ user, webcamRef, storageRef }) => {
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       //put user.email
@@ -15,7 +15,11 @@ const Detection = ({ user, webcamRef }) => {
       await Promise.all(
         labels.map(async () => {
           //put image hyperlink
-          const img = await faceapi.fetchImage();
+
+          const listImage = storage.ref;
+          const img = await faceapi.fetchImage(
+            `https://firebasestorage.googleapis.com/v0/b/proctorise-9e9b9.appspot.com/o/images/${user.email}`
+          );
           const detections = await faceapi
             .detectSingleFace(img)
             .withFaceLandmarks()
