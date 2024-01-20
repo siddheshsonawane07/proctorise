@@ -4,22 +4,17 @@ import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
 
-const Detection = ({ user, webcamRef, storageRef }) => {
+const Detection = ({ user, webcamRef, imageLink }) => {
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
-      //put user.email
-      const labels = [`${user.email}`];
+      const labels = [`${user.displayName}`];
 
       const descriptions = [];
 
       await Promise.all(
         labels.map(async () => {
-          //put image hyperlink
-
-          const listImage = storage.ref;
-          const img = await faceapi.fetchImage(
-            `https://firebasestorage.googleapis.com/v0/b/proctorise-9e9b9.appspot.com/o/images/${user.email}`
-          );
+          console.log(imageLink);
+          const img = await faceapi.fetchImage(imageLink);
           const detections = await faceapi
             .detectSingleFace(img)
             .withFaceLandmarks()
@@ -64,18 +59,14 @@ const Detection = ({ user, webcamRef, storageRef }) => {
         } else if (
           ["cell phone", "book", "laptop"].includes(prediction.class)
         ) {
-          console.log("Action has been Recorded");
+          console.log("Object Detected, Action has been Recorded");
         }
       });
 
       if (faceCount > 1) {
         console.log("Multiple People Detected");
       } else if (faceCount === 0) {
-        console.log(
-          "No Face Detected",
-          "Please ensure your face is visible",
-          "error"
-        );
+        console.log("No Face Detected");
       }
     };
 

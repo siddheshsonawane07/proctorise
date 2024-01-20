@@ -1,24 +1,26 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { auth, app } from "./firebase-config";
-import UploadImage from "../components/UploadImage";
-import Detection from "../components/Detection";
+import { auth, app } from "../utils/firebase-config";
+import UploadImage from "./UploadImage";
+import Detection from "./Detection";
 
-const AuthProvider = () => {
+const Home = () => {
   const [user] = useAuthState(auth);
   const webcamRef = useRef(null);
   const [hasStorageRef, setHasStorageRef] = useState(false);
+  const [imageLink, setimageLink] = useState(null);
   const storage = getStorage(app);
 
   useEffect(() => {
     const checkStorageRef = async () => {
       const storageRef = ref(storage, `/images/${user.email}`);
       try {
-        await getDownloadURL(storageRef);
+        const imageLink = await getDownloadURL(storageRef);
         setHasStorageRef(true);
+        setimageLink(imageLink);
       } catch (error) {
         setHasStorageRef(false);
       }
@@ -48,11 +50,7 @@ const AuthProvider = () => {
 
       {user ? (
         hasStorageRef ? (
-          <Detection
-            user={user}
-            webcamRef={webcamRef}
-            storageRef={storageRef}
-          />
+          <Detection user={user} webcamRef={webcamRef} imageLink={imageLink} />
         ) : (
           <UploadImage user={user} webcamRef={webcamRef} />
         )
@@ -87,4 +85,4 @@ const AuthProvider = () => {
   );
 };
 
-export default AuthProvider;
+export default Home;
