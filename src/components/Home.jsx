@@ -79,7 +79,7 @@ const Home = () => {
         <Typography variant="subtitle1" className={classes.subtitle}>
           Secure your online exams with our advanced proctoring solutions.
         </Typography>
-        <Button variant="contained" color="secondary" size="large">Sign In Bro</Button>
+        <Button variant="contained" color="secondary" size="large">Sign In Bhai</Button>
       </div>
       <div className={classes.features}>
         <div className={classes.feature}>
