@@ -6,6 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import PageNotFound from "./components/404";
+import MainPage from "./components/MainPage";
+import SignIn from "./components/SignIn";
 import Home from "./components/Home";
 
 class App extends Component {
@@ -13,7 +15,9 @@ class App extends Component {
     return (
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<MainPage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/404" element={<PageNotFound />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>

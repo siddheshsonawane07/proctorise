@@ -13,7 +13,7 @@ const Detection = ({ user, webcamRef, imageLink }) => {
 
       await Promise.all(
         labels.map(async () => {
-          console.log(imageLink);
+          // console.log(imageLink);
           const img = await faceapi.fetchImage(imageLink);
           const detections = await faceapi
             .detectSingleFace(img)
@@ -44,7 +44,7 @@ const Detection = ({ user, webcamRef, imageLink }) => {
               `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
             );
           } else {
-            console.log("Face not recognized.");
+            console.log("Face not recognized");
           }
         });
       }, 6000);
