@@ -5,7 +5,7 @@ import DetectRTC from "detectrtc";
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
   const [speedMbps, setSpeedMbps] = useState([0]);
-  const [webcamEnabled, setWebcamEnabled] = useState("Checking...");
+  const [webcamEnabled, setWebcamEnabled] = useState();
   const videoRef = useRef(null);
 
   useEffect(() => {

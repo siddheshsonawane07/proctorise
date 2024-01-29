@@ -12,7 +12,13 @@ const Home2 = () => {
       Home
       <div>
         <Button onClick={handleSystemCheck}>System Check </Button>
-        <Button>Instructions</Button>
+        <ul>
+          <li>instruction 1</li>
+          <li>instruction 2</li>
+          <li>instruction 3</li>
+          <li>instruction 4</li>
+          <li>instruction 5</li>
+        </ul>
       </div>
     </div>
   );
