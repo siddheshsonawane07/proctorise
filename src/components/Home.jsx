@@ -81,7 +81,7 @@ const Home = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       console.log(result.user.displayName);
-      navigate("/Home2");
+      navigate("/home");
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }
