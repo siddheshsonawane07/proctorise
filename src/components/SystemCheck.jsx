@@ -48,9 +48,7 @@ const SystemCheck = () => {
             threshold={50}
             imageUrl="https://i.postimg.cc/sft772VP/speedometer.png"
             downloadSize="1561257" //bytes
-            callbackFunctionOnNetworkDown={(data) =>
-              console.log(`Internet speed : ${data}`)
-            }
+            // callbackFunctionOnNetworkDown={}
             callbackFunctionOnNetworkTest={(data) => setSpeedMbps(data)}
           />
         </div>
