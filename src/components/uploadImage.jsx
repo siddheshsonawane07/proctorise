@@ -15,7 +15,7 @@ const UploadImage = ({ user, webcamRef }) => {
   const [uploadError, setUploadError] = useState(null);
   const [imageLink, setImageLink] = useState(null);
 
-  const capture = () => {
+  const capturePhoto = () => {
     if (webcamRef.current && webcamRef.current.video) {
       const video = webcamRef.current.video;
       const canvas = document.createElement("canvas");
@@ -67,11 +67,10 @@ const UploadImage = ({ user, webcamRef }) => {
 
   return (
     <div>
-      <button onClick={capture}>Capture Photo</button>
+      <button onClick={capturePhoto}>Capture Photo</button>
       {image && (
         <>
           <button onClick={uploadImageFunction}> Upload Photo </button>
-          
         </>
       )}
       {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}

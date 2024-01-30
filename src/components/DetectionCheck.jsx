@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import {useRef } from "react";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
