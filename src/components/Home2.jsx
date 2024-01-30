@@ -1,5 +1,6 @@
 import { Button } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
+import Detection2 from "./DetectionCheck";
 
 const Home2 = () => {
   const navigate = useNavigate();
@@ -7,6 +8,11 @@ const Home2 = () => {
   const handleSystemCheck = () => {
     navigate("/systemcheck");
   };
+
+  const handleDetectionCheck = () => {
+    navigate("/detectioncheck");
+  };
+
   return (
     <div>
       Home
@@ -20,6 +26,7 @@ const Home2 = () => {
           <li>instruction 5</li>
         </ul>
       </div>
+      <Button onClick={handleDetectionCheck}>Check the basic detections</Button>
     </div>
   );
 };

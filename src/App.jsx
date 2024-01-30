@@ -9,6 +9,7 @@ import PageNotFound from "./components/404";
 import Home from "./components/Home";
 import Home2 from "./components/Home2";
 import SystemCheck from "./components/SystemCheck";
+import DetectionCheck from "./components/DetectionCheck";
 
 class App extends Component {
   render() {
@@ -21,6 +22,7 @@ class App extends Component {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home2 />} />
           <Route path="/systemcheck" element={<SystemCheck />} />
+          <Route path="/detectioncheck" element={<DetectionCheck />} />
           <Route path="/404" element={<PageNotFound />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
