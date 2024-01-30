@@ -66,16 +66,17 @@ const SystemCheck = () => {
             txtSubHeading="Internet connection is slow"
             outputType=""
             customClassName={null}
-            pingInterval={2000}
+            pingInterval={5000}
             txtMainHeading="Opps..."
             thresholdUnit="megabyte"
-            threshold={50}
-            imageUrl="https://i.postimg.cc/sft772VP/speedometer.png"
+            threshold={100}
+            // can add a static imageURL
+            imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
             downloadSize="1561257"
             callbackFunctionOnNetworkTest={(data) => setSpeedMbps(data)}
           />
         </div>
-        <li>Internet Speed: {speedMbps} MB/s</li>
+        <li>Internet Speed: {speedMbps} Mbps</li>
       </ul>
       <video ref={videoRef} width="480" height="480" autoPlay></video>
     </div>
