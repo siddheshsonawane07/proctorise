@@ -54,9 +54,9 @@ const SystemCheck = () => {
   }, []);
 
   return (
-    <div>
-      <h1>System Compatibility Check</h1>
-      <ul>
+    <div className="SysCheckContainer">
+      <h1 className="titleSC">System Compatibility Check</h1>
+      <ul className="SysCompatibilityCompo">
         <li>
           Browser: {browserInfo.name} {browserInfo.version}
         </li>
@@ -78,7 +78,7 @@ const SystemCheck = () => {
         </div>
         <li>Internet Speed: {speedMbps} Mbps</li>
       </ul>
-      <video ref={videoRef} width="480" height="480" autoPlay></video>
+      <video className="SCVideo" ref={videoRef} width="480" height="480" autoPlay></video>
     </div>
   );
 };
