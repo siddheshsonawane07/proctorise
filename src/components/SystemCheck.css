@@ -1,44 +1,54 @@
-
 body {
-    background-color: #282c34;
-    font-family: 'Ubuntu', sans-serif;
-}
-
-.main {
-    background-color: #f6ebf6;
-    width: 700px;
-    height: 500px;
-    margin: 7em auto;
-    border-radius: 1.5em;
-    box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-}
-
-.sign {
-    padding-top: 40px;
-    padding-bottom: 100px;
-    /* color: #8C55AA; */
-    color:black;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: bold;
-    font-size: 30px;
-}
-
-.test{
-    color:black;
-    padding-bottom: 10px;
-    font-size: 24px;
-}
-
-#classIcon{
-    max-width: 200px;
-    max-height: 200px;
-}
-
-
-
-
-
+    margin: 10px;
+    background-color:#f0f9fe;
+    /* padding-top: 170px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* height: 100vh; */
+    /* background-color: green; */
+  }
+  
+  .SysCheckContainer {
     
+    text-align: center;
+ border-radius: 20px;
+  margin: auto; 
+  position: relative;
+    /* height: 50vh; */
+  background-color: #2980b9;
+  color: white;
+  padding: 4vh;
+  margin: 0;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 20px #044169b1;
+  
+  }
+  
+  .titleSC {
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 5vh;
+  }
+  
+  .SysCompatibilityCompo {
+    list-style-type: none;
+    padding: 0;
+    
+  }
+  .SysCompatibilityCompo li{
+    /* background-color: red; */
+    font-family: 'Roboto', sans-serif;
+    margin: 10px;
+    font-size: 20px;
+    /* background-color: #f50057; */
+    padding: 1px;
+    border-radius: 10px;
+  }
 
-
-
+  .SCVideo{
+    border: 1px solid rgb(253, 250, 250);
+    width: fit-content;
+    height: fit-content;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgb(255, 249, 245);
+  }
