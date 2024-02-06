@@ -12,6 +12,10 @@ const Home2 = () => {
     navigate("/detectioncheck");
   };
 
+  const handleTestButton = () => {
+    navigate("/test");
+  };
+
   return (
     <div>
       Home
@@ -26,6 +30,7 @@ const Home2 = () => {
         </ul>
       </div>
       <Button onClick={handleDetectionCheck}>Check the basic detections</Button>
+      <Button onClick={handleTestButton}> Test Page</Button>
     </div>
   );
 };
