@@ -6,7 +6,6 @@ import { auth, app } from "../utils/firebase-config";
 import { Button } from "@material-ui/core";
 
 const Home2 = () => {
-
   const [user] = useAuthState(auth);
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setimageLink] = useState(null);
@@ -42,7 +41,7 @@ const Home2 = () => {
     if (hasStorageRef) {
       navigate("/test");
     } else {
-      console.log("Image not found. Please upload image first");
+      alert("Image not found. Please upload image first");
       navigate("/uploadimage");
     }
   };
@@ -54,9 +53,7 @@ const Home2 = () => {
 
   return (
     <div>
-      Home
       <div>
-        <Button onClick={handleSystemCheck}> System Check </Button>
         <ul>
           <li>instruction 1</li>
           <li>instruction 2</li>
@@ -65,6 +62,7 @@ const Home2 = () => {
           <li>instruction 5</li>
         </ul>
       </div>
+      <Button onClick={handleSystemCheck}> System Check </Button>
       <Button onClick={handleDetectionCheck}>Check the basic detections</Button>
       <Button onClick={handleTestButton}> Test Page</Button>
       <Button onClick={handleLogoutButton}>Logout Page</Button>
