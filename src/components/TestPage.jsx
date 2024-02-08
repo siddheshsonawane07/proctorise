@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Webcam from "react-webcam";
-
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";

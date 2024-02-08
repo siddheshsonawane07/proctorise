@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ReactInternetSpeedMeter } from "react-internet-meter";
 import DetectRTC from "detectrtc";
+import "./SystemCheck.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
@@ -78,7 +79,13 @@ const SystemCheck = () => {
         </div>
         <li>Internet Speed: {speedMbps} Mbps</li>
       </ul>
-      <video className="SCVideo" ref={videoRef} width="480" height="480" autoPlay></video>
+      <video
+        className="SCVideo"
+        ref={videoRef}
+        width="480"
+        height="480"
+        autoPlay
+      ></video>
     </div>
   );
 };

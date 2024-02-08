@@ -69,9 +69,6 @@ const Home2 = () => {
       <Button onClick={handleTestButton}> Test Page</Button>
       <Button onClick={handleLogoutButton}>Logout Page</Button>
       <div>
-        <p>hasStorageRef{hasStorageRef} </p>
-      </div>
-      <div>
         <p>imageLink{imageLink} </p>
       </div>
     </div>
