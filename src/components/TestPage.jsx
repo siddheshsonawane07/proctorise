@@ -1,11 +1,29 @@
 import { useEffect, useRef } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Webcam from "react-webcam";
+
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-import Notification from "./Notification";
+import { toast } from "react-toastify";
+import { auth } from "../utils/firebase-config";
 
 const TestPage = () => {
+  const webcamRef = useRef(null);
+  const [user] = useAuthState(auth);
+
+  const toastOptions = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    progress: undefined,
+    type: "warning",
+  };
+
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       const labels = [`${user.displayName}`];
@@ -41,11 +59,12 @@ const TestPage = () => {
           const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
           if (bestMatch.distance < 0.5) {
-            showNotification(
-              `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
+            toast.error(
+              `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`,
+              toastOptions
             );
           } else {
-            showNotification("Face not recognized");
+            toast.error("Face not verified", toastOptions);
           }
         });
       }, 6000);
@@ -60,14 +79,17 @@ const TestPage = () => {
         } else if (
           ["cell phone", "book", "laptop"].includes(prediction.class)
         ) {
-          showNotification("Object Detected, Action has been Recorded");
+          toast.error(
+            "Object Detected, Action has been Recorded0",
+            toastOptions
+          );
         }
       });
 
       if (faceCount > 1) {
-        showNotification("Multiple People Detected");
+        toast.error("Multiple People Detected", toastOptions);
       } else if (faceCount === 0) {
-        showNotification("No Face Detected");
+        toast.error("No Face Detected", toastOptions);
       }
     };
 
@@ -79,7 +101,7 @@ const TestPage = () => {
         keypointEarL.score < minConfidence ||
         keypointEarR.score < minConfidence
       ) {
-        showNotification("You looked away from the screen");
+        toast.error("You looked away from the screen", toastOptions);
       }
     };
 
@@ -115,17 +137,78 @@ const TestPage = () => {
         if (poses.length > 0) {
           earsDetect(poses[0].keypoints, 0.5);
         } else {
-          showNotification("No one detected");
+          toast.error("No one detected", toastOptions);
         }
       }, 3000);
     };
 
-    const showNotification = (message) => {
-      return <Notification message={message} />;
-    };
-
     loadModels();
   }, []);
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        overflowX: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "fixed",
+          width: "20%",
+          height: "22%",
+          top: "1",
+          right: "3rem",
+        }}
+      >
+        <Webcam
+          ref={webcamRef}
+          style={{
+            zIndex: 9,
+            width: "100%",
+            height: "100%",
+            border: "1px solid black",
+            borderRadius: "1rem",
+            objectFit: "cover",
+          }}
+          // videoConstraints={{
+          //   width: 1280,
+          //   height: 720,
+          //   facingMode: "user",
+          // }}
+          screenshotFormat="image/png"
+        />
+      </div>
+      <div
+        style={{
+          "&::WebkitScrollbar": { width: 0, height: 0 },
+          // overflowX: "hidden",
+          // height: "100vh",
+          width: "100%",
+          aspectRatio: "16/9",
+          // "&::WebkitScrollbar": { width: 0, height: 0 },
+          // overflowX: "hidden",
+        }}
+      >
+        <iframe
+          style={{
+            width: "100vw",
+            aspectRatio: "16/9",
+            "&::WebkitScrollbar": { width: 0, height: 0 },
+            overflowX: "hidden",
+          }}
+          src="https://docs.google.com/forms/d/e/1FAIpQLScpSTfCwslQ9ygom1heqwmFv-wgR_jQEoFOHuZwH4XVk-mAFg/viewform?usp=sf_link"
+          // width="1080"
+          // height="500"
+          frameBorder="0"
+          marginHeight="0"
+          marginWidth="0"
+        ></iframe>
+      </div>
+    </div>
+  );
 };
 
 export default TestPage;
