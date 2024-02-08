@@ -11,6 +11,8 @@ import Home2 from "./components/Home2";
 import SystemCheck from "./components/SystemCheck";
 import DetectionCheck from "./components/DetectionCheck";
 import TestPage from "./components/TestPage";
+import UploadImage from "./components/UploadImage";
+import Temp from "./components/temp";
 
 class App extends Component {
   render() {
@@ -24,8 +26,10 @@ class App extends Component {
           <Route path="/home" element={<Home2 />} />
           <Route path="/systemcheck" element={<SystemCheck />} />
           <Route path="/detectioncheck" element={<DetectionCheck />} />
+          <Route path="/uploadimage" element={<UploadImage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/404" element={<PageNotFound />} />
+          <Route path="/temp" element={<Temp />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </Router>

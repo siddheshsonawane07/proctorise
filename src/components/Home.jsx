@@ -33,7 +33,7 @@
 
 // export default Home;
 
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -81,11 +81,18 @@ const Home = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       console.log(result.user.displayName);
+      localStorage.setItem("userId", result.user);
       navigate("/home");
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("userId")) {
+      navigate("/home");
+    }
+  }, []);
 
   return (
     <div>

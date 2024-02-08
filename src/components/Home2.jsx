@@ -6,14 +6,8 @@ import { auth, app } from "../utils/firebase-config";
 import { Button } from "@material-ui/core";
 
 const Home2 = () => {
-  //work to do in this component
-  //add instructions, css, buttons
-  //test page function when clicked, should check if the image is stored on firebase of that account or not
-  //if there is image present, redirect it to test page
-  //if there is image absent, redirect it to upload image function
 
   const [user] = useAuthState(auth);
-  const webcamRef = useRef(null);
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setimageLink] = useState(null);
   const storage = getStorage(app);
@@ -45,7 +39,17 @@ const Home2 = () => {
   };
 
   const handleTestButton = () => {
-    navigate("/test");
+    if (hasStorageRef) {
+      navigate("/test");
+    } else {
+      console.log("Image not found. Please upload image first");
+      navigate("/uploadimage");
+    }
+  };
+
+  const handleLogoutButton = async () => {
+    localStorage.clear();
+    navigate("/");
   };
 
   return (
@@ -63,6 +67,7 @@ const Home2 = () => {
       </div>
       <Button onClick={handleDetectionCheck}>Check the basic detections</Button>
       <Button onClick={handleTestButton}> Test Page</Button>
+      <Button onClick={handleLogoutButton}>Logout Page</Button>
       <div>
         <p>hasStorageRef{hasStorageRef} </p>
       </div>
