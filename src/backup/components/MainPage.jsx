@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../utils/firebase-config";
+import { auth } from "../../utils/firebase-config";
 
 const RedirectComponent = () => {
   const navigate = useNavigate();
