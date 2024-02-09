@@ -9,6 +9,7 @@ import PageNotFound from "./components/404";
 import MainPage from "./components/MainPage";
 import SignIn from "./components/SignIn";
 import Home from "./components/Home";
+//import HomeAnkit from "./components/AnkitHome";
 
 class App extends Component {
   render() {

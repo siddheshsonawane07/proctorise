@@ -55,17 +55,22 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     gap: theme.spacing(4),
-    flexWrap: 'wrap', // Allow features to wrap to the next line if needed
+    //overflowX: 'auto', // Allow features to scroll horizontally if needed
+    marginBottom: theme.spacing(4), // Add bottom margin for spacing
+    padding: theme.spacing(2), // Add padding for spacing
+    borderRadius: 10,
+    background: 'linear-gradient(to right, #ff6b6b, #556270)', // Gradient background color
+    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Add shadow effect
   },
   feature: {
-    width: 'calc(25% - 20px)', // Adjust width to fit all features in one line with some gap
-    height: 100, // Increase height of feature segments
+    flex: '0 0 auto', // Prevent features from stretching
+    width: 250, // Set minimum width for each feature
+    height: 300, // Increase height of feature segments
     backgroundColor: '#fff',
     padding: theme.spacing(4),
     borderRadius: 10,
-    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', // Add shadow effect
     textAlign: 'center',
-    marginBottom: theme.spacing(4), // Add bottom margin for spacing
   },
 }));
 
@@ -79,7 +84,7 @@ const Home = () => {
         <Typography variant="subtitle1" className={classes.subtitle}>
           Secure your online exams with our advanced proctoring solutions.
         </Typography>
-        <Button variant="contained" color="secondary" size="large">Sign In Bhai</Button>
+        <Button variant="contained" color="secondary" size="large">Sign In</Button>
       </div>
       <div className={classes.features}>
         <div className={classes.feature}>
