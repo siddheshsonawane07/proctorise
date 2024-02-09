@@ -82,7 +82,6 @@ const UploadImage = () => {
           <button onClick={uploadImageFunction}> Upload Photo </button>
         </>
       )}
-      {/* {uploadError && <p style={{ color: "red" }}>{uploadError}</p>} */}
     </div>
   );
 };

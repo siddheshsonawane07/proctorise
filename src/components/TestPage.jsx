@@ -1,16 +1,18 @@
+import Webcam from "react-webcam";
 import { useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import Webcam from "react-webcam";
+import { toast } from "react-toastify";
+import { auth, app } from "../utils/firebase-config";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-import { toast } from "react-toastify";
-import { auth } from "../utils/firebase-config";
 
 const TestPage = () => {
   const webcamRef = useRef(null);
   const [user] = useAuthState(auth);
+  const storage = getStorage(app);
 
   const toastOptions = {
     position: "top-right",
@@ -26,6 +28,8 @@ const TestPage = () => {
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
       const labels = [`${user.displayName}`];
+      const storageRef = ref(storage, `/images/${user.email}`);
+      const imageLink = await getDownloadURL(storageRef);
 
       const descriptions = [];
 
@@ -58,15 +62,14 @@ const TestPage = () => {
           const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
           if (bestMatch.distance < 0.5) {
-            toast.error(
-              `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`,
-              toastOptions
+            console.log(
+              `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
             );
           } else {
-            toast.error("Face not verified", toastOptions);
+            console.log("Face not verified");
           }
         });
-      }, 6000);
+      }, 3000);
     };
 
     const objectDetection = (predictions) => {
@@ -78,17 +81,14 @@ const TestPage = () => {
         } else if (
           ["cell phone", "book", "laptop"].includes(prediction.class)
         ) {
-          toast.error(
-            "Object Detected, Action has been Recorded0",
-            toastOptions
-          );
+          console.log("Object Detected, Action has been Recorded0");
         }
       });
 
       if (faceCount > 1) {
-        toast.error("Multiple People Detected", toastOptions);
+        console.log("Multiple People Detected");
       } else if (faceCount === 0) {
-        toast.error("No Face Detected", toastOptions);
+        console.log("No Face Detected");
       }
     };
 
@@ -100,7 +100,7 @@ const TestPage = () => {
         keypointEarL.score < minConfidence ||
         keypointEarR.score < minConfidence
       ) {
-        toast.error("You looked away from the screen", toastOptions);
+        console.log("You looked away from the screen");
       }
     };
 
@@ -136,7 +136,7 @@ const TestPage = () => {
         if (poses.length > 0) {
           earsDetect(poses[0].keypoints, 0.5);
         } else {
-          toast.error("No one detected", toastOptions);
+          console.log("No one detected");
         }
       }, 3000);
     };
@@ -172,23 +172,15 @@ const TestPage = () => {
             borderRadius: "1rem",
             objectFit: "cover",
           }}
-          // videoConstraints={{
-          //   width: 1280,
-          //   height: 720,
-          //   facingMode: "user",
-          // }}
           screenshotFormat="image/png"
         />
       </div>
       <div
         style={{
           "&::WebkitScrollbar": { width: 0, height: 0 },
-          // overflowX: "hidden",
-          // height: "100vh",
+
           width: "100%",
           aspectRatio: "16/9",
-          // "&::WebkitScrollbar": { width: 0, height: 0 },
-          // overflowX: "hidden",
         }}
       >
         <iframe
@@ -199,8 +191,6 @@ const TestPage = () => {
             overflowX: "hidden",
           }}
           src="https://docs.google.com/forms/d/e/1FAIpQLScpSTfCwslQ9ygom1heqwmFv-wgR_jQEoFOHuZwH4XVk-mAFg/viewform?usp=sf_link"
-          // width="1080"
-          // height="500"
           frameBorder="0"
           marginHeight="0"
           marginWidth="0"

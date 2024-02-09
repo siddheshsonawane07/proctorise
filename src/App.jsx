@@ -12,7 +12,6 @@ import SystemCheck from "./components/SystemCheck";
 import DetectionCheck from "./components/DetectionCheck";
 import TestPage from "./components/TestPage";
 import UploadImage from "./components/UploadImage";
-import Temp from "./components/temp";
 
 class App extends Component {
   render() {
@@ -29,7 +28,6 @@ class App extends Component {
           <Route path="/uploadimage" element={<UploadImage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/404" element={<PageNotFound />} />
-          <Route path="/temp" element={<Temp />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </Router>
