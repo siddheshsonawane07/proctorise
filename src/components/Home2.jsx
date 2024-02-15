@@ -3,7 +3,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
-import { Button } from "@material-ui/core";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
@@ -62,10 +61,13 @@ const Home2 = () => {
           <li>instruction 5</li>
         </ul>
       </div>
-      <Button onClick={handleSystemCheck}> System Check </Button>
-      <Button onClick={handleDetectionCheck}>Check the basic detections</Button>
-      <Button onClick={handleTestButton}> Test Page</Button>
-      <Button onClick={handleLogoutButton}>Logout Page</Button>
+      <button onClick={handleSystemCheck}> System Check </button>
+      <button onClick={handleDetectionCheck}>Check the basic detections</button>
+      <button onClick={handleTestButton}> Test Page</button>
+      <button onClick={handleLogoutButton}>Logout Page</button>
+      <button>Create test</button>
+      <button>Attempt Test</button>
+
       <div>
         <p>imageLink{imageLink} </p>
       </div>

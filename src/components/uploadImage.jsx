@@ -48,7 +48,7 @@ const UploadImage = () => {
 
   useEffect(() => {
     if (progress) {
-      navigate("/test");
+      navigate("/home");
     }
   }, [progress]);
 

@@ -1,5 +1,5 @@
 import Webcam from "react-webcam";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
 import { auth, app } from "../utils/firebase-config";
@@ -13,16 +13,26 @@ const TestPage = () => {
   const webcamRef = useRef(null);
   const [user] = useAuthState(auth);
   const storage = getStorage(app);
+  const [toasts, setToasts] = useState([]);
 
-  const toastOptions = {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: false,
-    progress: undefined,
-    type: "warning",
+  const showToast = (message, type) => {
+    const toastOptions = {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      type: type || "warning",
+    };
+
+    if (toasts.length >= 2) {
+      const removedToastId = toasts.shift(); // Remove the oldest toast
+      toast.dismiss(removedToastId); // Dismiss the oldest toast
+    }
+    const newToast = toast(message, toastOptions);
+    setToasts((prevToasts) => [...prevToasts, newToast]);
   };
 
   useEffect(() => {
@@ -66,7 +76,7 @@ const TestPage = () => {
               `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
             );
           } else {
-            console.log("Face not verified");
+            showToast("Face not verified");
           }
         });
       }, 3000);
@@ -81,12 +91,12 @@ const TestPage = () => {
         } else if (
           ["cell phone", "book", "laptop"].includes(prediction.class)
         ) {
-          console.log("Object Detected, Action has been Recorded0");
+          showToast("Object Detected, Action has been Recorded");
         }
       });
 
       if (faceCount > 1) {
-        console.log("Multiple People Detected");
+        showToast("Multiple People Detected");
       } else if (faceCount === 0) {
         console.log("No Face Detected");
       }
@@ -100,7 +110,7 @@ const TestPage = () => {
         keypointEarL.score < minConfidence ||
         keypointEarR.score < minConfidence
       ) {
-        console.log("You looked away from the screen");
+        showToast("You looked away from the screen");
       }
     };
 
@@ -136,7 +146,7 @@ const TestPage = () => {
         if (poses.length > 0) {
           earsDetect(poses[0].keypoints, 0.5);
         } else {
-          console.log("No one detected");
+          console.log("No ears detected");
         }
       }, 3000);
     };
