@@ -48,6 +48,10 @@ const Home2 = () => {
     }
   };
 
+  const handleUploadPhoto = () => {
+    navigate("/uploadimage");
+  };
+
   const handleLogoutButton = async () => {
     localStorage.clear();
     navigate("/");
@@ -55,6 +59,7 @@ const Home2 = () => {
 
   return (
     <div>
+      <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
       <div>
         <ul>
           <li>instruction 1</li>
@@ -67,13 +72,22 @@ const Home2 = () => {
       <button onClick={handleSystemCheck}> System Check </button>
       <button onClick={handleDetectionCheck}>Check the basic detections</button>
       <button onClick={handleTestButton}> Test Page</button>
+      <button onClick={handleUploadPhoto}>Upload Photo </button>
       <button onClick={handleLogoutButton}>Logout Page</button>
       <button>Create test</button>
       <button>Attempt Test</button>
 
       <div>
-        <p>imageLink: {imageLink} </p>
-        <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
+        <p>
+          {/* Uploaded Photo{" "} */}
+          {imageLink && (
+            <img
+              src={imageLink}
+              alt="No Photo Uploaded"
+              style={{ maxWidth: "1000px", maxHeight: "300px" }}
+            />
+          )}{" "}
+        </p>
       </div>
     </div>
   );
