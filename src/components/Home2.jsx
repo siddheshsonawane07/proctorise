@@ -14,13 +14,13 @@ const Home2 = () => {
 
   useEffect(() => {
     const checkStorageRef = async () => {
+      const image = user.photoURL;
+      setProfilePhoto(image);
       const storageRef = ref(storage, `/images/${user.email}`);
       try {
         const imageLink = await getDownloadURL(storageRef);
         setHasStorageRef(true);
         setimageLink(imageLink);
-        const image = user.photoURL;
-        setProfilePhoto(image);
       } catch (error) {
         setHasStorageRef(false);
       }
