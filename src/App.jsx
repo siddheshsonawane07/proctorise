@@ -21,9 +21,6 @@ class App extends Component {
       <div>
         <Router>
           <Routes>
-            {/* <Route path="/" element={<MainPage />} /> */}
-            {/* <Route path="/signin" element={<SignIn />} /> */}
-            {/* <Route path="/home" element={<Home />} /> */}
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home2 />} />
             <Route path="/systemcheck" element={<SystemCheck />} />
@@ -31,7 +28,7 @@ class App extends Component {
             <Route path="/uploadimage" element={<UploadImage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/404" element={<PageNotFound />} />
-            <Route path="*" element={<Navigate to="/404" />} />
+            <Route path="*" element={<Navigate to="/404" />} />vcb
           </Routes>
         </Router>
         <ToastContainer />

@@ -8,6 +8,7 @@ const Home2 = () => {
   const [user] = useAuthState(auth);
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setimageLink] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const storage = getStorage(app);
   const navigate = useNavigate();
 
@@ -18,6 +19,8 @@ const Home2 = () => {
         const imageLink = await getDownloadURL(storageRef);
         setHasStorageRef(true);
         setimageLink(imageLink);
+        const image = user.photoURL;
+        setProfilePhoto(image);
       } catch (error) {
         setHasStorageRef(false);
       }
@@ -69,7 +72,8 @@ const Home2 = () => {
       <button>Attempt Test</button>
 
       <div>
-        <p>imageLink{imageLink} </p>
+        <p>imageLink: {imageLink} </p>
+        <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
       </div>
     </div>
   );
