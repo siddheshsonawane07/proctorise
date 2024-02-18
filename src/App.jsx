@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import PageNotFound from "./components/404";
 import Home from "./components/Home";
+//import HomeAnkit from "./components/AnkitHome";
 import Home2 from "./components/Home2";
 import SystemCheck from "./components/SystemCheck";
 import DetectionCheck from "./components/DetectionCheck";
@@ -15,6 +16,7 @@ import UploadImage from "./components/UploadImage";
 import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 class App extends Component {
   render() {
