@@ -53,6 +53,10 @@ const Home2 = () => {
     navigate("/uploadimage");
   };
 
+  const handleCreateTest = () => {
+    navigate("/createtest");
+  };
+
   const handleLogoutButton = async () => {
     localStorage.clear();
     navigate("/");
@@ -75,7 +79,7 @@ const Home2 = () => {
       <button onClick={handleTestButton}> Test Page</button>
       <button onClick={handleUploadPhoto}>Upload Photo </button>
       <button onClick={handleLogoutButton}>Logout Page</button>
-      <button>Create test</button>
+      <button onClick={handleCreateTest}>Create test</button>
       <button>Attempt Test</button>
 
       <div>

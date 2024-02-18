@@ -15,8 +15,13 @@ const TestPage = () => {
   const [user] = useAuthState(auth);
   const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
-  const [timer, setTimer] = useState(10);
+
+  // usertestinput
+  const testdetails = localStorage.getItem("testDetails");
+  const { formLink, testTime } = testdetails;
+  const [timer, setTimer] = useState(50);
   const navigate = useNavigate();
+  setTimer(parseInt(testTime));
 
   const showToast = (message, type) => {
     const toastOptions = {
@@ -46,6 +51,10 @@ const TestPage = () => {
     const countdown = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
+
+    if (timer === 0) {
+      handleCloseTestPage();
+    }
 
     const getLabeledFaceDescriptions = async () => {
       const labels = [`${user.displayName}`];
@@ -165,12 +174,11 @@ const TestPage = () => {
     return () => clearInterval(countdown);
   }, []);
 
-  useEffect(() => {
-    if (timer === 0) {
-      // Perform actions when the timer reaches zero
-      handleCloseTestPage();
-    }
-  }, [timer]);
+  // useEffect(() => {
+  //   if (timer === 0) {
+  //     handleCloseTestPage();
+  //   }
+  // }, [timer]);
 
   return (
     <div
@@ -191,7 +199,7 @@ const TestPage = () => {
         }}
       >
         <p>Time remaining: {timer} seconds</p>
-
+        {/* <p>{localStorage.getItem("test")}</p> */}
         <Webcam
           ref={webcamRef}
           style={{
