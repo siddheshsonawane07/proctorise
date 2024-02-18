@@ -8,12 +8,15 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
+import { useNavigate } from "react-router-dom";
 
 const TestPage = () => {
   const webcamRef = useRef(null);
   const [user] = useAuthState(auth);
   const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
+  const [timer, setTimer] = useState(10);
+  const navigate = useNavigate();
 
   const showToast = (message, type) => {
     const toastOptions = {
@@ -35,7 +38,15 @@ const TestPage = () => {
     setToasts((prevToasts) => [...prevToasts, newToast]);
   };
 
+  const handleCloseTestPage = () => {
+    navigate("/home");
+  };
+
   useEffect(() => {
+    const countdown = setInterval(() => {
+      setTimer((prevTimer) => prevTimer - 1);
+    }, 1000);
+
     const getLabeledFaceDescriptions = async () => {
       const labels = [`${user.displayName}`];
       const storageRef = ref(storage, `/images/${user.email}`);
@@ -150,9 +161,16 @@ const TestPage = () => {
         }
       }, 3000);
     };
-
     loadModels();
+    return () => clearInterval(countdown);
   }, []);
+
+  useEffect(() => {
+    if (timer === 0) {
+      // Perform actions when the timer reaches zero
+      handleCloseTestPage();
+    }
+  }, [timer]);
 
   return (
     <div
@@ -172,6 +190,8 @@ const TestPage = () => {
           right: "3rem",
         }}
       >
+        <p>Time remaining: {timer} seconds</p>
+
         <Webcam
           ref={webcamRef}
           style={{
