@@ -6,6 +6,7 @@ import { auth, app } from "../utils/firebase-config";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
+  // const user = localStorage.getItem("userId");
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setimageLink] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
@@ -59,8 +60,8 @@ const Home2 = () => {
 
   return (
     <div>
-      <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
       <div>
+        <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
         <ul>
           <li>instruction 1</li>
           <li>instruction 2</li>
@@ -79,7 +80,6 @@ const Home2 = () => {
 
       <div>
         <p>
-          {/* Uploaded Photo{" "} */}
           {imageLink && (
             <img
               src={imageLink}
