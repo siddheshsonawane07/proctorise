@@ -63,29 +63,45 @@ const Home2 = () => {
   };
 
   return (
-    <div>
-      <div>
-        <p> {profilePhoto && <img src={profilePhoto} alt="Profile Photo" />}</p>
-        <ul>
-          <li>instruction 1</li>
-          <li>instruction 2</li>
-          <li>instruction 3</li>
-          <li>instruction 4</li>
-          <li>instruction 5</li>
+   <div className="mainCon">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <div>
+          <img id="logo"  src='https://cdn-icons-png.flaticon.com/128/8763/8763240.png' alt="logo" />
+          <a className="navbar-brand" href="#">PROCTORIES</a>
+        </div> 
+        <>
+          <p className="forPhoto "> {profilePhoto && <img id="profPhoto" src={profilePhoto} alt="Profile Photo" />}</p>
+        </>
+      </nav>
+     
+      <div className="photoandinstr">
+        <ul className="instruction-lines">
+          <li className="instructions">You must use a functioning webcam and microphone</li>
+          <li className="instructions">No cell phones or other secondary devices in the room or test area</li>
+          <li className="instructions">Your desk/table must be clear or any materials except your test-taking device</li>
+          <li className="instructions">No one else can be in the room with you</li>
+          <li className="instructions">No talking</li>
+          <li className="instructions">The testing room must be well-lit and you must be clearly visible</li>
+          <li className="instructions">No dual screens/monitors</li>
+          <li className="instructions">Do not leave the camera </li>
         </ul>
       </div>
-      <button onClick={handleSystemCheck}> System Check </button>
-      <button onClick={handleDetectionCheck}>Check the basic detections</button>
-      <button onClick={handleTestButton}> Test Page</button>
-      <button onClick={handleUploadPhoto}>Upload Photo </button>
-      <button onClick={handleLogoutButton}>Logout Page</button>
-      <button onClick={handleCreateTest}>Create test</button>
-      <button>Attempt Test</button>
-
+      
+      <div className="text-center">
+        <button type="button" className="btn btn-danger" onClick={handleSystemCheck}> System Check </button>
+        <button type="button" className="btn btn-danger" onClick={handleDetectionCheck}>Check the basic detections</button>
+        <button type="button" className="btn btn-danger" onClick={handleTestButton}> Test Page</button>
+        <button type="button" className="btn btn-danger" onClick={handleUploadPhoto}>Upload Photo </button>
+        <button type="button" className="btn btn-danger" onClick={handleLogoutButton}>Logout Page</button>
+        <button type="button" className="btn btn-danger">Create test</button>
+        <button type="button" className="btn btn-danger">Attempt Test</button>
+      </div>
+      
       <div>
-        <p>
+        <p className="uploadedimg-container">
           {imageLink && (
             <img
+            className="uploadedimg"
               src={imageLink}
               alt="No Photo Uploaded"
               style={{ maxWidth: "1000px", maxHeight: "300px" }}
