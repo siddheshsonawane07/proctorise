@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
-import './home2.css';
+import "./Home2.css";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
@@ -64,45 +64,102 @@ const Home2 = () => {
   };
 
   return (
-   <div className="mainCon">
+    <div className="mainCon">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div>
-          <img id="logo"  src='https://cdn-icons-png.flaticon.com/128/8763/8763240.png' alt="logo" />
-          <a className="navbar-brand" href="#">PROCTORIES</a>
-        </div> 
+          <img
+            id="logo"
+            src="https://cdn-icons-png.flaticon.com/128/8763/8763240.png"
+            alt="logo"
+          />
+          <a className="navbar-brand">PROCTORISE</a>
+        </div>
         <>
-          <p className="forPhoto "> {profilePhoto && <img id="profPhoto" src={profilePhoto} alt="Profile Photo" />}</p>
+          <p className="forPhoto ">
+            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
+          </p>
         </>
       </nav>
-     
+
       <div className="photoandinstr">
         <ul className="instruction-lines">
-          <li className="instructions">You must use a functioning webcam and microphone</li>
-          <li className="instructions">No cell phones or other secondary devices in the room or test area</li>
-          <li className="instructions">Your desk/table must be clear or any materials except your test-taking device</li>
-          <li className="instructions">No one else can be in the room with you</li>
+          <li className="instructions">
+            You must use a functioning webcam and microphone
+          </li>
+          <li className="instructions">
+            No cell phones or other secondary devices in the room or test area
+          </li>
+          <li className="instructions">
+            Your desk/table must be clear or any materials except your
+            test-taking device
+          </li>
+          <li className="instructions">
+            No one else can be in the room with you
+          </li>
           <li className="instructions">No talking</li>
-          <li className="instructions">The testing room must be well-lit and you must be clearly visible</li>
+          <li className="instructions">
+            The testing room must be well-lit and you must be clearly visible
+          </li>
           <li className="instructions">No dual screens/monitors</li>
           <li className="instructions">Do not leave the camera </li>
         </ul>
       </div>
-      
+
       <div className="text-center">
-        <button type="button" className="btn btn-danger" onClick={handleSystemCheck}> System Check </button>
-        <button type="button" className="btn btn-danger" onClick={handleDetectionCheck}>Check the basic detections</button>
-        <button type="button" className="btn btn-danger" onClick={handleTestButton}> Test Page</button>
-        <button type="button" className="btn btn-danger" onClick={handleUploadPhoto}>Upload Photo </button>
-        <button type="button" className="btn btn-danger" onClick={handleLogoutButton}>Logout Page</button>
-        <button type="button" className="btn btn-danger">Create test</button>
-        <button type="button" className="btn btn-danger">Attempt Test</button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleSystemCheck}
+        >
+          {" "}
+          System Check{" "}
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleDetectionCheck}
+        >
+          Check the basic detections
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleTestButton}
+        >
+          {" "}
+          Test Page
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleUploadPhoto}
+        >
+          Upload Photo{" "}
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleLogoutButton}
+        >
+          Logout Page
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleCreateTest}
+        >
+          Create test
+        </button>
+        <button type="button" className="btn btn-danger">
+          Attempt Test
+        </button>
       </div>
-      
+
       <div>
         <p className="uploadedimg-container">
           {imageLink && (
             <img
-            className="uploadedimg"
+              className="uploadedimg"
               src={imageLink}
               alt="No Photo Uploaded"
               style={{ maxWidth: "1000px", maxHeight: "300px" }}
