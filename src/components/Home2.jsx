@@ -3,6 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
+import './home2.css';
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
