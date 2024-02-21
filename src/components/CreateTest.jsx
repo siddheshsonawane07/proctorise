@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../utils/firebase-config"; // Assuming you have a 'db' instance configured
+import { getDocs, query, where, collection, addDoc } from "firebase/firestore";
+import { db } from "../utils/firebase-config";
 
 const CreateTest = () => {
   const [values, setValues] = useState({
@@ -20,11 +20,21 @@ const CreateTest = () => {
     }
 
     try {
+      // checking if the google form link is present in firestore
+      const formLinkQuery = query(
+        collection(db, "testDetails"),
+        where("formLink", "==", values.formLink)
+      );
+      const existingDocs = await getDocs(formLinkQuery);
+
+      if (!existingDocs.empty) {
+        alert("This form link already exists. Please use a different one.");
+        return;
+      }
+
       // adding test details to firestore
       const docRef = await addDoc(collection(db, "testDetails"), values);
       console.log("Document written with ID: ", docRef.id);
-
-      // Navigate to the "/home" route
       navigate("/home");
     } catch (error) {
       console.error("Error adding document: ", error);
