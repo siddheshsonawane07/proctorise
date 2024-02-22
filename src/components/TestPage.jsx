@@ -8,20 +8,17 @@ import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import * as faceapi from "@vladmandic/face-api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const TestPage = () => {
-  const webcamRef = useRef(null);
+  const { state } = useLocation();
+  const { formLink, testTime } = state || {};
   const [user] = useAuthState(auth);
+  const webcamRef = useRef(null);
   const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
-
-  // usertestinput
-  const testdetails = localStorage.getItem("testDetails");
-  const { formLink, testTime } = testdetails;
-  const [timer, setTimer] = useState(50);
+  const [timer, setTimer] = useState(testTime);
   const navigate = useNavigate();
-  setTimer(parseInt(testTime));
 
   const showToast = (message, type) => {
     const toastOptions = {
@@ -36,8 +33,8 @@ const TestPage = () => {
     };
 
     if (toasts.length >= 2) {
-      const removedToastId = toasts.shift(); // Remove the oldest toast
-      toast.dismiss(removedToastId); // Dismiss the oldest toast
+      const removedToastId = toasts.shift();
+      toast.dismiss(removedToastId);
     }
     const newToast = toast(message, toastOptions);
     setToasts((prevToasts) => [...prevToasts, newToast]);
@@ -48,14 +45,6 @@ const TestPage = () => {
   };
 
   useEffect(() => {
-    const countdown = setInterval(() => {
-      setTimer((prevTimer) => prevTimer - 1);
-    }, 1000);
-
-    if (timer === 0) {
-      handleCloseTestPage();
-    }
-
     const getLabeledFaceDescriptions = async () => {
       const labels = [`${user.displayName}`];
       const storageRef = ref(storage, `/images/${user.email}`);
@@ -171,14 +160,18 @@ const TestPage = () => {
       }, 3000);
     };
     loadModels();
-    return () => clearInterval(countdown);
-  }, []);
 
-  // useEffect(() => {
-  //   if (timer === 0) {
-  //     handleCloseTestPage();
-  //   }
-  // }, [timer]);
+    const countdown = setInterval(() => {
+      setTimer((prevTimer) => prevTimer - 1);
+    }, 1000);
+
+    if (timer === 0) {
+      handleCloseTestPage();
+    }
+    return () => {
+      clearInterval(countdown);
+    };
+  }, [timer]);
 
   return (
     <div
@@ -199,7 +192,6 @@ const TestPage = () => {
         }}
       >
         <p>Time remaining: {timer} seconds</p>
-        {/* <p>{localStorage.getItem("test")}</p> */}
         <Webcam
           ref={webcamRef}
           style={{
@@ -228,7 +220,7 @@ const TestPage = () => {
             "&::WebkitScrollbar": { width: 0, height: 0 },
             overflowX: "hidden",
           }}
-          src="https://docs.google.com/forms/d/e/1FAIpQLScpSTfCwslQ9ygom1heqwmFv-wgR_jQEoFOHuZwH4XVk-mAFg/viewform?usp=sf_link"
+          src={formLink}
           frameBorder="0"
           marginHeight="0"
           marginWidth="0"
@@ -237,5 +229,4 @@ const TestPage = () => {
     </div>
   );
 };
-
 export default TestPage;

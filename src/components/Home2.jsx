@@ -4,6 +4,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
 import "./Home2.css";
+import TestPage from "./TestPage";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
@@ -43,7 +44,10 @@ const Home2 = () => {
 
   const handleTestButton = () => {
     if (hasStorageRef) {
-      navigate("/test");
+      const formLink =
+        "https://docs.google.com/forms/d/e/1FAIpQLSc949s3nmwj7ATngW04nszTiG2A9HdHm4YLylRP8kQCA-fyJA/viewform?usp=sf_link";
+      const time = 15;
+      navigate("/test", { state: { formLink: formLink, testTime: time } });
     } else {
       alert("Image not found. Please upload image first");
       navigate("/uploadimage");
@@ -126,7 +130,6 @@ const Home2 = () => {
           className="btn btn-danger"
           onClick={handleTestButton}
         >
-          {" "}
           Test Page
         </button>
         <button
