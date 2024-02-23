@@ -17,7 +17,7 @@ const TestPage = () => {
   const webcamRef = useRef(null);
   const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
-  const [timer, setTimer] = useState(testTime);
+  const [timer, setTimer] = useState(testTime * 60);
   const navigate = useNavigate();
 
   const showToast = (message, type) => {
@@ -191,7 +191,7 @@ const TestPage = () => {
           right: "3rem",
         }}
       >
-        <p>Time remaining: {timer} seconds</p>
+        <p>Time remaining: {timer} </p>
         <Webcam
           ref={webcamRef}
           style={{

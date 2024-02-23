@@ -16,7 +16,7 @@ import UploadImage from "./components/UploadImage";
 import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import AttemptTest from "./components/AttemptTest";
 
 class App extends Component {
   render() {
@@ -31,6 +31,7 @@ class App extends Component {
             <Route path="/uploadimage" element={<UploadImage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/createtest" element={<CreateTest />} />
+            <Route path="/attempttest" element={<AttemptTest />} />
             <Route path="/404" element={<PageNotFound />} />
             <Route path="*" element={<Navigate to="/404" />} />
             vcb

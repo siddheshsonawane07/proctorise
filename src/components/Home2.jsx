@@ -42,17 +42,17 @@ const Home2 = () => {
     navigate("/detectioncheck");
   };
 
-  const handleTestButton = () => {
-    if (hasStorageRef) {
-      const formLink =
-        "https://docs.google.com/forms/d/e/1FAIpQLSc949s3nmwj7ATngW04nszTiG2A9HdHm4YLylRP8kQCA-fyJA/viewform?usp=sf_link";
-      const time = 15;
-      navigate("/test", { state: { formLink: formLink, testTime: time } });
-    } else {
-      alert("Image not found. Please upload image first");
-      navigate("/uploadimage");
-    }
-  };
+  // const handleTestButton = () => {
+  //   if (hasStorageRef) {
+  //     const formLink =
+  //       "https://docs.google.com/forms/d/e/1FAIpQLSc949s3nmwj7ATngW04nszTiG2A9HdHm4YLylRP8kQCA-fyJA/viewform?usp=sf_link";
+  //     const time = 15;
+  //     navigate("/test", { state: { formLink: formLink, testTime: time } });
+  //   } else {
+  //     alert("Image not found. Please upload image first");
+  //     navigate("/uploadimage");
+  //   }
+  // };
 
   const handleUploadPhoto = () => {
     navigate("/uploadimage");
@@ -60,6 +60,10 @@ const Home2 = () => {
 
   const handleCreateTest = () => {
     navigate("/createtest");
+  };
+
+  const handleAttemptTest = () => {
+    navigate("/attempttest");
   };
 
   const handleLogoutButton = async () => {
@@ -125,13 +129,13 @@ const Home2 = () => {
         >
           Check the basic detections
         </button>
-        <button
+        {/* <button
           type="button"
           className="btn btn-danger"
           onClick={handleTestButton}
         >
           Test Page
-        </button>
+        </button> */}
         <button
           type="button"
           className="btn btn-danger"
@@ -153,7 +157,11 @@ const Home2 = () => {
         >
           Create test
         </button>
-        <button type="button" className="btn btn-danger">
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={handleAttemptTest}
+        >
           Attempt Test
         </button>
       </div>
