@@ -34,7 +34,8 @@ const CreateTest = () => {
 
       // adding test details to firestore
       const docRef = await addDoc(collection(db, "testDetails"), values);
-      console.log("Document written with ID: ", docRef.id);
+      // console.log("Document written with ID: ", docRef.id);
+      alert("test creation successfull");
       navigate("/home");
     } catch (error) {
       console.error("Error adding document: ", error);

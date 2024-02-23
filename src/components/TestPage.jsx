@@ -88,7 +88,7 @@ const TestPage = () => {
             showToast("Face not verified");
           }
         });
-      }, 3000);
+      }, 15000);
     };
 
     const objectDetection = (predictions) => {
@@ -135,31 +135,31 @@ const TestPage = () => {
       faceapi.SsdMobilenetv1Options.minConfidence = 0.5;
 
       await setupFaceRecognition(webcamRef.current.video);
-
-      setInterval(async () => {
-        const objectModel = await cocoSsd.load();
-
-        const detectorConfig = {
-          modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
-        };
-
-        const detector = await poseDetection.createDetector(
-          poseDetection.SupportedModels.MoveNet,
-          detectorConfig
-        );
-
-        const predictions = await objectModel.detect(webcamRef.current.video);
-        objectDetection(predictions);
-
-        const poses = await detector.estimatePoses(webcamRef.current.video);
-        if (poses.length > 0) {
-          earsDetect(poses[0].keypoints, 0.5);
-        } else {
-          console.log("No ears detected");
-        }
-      }, 3000);
     };
     loadModels();
+
+    setInterval(async () => {
+      const objectModel = await cocoSsd.load();
+
+      const detectorConfig = {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+      };
+
+      const detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        detectorConfig
+      );
+
+      const predictions = await objectModel.detect(webcamRef.current.video);
+      objectDetection(predictions);
+
+      const poses = await detector.estimatePoses(webcamRef.current.video);
+      if (poses.length > 0) {
+        earsDetect(poses[0].keypoints, 0.5);
+      } else {
+        console.log("No ears detected");
+      }
+    }, 3000);
 
     const countdown = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
@@ -171,7 +171,7 @@ const TestPage = () => {
     return () => {
       clearInterval(countdown);
     };
-  }, [timer]);
+  }, []);
 
   return (
     <div
