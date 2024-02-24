@@ -159,7 +159,7 @@ const TestPage = () => {
       } else {
         console.log("No ears detected");
       }
-    }, 3000);
+    }, 8000);
 
     const countdown = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
