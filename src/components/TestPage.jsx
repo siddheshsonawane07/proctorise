@@ -18,6 +18,7 @@ const TestPage = () => {
   const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
   const [timer, setTimer] = useState(testTime * 60);
+  const [visibilityCount, setVisibilityCount] = useState(0);
   const navigate = useNavigate();
 
   const showToast = (message, type) => {
@@ -38,10 +39,6 @@ const TestPage = () => {
     }
     const newToast = toast(message, toastOptions);
     setToasts((prevToasts) => [...prevToasts, newToast]);
-  };
-
-  const handleCloseTestPage = () => {
-    navigate("/home");
   };
 
   useEffect(() => {
@@ -88,7 +85,7 @@ const TestPage = () => {
             showToast("Face not verified");
           }
         });
-      }, 15000);
+      }, 3000);
     };
 
     const objectDetection = (predictions) => {
@@ -159,17 +156,57 @@ const TestPage = () => {
       } else {
         console.log("No ears detected");
       }
-    }, 8000);
+    }, 3000);
 
     const countdown = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        setVisibilityCount((prevCount) => prevCount + 1);
+        showToast("Warning: Tab Changed");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Prevent copy and paste
+    const handleCopyPaste = (event) => {
+      showToast(
+        `${
+          event.type.charAt(0).toUpperCase() + event.type.slice(1)
+        }ing is not allowed.`
+      );
+      event.preventDefault();
+    };
+
+    document.addEventListener("copy", handleCopyPaste);
+    document.addEventListener("paste", handleCopyPaste);
+
+    // Prevent certain special keys
+    const handleKeyDown = (event) => {
+      const restrictedKeys = [27, 16, 18, 17, 91, 9, 44]; // ESC, SHIFT, ALT, CONTROL, COMMAND, TAB, PRT SRC
+      if (restrictedKeys.includes(event.keyCode)) {
+        showToast("This key is restricted.");
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
     if (timer === 0) {
-      handleCloseTestPage();
+      navigate("/home2");
     }
+
+    // Cleanup functions
     return () => {
       clearInterval(countdown);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("copy", handleCopyPaste);
+      document.removeEventListener("paste", handleCopyPaste);
+      document.removeEventListener("keydown", handleKeyDown);
+      navigate("/home");
     };
   }, []);
 
