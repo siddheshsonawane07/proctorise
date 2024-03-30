@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
-import "./Home2.css";
+import "./css/Home2.css";
 import TestPage from "./TestPage";
 
 const Home2 = () => {

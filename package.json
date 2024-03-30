@@ -11,12 +11,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@material-ui/core": "^4.12.4",
     "@mediapipe/pose": "^0.5.1675469404",
     "@mui/icons-material": "^5.15.8",
-    "@mui/material": "^5.15.7",
+    "@mui/material": "^5.15.14",
     "@mui/styled-engine": "^5.15.8",
     "@reduxjs/toolkit": "^2.1.0",
     "@tensorflow-models/coco-ssd": "^2.2.3",
@@ -30,6 +30,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
+    "react-icons": "^5.0.1",
     "react-internet-meter": "^1.1.1",
     "react-router-dom": "^6.21.1",
     "react-toastify": "^9.1.3",

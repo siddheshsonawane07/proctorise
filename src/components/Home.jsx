@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/firebase-config";
-import "./Home.css";
+import "./css/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -27,17 +27,13 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      <div>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="large"
-          onClick={handleGoogleSignIn}
-        >
-          Sign In
-        </Button>
+    <div className="body">
+      <div className="header">
+        Proctored exams: Secure your exams with online exam proctoring with
+        Proctorise
+        <button onClick={handleGoogleSignIn}>TRY FOR FREE</button>
       </div>
+
       <div className="features">
         <div class="card">
           <div class="image"></div>
