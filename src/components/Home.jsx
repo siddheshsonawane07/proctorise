@@ -65,26 +65,56 @@ const Home = () => {
             src="https://img.icons8.com/ios/100/000000/id-verified.png"
             className="card-icon"
           />
-          <h2>Student Authentication</h2>
-          <p>This is the content of card 1.</p>
+          <div className="card-title">Student Authentication</div>
+          <div className="card-content">
+            <b>Multi-factor authentication </b>technology to eliminate the risk
+            of student impersonation.
+          </div>
+          <button className="card-button">Explore </button>
         </div>
         <div className="card">
           <img
             src="https://img.icons8.com/dotty/100/webcam.png"
             className="card-icon"
           />
-          <h2>Proctoring technology</h2>
-          <p>This is the content of card 2.</p>
+          <div className="card-title">Proctoring Technology</div>
+          <div className="card-content">
+            A comprehensive <b>AI-based Proctoring Technology </b>supporting
+            auto proctoring.
+          </div>
+          <button className="card-button">Explore </button>
         </div>
         <div className="card">
           <img
             src="https://img.icons8.com/ios/100/lock--v1.png"
             className="card-icon"
           />
-          <h2>Proctorise Secure Exam Browser</h2>
-          <p>This is the content of card 3.</p>
+          <div className="card-title">Proctorise Secure Exam Browser</div>
+          <div className="card-content">
+            <b>Secure Browser Lockdown Technology </b>that sanitizes students'
+            computers by disabling additional tabs, browsers, external ports,
+            etc.
+          </div>
+          <button className="card-button">Explore </button>
         </div>
       </div>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+
+      <p>siddhesh</p>
+
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
+      <p>siddhesh</p>
     </div>
   );
 };
