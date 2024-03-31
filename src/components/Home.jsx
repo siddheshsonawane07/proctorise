@@ -2,7 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/firebase-config";
+import HorizontalComponent2 from "./Horizontal-Component-2";
 import "./css/Home.css";
+import CardComponent from "./Card-Component";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -60,43 +62,33 @@ const Home = () => {
         Exams
       </div>
       <div className="card-row">
-        <div className="card">
-          <img
-            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FStudent-authentication.svg&w=64&q=75"
-            className="card-icon"
-          />
-          <div className="card-title">Student Authentication</div>
-          <div className="card-content">
-            <b>Multi-factor authentication </b>technology to eliminate the risk
-            of student impersonation.
-          </div>
-          <button className="card-button">EXPLORE</button>
-        </div>
-        <div className="card">
-          <img
-            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FRemote-proctoring.svg&w=64&q=75"
-            className="card-icon"
-          />
-          <div className="card-title">Proctoring Technology</div>
-          <div className="card-content">
-            A comprehensive <b>AI-based Proctoring Technology </b>supporting
-            auto proctoring.
-          </div>
-          <button className="card-button">EXPLORE</button>
-        </div>
-        <div className="card">
-          <img
-            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
-            className="card-icon"
-          />
-          <div className="card-title">Proctorise Secure Exam Browser</div>
-          <div className="card-content">
-            <b>Secure Browser Lockdown Technology </b>that sanitizes students'
-            computers by disabling additional tabs, browsers, external ports,
-            etc.
-          </div>
-          <button className="card-button">Explore </button>
-        </div>
+        <CardComponent
+          imgSrc={
+            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FStudent-authentication.svg&w=64&q=75"
+          }
+          title={"Student Authentication"}
+          content={
+            "Multi-factor authentication technology to eliminate the risk of student impersonation."
+          }
+        />
+        <CardComponent
+          imgSrc={
+            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FRemote-proctoring.svg&w=64&q=75"
+          }
+          title={"Proctoring Technology"}
+          content={
+            "Comprehensive AI-based Proctoring Technology supporting auto proctoring."
+          }
+        />
+        <CardComponent
+          imgSrc={
+            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
+          }
+          title={"Proctorise Secure Exam Browser"}
+          content={
+            "Secure Browser Lockdown Technology that sanitizes students' computers by disabling additional tabs, browsers, external ports,"
+          }
+        />
       </div>
       <div className="title-2">
         Our AI based proctoring features ensure total cheating prevention.
@@ -107,29 +99,22 @@ const Home = () => {
           className="graphics"
         />
         <div className="vertical-div-1">
-          <div className="horizontal-div-2">
-            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FVideo-Proctoring.svg&w=48&q=75" />
-            <div className="title-3">Attention Proctoring</div>
-            <div className="content-1">
-              It checks students' video feeds to raises flags in case of any
-              suspicious activity visible in the video
-            </div>
-          </div>
-          <div className="horizontal-div-2">
-            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75" />
-            <div classNamed="title-3">Image Proctoring</div>
-            <div className="content-1">
-              It assesses checks students' pictures taken at regular intervals
-            </div>
-          </div>
-          <div className="horizontal-div-2">
-            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75" />
-            <div className="title-3">Object Proctoring</div>
-            <div className="content-1">
-              It checks students' video feeds to raises flags in case of any
-              suspicious objects visible in the video
-            </div>
-          </div>
+          <HorizontalComponent2
+            imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FVideo-Proctoring.svg&w=48&q=75"
+            title="Attention Proctoring"
+            content="It checks students' video feeds to raises flags in case of any
+            suspicious activity visible in the video"
+          />
+          <HorizontalComponent2
+            imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75"
+            title="Image Proctoring"
+            content="It assesses checks students' pictures taken at regular intervals"
+          />
+          <HorizontalComponent2
+            imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75"
+            title="Object Proctoring"
+            content="It checks students' video feeds to raises flags in case of any suspicious objects visible in the video"
+          />
         </div>
       </div>
     </div>
