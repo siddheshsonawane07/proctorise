@@ -8,9 +8,8 @@ import TestPage from "./TestPage";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
-  // const user = localStorage.getItem("userId");
   const [hasStorageRef, setHasStorageRef] = useState(false);
-  const [imageLink, setimageLink] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const storage = getStorage(app);
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ const Home2 = () => {
       try {
         const imageLink = await getDownloadURL(storageRef);
         setHasStorageRef(true);
-        setimageLink(imageLink);
+        setImageLink(imageLink);
       } catch (error) {
         setHasStorageRef(false);
       }
@@ -41,18 +40,6 @@ const Home2 = () => {
   const handleDetectionCheck = () => {
     navigate("/detectioncheck");
   };
-
-  // const handleTestButton = () => {
-  //   if (hasStorageRef) {
-  //     const formLink =
-  //       "https://docs.google.com/forms/d/e/1FAIpQLSc949s3nmwj7ATngW04nszTiG2A9HdHm4YLylRP8kQCA-fyJA/viewform?usp=sf_link";
-  //     const time = 15;
-  //     navigate("/test", { state: { formLink: formLink, testTime: time } });
-  //   } else {
-  //     alert("Image not found. Please upload image first");
-  //     navigate("/uploadimage");
-  //   }
-  // };
 
   const handleUploadPhoto = () => {
     navigate("/uploadimage");
@@ -73,8 +60,8 @@ const Home2 = () => {
 
   return (
     <div className="mainCon">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div>
+      <nav className="navbar">
+        <div className="logo-container">
           <img
             id="logo"
             src="https://cdn-icons-png.flaticon.com/128/8763/8763240.png"
@@ -82,101 +69,68 @@ const Home2 = () => {
           />
           <a className="navbar-brand">PROCTORISE</a>
         </div>
-        <>
-          <p className="forPhoto ">
-            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
-          </p>
-        </>
+        <div className="btn-container">
+  <button className="btn" onClick={handleSystemCheck}>
+    System Check
+  </button>
+  <button className="btn" onClick={handleDetectionCheck}>
+    Check Basic Detections
+  </button>
+  <button className="btn" onClick={handleUploadPhoto}>
+    Upload Photo
+  </button>
+  <button className="btn" onClick={handleCreateTest}>
+    Create Test
+  </button>
+  <button className="btn" onClick={handleAttemptTest}>
+    Attempt Test
+  </button>
+  <button className="btn" onClick={handleLogoutButton}>
+    Logout
+  </button>
+</div>
+
+        <div className="user-profile">
+          {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
+        </div>
       </nav>
 
-      <div className="photoandinstr">
-        <ul className="instruction-lines">
-          <li className="instructions">
-            You must use a functioning webcam and microphone
-          </li>
-          <li className="instructions">
-            No cell phones or other secondary devices in the room or test area
-          </li>
-          <li className="instructions">
-            Your desk/table must be clear or any materials except your
-            test-taking device
-          </li>
-          <li className="instructions">
-            No one else can be in the room with you
-          </li>
-          <li className="instructions">No talking</li>
-          <li className="instructions">
-            The testing room must be well-lit and you must be clearly visible
-          </li>
-          <li className="instructions">No dual screens/monitors</li>
-          <li className="instructions">Do not leave the camera </li>
-        </ul>
-      </div>
+      <div className="content-container">
+        <div className="instruction-container">
+          <h2>Instructions</h2>
+          <ul className="instruction-lines">
+            <li className="instructions">
+              You must use a functioning webcam and microphone
+            </li>
+            <li className="instructions">
+              No cell phones or other secondary devices in the room or test
+              area
+            </li>
+            <li className="instructions">
+              Your desk/table must be clear of any materials except your
+              test-taking device
+            </li>
+            <li className="instructions">
+              No one else can be in the room with you
+            </li>
+            <li className="instructions">No talking</li>
+            <li className="instructions">
+              The testing room must be well-lit and you must be clearly visible
+            </li>
+            <li className="instructions">No dual screens/monitors</li>
+            <li className="instructions">Do not leave the camera</li>
+          </ul>
+        </div>
 
-      <div className="text-center">
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleSystemCheck}
-        >
-          {" "}
-          System Check{" "}
-        </button>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleDetectionCheck}
-        >
-          Check the basic detections
-        </button>
-        {/* <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleTestButton}
-        >
-          Test Page
-        </button> */}
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleUploadPhoto}
-        >
-          Upload Photo{" "}
-        </button>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleLogoutButton}
-        >
-          Logout Page
-        </button>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleCreateTest}
-        >
-          Create test
-        </button>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleAttemptTest}
-        >
-          Attempt Test
-        </button>
-      </div>
-
-      <div>
-        <p className="uploadedimg-container">
+        <div className="image-container">
           {imageLink && (
             <img
               className="uploadedimg"
               src={imageLink}
               alt="No Photo Uploaded"
-              style={{ maxWidth: "1000px", maxHeight: "300px" }}
             />
-          )}{" "}
-        </p>
+          )}
+        </div>
       </div>
     </div>
   );
