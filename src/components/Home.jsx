@@ -45,9 +45,7 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
-          <button className="button-1" id="tryforfree">
-            REQUEST A DEMO
-          </button>
+          <button className="button-3">REQUEST A DEMO</button>
         </div>
       </div>
       <div className="title-2">
@@ -73,7 +71,7 @@ const Home = () => {
         <CardComponent
           imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
           title="Proctorise Secure Exam Browser"
-          content="Secure Browser Lockdown Technology that sanitizes students' computers by disabling additional tabs, browsers, external ports,"
+          content="Secure Browser Lockdown Technology using Javascript"
           buttonType="three"
         />
       </div>
@@ -108,7 +106,7 @@ const Home = () => {
         <button className="button-2">SPEAK TO OUR EXPERTS</button>
         <button
           className="button-2"
-          style={{ backgroundColor: "rgba(0, 31, 255, 0.8407738095238095)" }}
+          style={{ backgroundColor: "rgba(63, 75, 141, 255)" }}
         >
           FAQS
         </button>

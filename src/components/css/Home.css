@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 * {
   margin: 0;
@@ -9,40 +9,44 @@
 }
 
 .title-1 {
-  font-family: "Roboto", sans-serif;
-  font-size: 2rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 350;
 }
 
 .title-2 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 2rem;
   text-align: center;
   margin-top: 4rem;
 }
 
 .title-3 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
   font-weight: bolder;
+  color: rgba(63, 75, 141, 255);
   margin-left: 0.5;
   padding: 1.8rem;
   width: 5rem;
+  text-align: center;
 }
 
 .subtitle-1 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1.2rem;
   text-align: center;
   margin-top: 0.4rem;
 }
 
 .subtitle-2 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1.2rem;
+  text-align: center;
 }
 
 .content-1 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
   margin-right: 3.5rem;
   margin-top: 0.5rem;
@@ -51,8 +55,8 @@
 .header {
   background: linear-gradient(
     90deg,
-    rgba(39, 117, 5, 0.908000700280112) 38%,
-    rgba(0, 31, 255, 0.8407738095238095) 96%
+    rgba(32, 117, 98, 255) 38%,
+    rgba(63, 75, 141, 255) 96%
   );
 
   color: #fff;
@@ -65,13 +69,13 @@
 }
 
 .button-1 {
-  background-color: #2ea44f;
+  background-color: #2c974b;
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 0.5rem;
@@ -81,7 +85,7 @@
 }
 
 .button-1:hover {
-  background-color: #2c974b; /* Change color on hover */
+  background-color: #2c974b;
 }
 
 .button-1:focus {
@@ -93,13 +97,13 @@
 }
 
 .button-2 {
-  background-color: #2ea44f;
+  background-color: rgba(32, 117, 98, 255);
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 0.5rem;
@@ -122,6 +126,33 @@
   background-color: #298e46;
 }
 
+.button-3 {
+  background-color: #2c974b;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.button-3:hover {
+  background-color: #2c974b; /* Change color on hover */
+}
+
+.button-3:focus {
+  outline: none;
+}
+
+.button-3:active {
+  background-color: #298e46;
+}
 .horizontal-div-1 {
   display: flex;
   align-items: center;
@@ -185,28 +216,31 @@
 
 .card-title {
   margin-top: 2rem;
-  font-family: "Roboto", sans-serif;
+  margin-right: 1.5rem;
+  margin-left: 1.5rem;
+  font-family: "Poppins", sans-serif;
   font-size: 1.4rem;
   text-align: center;
+  color: rgba(63, 75, 141, 255);
 }
 
 .card-content {
   margin-top: 1.2rem;
-  margin-left: 1.2rem;
-  margin-right: 1.2rem;
-  font-family: "Roboto", sans-serif;
+  margin-right: 1.5rem;
+  margin-left: 1.5rem;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
   text-align: center;
 }
 
 .card-button {
-  background-color: #2ea44f;
+  background-color: rgba(32, 117, 98, 255);
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 0.5rem;
@@ -215,16 +249,16 @@
 }
 
 #one {
-  margin-top: 3rem;
+  margin-top: 2rem;
   margin-left: 7.5rem;
 }
 
 #two {
-  margin-top: 3rem;
+  margin-top: 1.89rem;
   margin-left: 7.5rem;
 }
 
 #three {
-  margin-top: 1.7rem;
+  margin-top: 1.3rem;
   margin-left: 7.5rem;
 }

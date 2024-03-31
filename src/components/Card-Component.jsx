@@ -7,7 +7,7 @@ const CardComponent = ({ imgSrc, title, content, buttonType }) => {
       <div className="card-title">{title}</div>
       <div className="card-content">{content}</div>
       <button className={`card-button`} id={`${buttonType}`}>
-        Explore
+        EXPLORE
       </button>
     </div>
   );
