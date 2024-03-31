@@ -85,8 +85,9 @@ body {
 }
 
 .graphics {
-  margin-left: 7rem;
+  margin-left: 4.5rem;
   margin-right: 5rem;
+  width: 25rem;
 }
 
 .card-row {
@@ -98,7 +99,7 @@ body {
 }
 
 .card {
-  width: 25rem;
+  width: 22rem;
   height: 15rem;
   background-color: #fff;
   border-radius: 8px;
@@ -125,8 +126,8 @@ body {
 
 .card-content {
   margin-top: 1.2rem;
-  margin-left: 3.2rem;
-  margin-right: 3.2rem;
+  margin-left: 1.2rem;
+  margin-right: 1.2rem;
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
   text-align: center;

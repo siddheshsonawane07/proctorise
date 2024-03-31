@@ -98,23 +98,20 @@ const Home = () => {
           <button className="card-button">Explore </button>
         </div>
       </div>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-
-      <p>siddhesh</p>
-
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
-      <p>siddhesh</p>
+      <div id="title-2">
+        Our AI based proctoring features ensure total cheating prevention.
+      </div>
+      <div className="horizontal-card">
+        <img
+          src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FAI-based-Flag.gif&w=640&q=75"
+          className="graphics"
+        />
+        <div className="horizontal-card-content"></div>
+        <div id="content-1">
+          Auto proctoring is an AI-based automated proctoring technology that
+          uses students' webcams, and microphone feeds for auto invigilation.
+        </div>
+      </div>
     </div>
   );
 };
