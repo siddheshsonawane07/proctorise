@@ -27,7 +27,7 @@ const Home = () => {
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
         <button
-          className="greenButton"
+          className="button-1"
           id="tryforfree"
           onClick={handleGoogleSignIn}
         >
@@ -37,7 +37,7 @@ const Home = () => {
       <div className="horizontal-div-1">
         <img
           src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FRemote-Proctoring-Solution.svg&w=384&q=75"
-          className="graphics"
+          className="graphics-1"
         />
         <div className="vertical-div-1">
           <div className="title-1">What is a Proctored Exam?</div>
@@ -49,7 +49,7 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
-          <button className="greenButton" id="tryforfree">
+          <button className="button-1" id="tryforfree">
             REQUEST A DEMO
           </button>
         </div>
@@ -96,7 +96,7 @@ const Home = () => {
       <div className="horizontal-div-1">
         <img
           src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FAI-based-Flag.gif&w=640&q=75"
-          className="graphics"
+          className="graphics-2"
         />
         <div className="vertical-div-1">
           <HorizontalComponent2
@@ -116,6 +116,15 @@ const Home = () => {
             content="It checks students' video feeds to raises flags in case of any suspicious objects visible in the video"
           />
         </div>
+      </div>
+      <div className="horizontal-div-3">
+        <button className="button-2">SPEAK TO OUR EXPERTS</button>
+        <button
+          className="button-2"
+          style={{ backgroundColor: "rgba(0, 31, 255, 0.8407738095238095)" }}
+        >
+          FAQS
+        </button>
       </div>
     </div>
   );
