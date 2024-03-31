@@ -108,7 +108,7 @@ const Home = () => {
           <HorizontalComponent2
             imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75"
             title="Image Proctoring"
-            content="It assesses checks students' pictures taken at regular intervals"
+            content="It assesses students' pictures taken at regular intervals with the authenticated image"
           />
           <HorizontalComponent2
             imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75"

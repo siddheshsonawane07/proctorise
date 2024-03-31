@@ -23,13 +23,10 @@ body {
 .title-3 {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
+  font-weight: bolder;
   margin-left: 0.5;
   padding: 1.8rem;
-}
-
-.title-4 {
-  font-family: "Roboto", sans-serif;
-  font-size: 1rem;
+  width: 5rem;
 }
 
 .subtitle-1 {
