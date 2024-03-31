@@ -45,7 +45,7 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
-          <button className="button-3">REQUEST A DEMO</button>
+          <button className="button-2">REQUEST A DEMO</button>
         </div>
       </div>
       <div className="title-2">
