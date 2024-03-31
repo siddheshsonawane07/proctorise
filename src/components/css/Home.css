@@ -8,29 +8,47 @@ body {
   margin: 0;
 }
 
-#title-1 {
+.title-1 {
   font-family: "Roboto", sans-serif;
   font-size: 2rem;
 }
 
-#title-2 {
+.title-2 {
   font-family: "Roboto", sans-serif;
   font-size: 2rem;
   text-align: center;
   margin-top: 4rem;
 }
 
-#subtitle-1 {
+.title-3 {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  margin-left: 0.5;
+  padding: 1.8rem;
+}
+
+.title-4 {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+}
+
+.subtitle-1 {
   font-family: "Roboto", sans-serif;
   font-size: 1.2rem;
   text-align: center;
   margin-top: 0.4rem;
 }
 
-#content-1 {
+.subtitle-2 {
   font-family: "Roboto", sans-serif;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
+}
+
+.content-1 {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
   margin-right: 0.4rem;
+  margin-top: 0.5rem;
 }
 
 .header {
@@ -78,12 +96,21 @@ body {
   background-color: #298e46;
 }
 
-.horizontal-card {
+.horizontal-div-1 {
   display: flex;
   align-items: center;
   margin-top: 2rem;
 }
 
+.horizontal-div-2 {
+  display: flex;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.vertical-div-1 {
+  margin-top: 0rem;
+}
 .graphics {
   margin-left: 4.5rem;
   margin-right: 5rem;

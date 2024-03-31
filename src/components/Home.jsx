@@ -21,7 +21,7 @@ const Home = () => {
   return (
     <div className="body">
       <div className="header">
-        <div id="title-1">
+        <div className="title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
         <button
@@ -32,14 +32,14 @@ const Home = () => {
           TRY FOR FREE
         </button>
       </div>
-      <div className="horizontal-card">
+      <div className="horizontal-div-1">
         <img
           src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FRemote-Proctoring-Solution.svg&w=384&q=75"
           className="graphics"
         />
-        <div className="horizontal-card-content">
-          <div id="title-1">What is a Proctored Exam?</div>
-          <div id="content-1">
+        <div className="vertical-div-1">
+          <div className="title-1">What is a Proctored Exam?</div>
+          <div className="content-1">
             Proctor exam test is a term used to define an online assessment that
             employs a tech-enabled AI based proctoring software that
             automatically supervises a test taker. An online proctored test uses
@@ -52,17 +52,17 @@ const Home = () => {
           </button>
         </div>
       </div>
-      <div id="title-2">
+      <div className="title-2">
         Proctorise: Secure online exam proctoring with an AI-powered tool
       </div>
-      <div id="subtitle-1">
+      <div className="subtitle-1">
         Our Suite of Online Proctoring Services Ensures Cheating-Free Online
         Exams
       </div>
       <div className="card-row">
         <div className="card">
           <img
-            src="https://img.icons8.com/ios/100/000000/id-verified.png"
+            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FStudent-authentication.svg&w=64&q=75"
             className="card-icon"
           />
           <div className="card-title">Student Authentication</div>
@@ -70,11 +70,11 @@ const Home = () => {
             <b>Multi-factor authentication </b>technology to eliminate the risk
             of student impersonation.
           </div>
-          <button className="card-button">Explore </button>
+          <button className="card-button">EXPLORE</button>
         </div>
         <div className="card">
           <img
-            src="https://img.icons8.com/dotty/100/webcam.png"
+            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FRemote-proctoring.svg&w=64&q=75"
             className="card-icon"
           />
           <div className="card-title">Proctoring Technology</div>
@@ -82,11 +82,11 @@ const Home = () => {
             A comprehensive <b>AI-based Proctoring Technology </b>supporting
             auto proctoring.
           </div>
-          <button className="card-button">Explore </button>
+          <button className="card-button">EXPLORE</button>
         </div>
         <div className="card">
           <img
-            src="https://img.icons8.com/ios/100/lock--v1.png"
+            src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
             className="card-icon"
           />
           <div className="card-title">Proctorise Secure Exam Browser</div>
@@ -98,18 +98,38 @@ const Home = () => {
           <button className="card-button">Explore </button>
         </div>
       </div>
-      <div id="title-2">
+      <div className="title-2">
         Our AI based proctoring features ensure total cheating prevention.
       </div>
-      <div className="horizontal-card">
+      <div className="horizontal-div-1">
         <img
           src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FAI-based-Flag.gif&w=640&q=75"
           className="graphics"
         />
-        <div className="horizontal-card-content"></div>
-        <div id="content-1">
-          Auto proctoring is an AI-based automated proctoring technology that
-          uses students' webcams, and microphone feeds for auto invigilation.
+        <div className="vertical-div-1">
+          <div className="horizontal-div-2">
+            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FVideo-Proctoring.svg&w=48&q=75" />
+            <div className="title-3">Attention Proctoring</div>
+            <div className="content-1">
+              It checks students' video feeds to raises flags in case of any
+              suspicious activity visible in the video
+            </div>
+          </div>
+          <div className="horizontal-div-2">
+            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75" />
+            <div classNamed="title-3">Image Proctoring</div>
+            <div className="content-1">
+              It assesses checks students' pictures taken at regular intervals
+            </div>
+          </div>
+          <div className="horizontal-div-2">
+            <img src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FImage-Proctoring.svg&w=48&q=75" />
+            <div className="title-3">Object Proctoring</div>
+            <div className="content-1">
+              It checks students' video feeds to raises flags in case of any
+              suspicious objects visible in the video
+            </div>
+          </div>
         </div>
       </div>
     </div>
