@@ -69,12 +69,10 @@ const Home = () => {
           <p>This is the content of card 1.</p>
         </div>
         <div className="card">
-          <div className="card-icon-container">
-            <img
-              src="https://img.icons8.com/dotty/100/webcam.png"
-              className="card-icon"
-            />
-          </div>
+          <img
+            src="https://img.icons8.com/dotty/100/webcam.png"
+            className="card-icon"
+          />
           <h2>Proctoring technology</h2>
           <p>This is the content of card 2.</p>
         </div>
