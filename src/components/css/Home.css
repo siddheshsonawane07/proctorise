@@ -27,7 +27,7 @@ body {
   margin-top: 0.4rem;
 }
 
-.content-1 {
+#content-1 {
   font-family: "Roboto", sans-serif;
   font-size: 1.4rem;
   margin-right: 0.4rem;
@@ -87,4 +87,37 @@ body {
 .graphics {
   margin-left: 7rem;
   margin-right: 5rem;
+}
+
+.card-row {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: space-around; /* Adjust spacing between cards */
+}
+
+.card-icon {
+  position: absolute; /* Position the container absolutely */
+  top: -15px; /* Adjust top position to move it up */
+  left: 50%; /* Center the container horizontally */
+  transform: translateX(-50%); /* Center the container horizontally */
+  z-index: -1; /* Move the container behind the card content */
+}
+
+.card {
+  width: 18rem;
+  height: 20rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.card h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #666;
 }

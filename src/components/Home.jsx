@@ -39,7 +39,7 @@ const Home = () => {
         />
         <div className="horizontal-card-content">
           <div id="title-1">What is a Proctored Exam?</div>
-          <div className="content-1">
+          <div id="content-1">
             Proctor exam test is a term used to define an online assessment that
             employs a tech-enabled AI based proctoring software that
             automatically supervises a test taker. An online proctored test uses
@@ -58,6 +58,34 @@ const Home = () => {
       <div id="subtitle-1">
         Our Suite of Online Proctoring Services Ensures Cheating-Free Online
         Exams
+      </div>
+      <div className="card-row">
+        <div className="card">
+          <img
+            src="https://img.icons8.com/ios/100/000000/id-verified.png"
+            className="card-icon"
+          />
+          <h2>Student Authentication</h2>
+          <p>This is the content of card 1.</p>
+        </div>
+        <div className="card">
+          <div className="card-icon-container">
+            <img
+              src="https://img.icons8.com/dotty/100/webcam.png"
+              className="card-icon"
+            />
+          </div>
+          <h2>Proctoring technology</h2>
+          <p>This is the content of card 2.</p>
+        </div>
+        <div className="card">
+          <img
+            src="https://img.icons8.com/ios/100/lock--v1.png"
+            className="card-icon"
+          />
+          <h2>Proctorise Secure Exam Browser</h2>
+          <p>This is the content of card 3.</p>
+        </div>
       </div>
     </div>
   );
