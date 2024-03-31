@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
-:root {
+* {
   margin: 0;
 }
 
-body {
+.body {
   margin: 0;
 }
 
@@ -44,7 +44,7 @@ body {
 .content-1 {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
-  margin-right: 0.4rem;
+  margin-right: 3.5rem;
   margin-top: 0.5rem;
 }
 
@@ -61,6 +61,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0;
 }
 
 .button-1 {
@@ -131,6 +132,7 @@ body {
   display: flex;
   align-items: center;
   margin-top: 0.2rem;
+  margin-right: 3.5rem;
 }
 
 .horizontal-div-3 {
@@ -210,4 +212,19 @@ body {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   transition: background-color 0.3s ease;
+}
+
+#one {
+  margin-top: 3rem;
+  margin-left: 7.5rem;
+}
+
+#two {
+  margin-top: 3rem;
+  margin-left: 7.5rem;
+}
+
+#three {
+  margin-top: 1.7rem;
+  margin-left: 7.5rem;
 }

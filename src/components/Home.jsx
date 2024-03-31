@@ -26,11 +26,7 @@ const Home = () => {
         <div className="title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
-        <button
-          className="button-1"
-          id="tryforfree"
-          onClick={handleGoogleSignIn}
-        >
+        <button className="button-1" onClick={handleGoogleSignIn}>
           TRY FOR FREE
         </button>
       </div>
@@ -63,31 +59,22 @@ const Home = () => {
       </div>
       <div className="card-row">
         <CardComponent
-          imgSrc={
-            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FStudent-authentication.svg&w=64&q=75"
-          }
-          title={"Student Authentication"}
-          content={
-            "Multi-factor authentication technology to eliminate the risk of student impersonation."
-          }
+          imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FStudent-authentication.svg&w=64&q=75"
+          title="Student Authentication"
+          content="Multi-factor authentication technology to eliminate the risk of student impersonation."
+          buttonType="one"
         />
         <CardComponent
-          imgSrc={
-            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FRemote-proctoring.svg&w=64&q=75"
-          }
-          title={"Proctoring Technology"}
-          content={
-            "Comprehensive AI-based Proctoring Technology supporting auto proctoring."
-          }
+          imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FRemote-proctoring.svg&w=64&q=75"
+          title="Proctoring Technology"
+          content="Comprehensive AI-based Proctoring Technology supporting auto proctoring."
+          buttonType="two"
         />
         <CardComponent
-          imgSrc={
-            "https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
-          }
-          title={"Proctorise Secure Exam Browser"}
-          content={
-            "Secure Browser Lockdown Technology that sanitizes students' computers by disabling additional tabs, browsers, external ports,"
-          }
+          imgSrc="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fstrategic-partnerships%2FMettl-Secure-Browser.svg&w=64&q=75"
+          title="Proctorise Secure Exam Browser"
+          content="Secure Browser Lockdown Technology that sanitizes students' computers by disabling additional tabs, browsers, external ports,"
+          buttonType="three"
         />
       </div>
       <div className="title-2">
