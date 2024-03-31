@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/firebase-config";
@@ -6,7 +6,6 @@ import "./css/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
-
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -19,17 +18,11 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    if (localStorage.getItem("userId")) {
-      navigate("/home");
-    }
-  }, []);
-
   return (
     <div className="body">
       <div className="header">
-        <div className="title">
-          Proctored exams: Secure your online assesments using Proctorise{" "}
+        <div id="title-1">
+          Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
         <button
           className="greenButton"
@@ -44,9 +37,9 @@ const Home = () => {
           src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FRemote-Proctoring-Solution.svg&w=384&q=75"
           className="graphics"
         />
-        <div>
-          <div className="title">What is a Proctored Exam?</div>
-          <div className="desc">
+        <div className="horizontal-card-content">
+          <div id="title-1">What is a Proctored Exam?</div>
+          <div className="content-1">
             Proctor exam test is a term used to define an online assessment that
             employs a tech-enabled AI based proctoring software that
             automatically supervises a test taker. An online proctored test uses
@@ -54,88 +47,17 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
+          <button className="greenButton" id="tryforfree">
+            REQUEST A DEMO
+          </button>
         </div>
       </div>
-      <div className="features">
-        <div class="card">
-          <div class="image"></div>
-          <div class="content">
-            <a href="#">
-              <span class="title">
-                <h6>Real-time Face Verification</h6>
-              </span>
-            </a>
-
-            <p class="desc">
-              Ensure the identity of exam takers through live face verification.
-            </p>
-
-            <a class="action" href="#">
-              Find out more
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="image"></div>
-          <div class="content">
-            <a href="#">
-              <span class="title">
-                <h6>Face Recognition</h6>
-              </span>
-            </a>
-
-            <p class="desc">
-              Recognize registered users' faces during exams to prevent
-              impersonation.
-            </p>
-
-            <a class="action" href="#">
-              Find out more
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="image"></div>
-          <div class="content">
-            <a href="#">
-              <span class="title">
-                <h6>Pose Detection</h6>
-              </span>
-            </a>
-
-            <p class="desc">
-              Detect the Face Position of the examinee to avoid any cheating
-              attempts.
-            </p>
-
-            <a class="action" href="#">
-              Find out more
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="image"></div>
-          <div class="content">
-            <a href="#">
-              <span class="title">
-                <h6>Cheating Detection</h6>
-              </span>
-            </a>
-
-            <p class="desc">
-              Detect cheating behaviors such as looking away from the screen or
-              using unauthorized materials.
-            </p>
-
-            <a class="action" href="#">
-              Find out more
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </div>
+      <div id="title-2">
+        Proctorise: Secure online exam proctoring with an AI-powered tool
+      </div>
+      <div id="subtitle-1">
+        Our Suite of Online Proctoring Services Ensures Cheating-Free Online
+        Exams
       </div>
     </div>
   );
