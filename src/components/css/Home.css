@@ -1,78 +1,113 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
 :root {
   margin: 0;
 }
 
 body {
   margin: 0;
-  padding: 20px;
 }
 
+.title {
+  font-family: "Roboto", sans-serif;
+  font-size: 2rem;
+}
+
+.desc {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.4rem;
+}
 .header {
   margin: 0;
   background: linear-gradient(
     90deg,
-    rgba(2, 0, 36, 1) 0%,
-    rgba(9, 121, 86, 0.9220063025210083) 0%,
-    rgba(9, 125, 93, 1) 64%,
-    rgba(0, 212, 255, 1) 100%
+    rgba(39, 117, 5, 0.908000700280112) 38%,
+    rgba(0, 31, 255, 0.8407738095238095) 96%
   );
+
   color: #fff;
-  padding: 50px;
+  padding: 5rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.greenButton {
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  padding: 0.8rem;
+  transition: background-color 0.3s ease;
+}
+
+#tryforfree {
+  display: block;
+  margin-top: 1rem;
+}
+
+.greenButton:hover {
+  background-color: #2c974b; /* Change color on hover */
+}
+
+.greenButton:focus {
+  outline: none;
+}
+
+.greenButton:active {
+  background-color: #298e46;
 }
 
 .features {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 30px;
-  padding: 20px;
+  gap: 3rem;
+  padding: 2rem;
+}
+
+.horizontal-card {
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.graphics {
+  margin-left: 7rem;
+  margin-right: 5rem;
 }
 
 .card {
-  width: 300px;
-  background-color: var(--card-background);
+  width: 25rem;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 5px 15px var(--card-shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px var(--card-shadow);
+  transform: translateY(-2rem);
 }
 
 .image {
-  height: 180px;
-  background-color: #eaeaea;
-  background-size: cover;
+  height: 12rem;
+  background-color: black;
   background-position: center;
 }
 
 .content {
-  padding: 20px;
+  padding: 1rem;
   flex: 1; /* Make content flex to push actions to the bottom */
   display: flex;
   flex-direction: column;
 }
 
-.title h6 {
-  margin: 0 0 10px;
-  color: var(--text-color);
-  font-size: 20px;
-}
-
-.desc {
-  color: var(--text-color-light);
-  font-size: 16px;
-  flex: 1; /* Make description take available space */
-}
-
 .action {
-  color: var(--primary-color);
   text-decoration: none;
   font-weight: bold;
   align-self: flex-start; /* Align link to the start */
@@ -84,7 +119,7 @@ body {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 10rem) {
   .features {
     flex-direction: column;
     align-items: center;

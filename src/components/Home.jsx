@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Button from "@material-ui/core/Button";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/firebase-config";
@@ -29,11 +28,34 @@ const Home = () => {
   return (
     <div className="body">
       <div className="header">
-        Proctored exams: Secure your exams with online exam proctoring with
-        Proctorise
-        <button onClick={handleGoogleSignIn}>TRY FOR FREE</button>
+        <div className="title">
+          Proctored exams: Secure your online assesments using Proctorise{" "}
+        </div>
+        <button
+          className="greenButton"
+          id="tryforfree"
+          onClick={handleGoogleSignIn}
+        >
+          TRY FOR FREE
+        </button>
       </div>
-
+      <div className="horizontal-card">
+        <img
+          src="https://assetsprelogin.mettl.com/_next/image/?url=%2Fassets%2Fonline-remote-proctoring%2FRemote-Proctoring-Solution.svg&w=384&q=75"
+          className="graphics"
+        />
+        <div>
+          <div className="title">What is a Proctored Exam?</div>
+          <div className="desc">
+            Proctor exam test is a term used to define an online assessment that
+            employs a tech-enabled AI based proctoring software that
+            automatically supervises a test taker. An online proctored test uses
+            a combination of video and audio to prevent cheating. A proctor
+            exam/test provides utmost strictness to an examination drive and
+            eliminates any unwanted incident.
+          </div>
+        </div>
+      </div>
       <div className="features">
         <div class="card">
           <div class="image"></div>
