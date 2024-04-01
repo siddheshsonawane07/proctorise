@@ -1,36 +1,5 @@
-/* body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
 
-body {
-  background: linear-gradient(
-    90deg,
-    rgba(39, 117, 5, 0.908000700280112) 38%,
-    rgba(0, 31, 255, 0.8407738095238095) 96%
-  );
-} */
-
-/* .mainCon {
-  color: #fff;
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-  padding-bottom: 20px;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(
-    90deg,
-    rgba(32, 117, 98, 255) 38%,
-    rgba(63, 75, 141, 255) 96%
-  );
-} */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-
-.home-2-body {
-}
 
 .home-2-navbar {
   position: fixed;
