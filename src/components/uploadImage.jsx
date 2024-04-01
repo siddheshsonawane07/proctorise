@@ -13,6 +13,7 @@ const UploadImage = () => {
   const [user] = useAuthState(auth);
   const webcamRef = useRef(null);
   const navigate = useNavigate();
+  const profilePhoto = localStorage.getItem("user_photo");
 
   const capturePhoto = () => {
     if (webcamRef.current && webcamRef.current.video) {
@@ -45,6 +46,35 @@ const UploadImage = () => {
       }
     }
   };
+  
+  const handleSystemCheck = () => {
+    navigate("/systemcheck");
+  };
+
+  const handleDetectionCheck = () => {
+    navigate("/detectioncheck");
+  };
+
+  const handleUploadPhoto = () => {
+    navigate("/uploadimage");
+  };
+
+  const handleCreateTest = () => {
+    navigate("/createtest");
+  };
+
+  const handleAttemptTest = () => {
+    navigate("/attempttest");
+  };
+
+  const handleProfilePhoto = () => {
+    navigate("/home");
+  };
+
+  const handleLogoutButton = async () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (progress) {
@@ -54,15 +84,39 @@ const UploadImage = () => {
 
   return (
     <div>
+      <div className="home-2-body">
+        <nav className="home-2-navbar">
+          <a className="home-2-navbar-brand">Proctorise</a>
+          <div className="home-2-button-container">
+            <button className="home-2-button-1" onClick={handleSystemCheck}>
+              System Check
+            </button>
+            <button className="home-2-button-1" onClick={handleDetectionCheck}>
+              Check Basic Detections
+            </button>
+            <button className="home-2-button-1" onClick={handleUploadPhoto}>
+              Upload Photo
+            </button>
+            <button className="home-2-button-1" onClick={handleCreateTest}>
+              Create Test
+            </button>
+            <button className="home-2-button-1" onClick={handleAttemptTest}>
+              Attempt Test
+            </button>
+            <button className="home-2-button-1" onClick={handleLogoutButton}>
+              Logout
+            </button>
+          </div>
+
+          <div className="home-2-user-profile" onClick={handleProfilePhoto}>
+            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
+          </div>
+        </nav>
+      </div>
       <Webcam
         ref={webcamRef}
         style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
+          marginTop: 60,
           textAlign: "center",
           zIndex: 9,
           width: 480,
@@ -76,10 +130,15 @@ const UploadImage = () => {
         screenshotFormat="image/png"
       />
       <h1>{progress}</h1>
-      <button onClick={capturePhoto}>Capture Photo</button>
+      <button onClick={capturePhoto} className="home-2-button-1">
+        Capture Photo
+      </button>
       {image && (
         <>
-          <button onClick={uploadImageFunction}> Upload Photo </button>
+          <button onClick={uploadImageFunction} className="home-2-button-1">
+            {" "}
+            Upload Photo{" "}
+          </button>
         </>
       )}
     </div>

@@ -1,12 +1,36 @@
-import {useRef } from "react";
+import { useRef, useState } from "react";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import Webcam from "react-webcam";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const DetectionCheck = () => {
+  const [toasts, setToasts] = useState([]);
   const webcamRef = useRef(null);
+  const profilePhoto = localStorage.getItem("user_photo");
+  const navigate = useNavigate();
 
+  const showToast = (message, type) => {
+    const toastOptions = {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      type: type || "warning",
+    };
+
+    if (toasts.length >= 2) {
+      const removedToastId = toasts.shift();
+      toast.dismiss(removedToastId);
+    }
+    const newToast = toast(message, toastOptions);
+    setToasts((prevToasts) => [...prevToasts, newToast]);
+  };
   const objectDetection = (predictions) => {
     let faceCount = 0;
 
@@ -14,14 +38,14 @@ const DetectionCheck = () => {
       if (prediction.class === "person") {
         faceCount++;
       } else if (["cell phone", "book", "laptop"].includes(prediction.class)) {
-        console.log("Object Detected, Action has been Recorded");
+        showToast("Object Detected, Action has been Recorded");
       }
     });
 
     if (faceCount > 1) {
-      console.log("Multiple People Detected");
+      showToast("Multiple People Detected");
     } else if (faceCount === 0) {
-      console.log("No Face Detected");
+      showToast("No Face Detected");
     }
   };
 
@@ -33,7 +57,7 @@ const DetectionCheck = () => {
       keypointEarL.score < minConfidence ||
       keypointEarR.score < minConfidence
     ) {
-      console.log("You looked away from the screen");
+      showToast("You looked away from the screen");
     }
   };
 
@@ -57,33 +81,87 @@ const DetectionCheck = () => {
     if (poses.length > 0) {
       earsDetect(poses[0].keypoints, 0.5);
     } else {
-      console.log("No one detected");
+      showToast("No one detected");
     }
-  }, 3000);
+  }, 8000);
+
+  const handleSystemCheck = () => {
+    navigate("/systemcheck");
+  };
+
+  const handleDetectionCheck = () => {
+    navigate("/detectioncheck");
+  };
+
+  const handleUploadPhoto = () => {
+    navigate("/uploadimage");
+  };
+
+  const handleCreateTest = () => {
+    navigate("/createtest");
+  };
+
+  const handleAttemptTest = () => {
+    navigate("/attempttest");
+  };
+
+  const handleProfilePhoto = () => {
+    navigate("/home");
+  };
+
+  const handleLogoutButton = async () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   return (
     <div>
-      <Webcam
-        ref={webcamRef}
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          textAlign: "center",
-          zIndex: 9,
-          width: 480,
-          height: 480,
-        }}
-        videoConstraints={{
-          width: 1280,
-          height: 720,
-          facingMode: "user",
-        }}
-        screenshotFormat="image/png"
-      />
+      <nav className="home-2-navbar">
+        <a className="home-2-navbar-brand">Proctorise</a>
+        <div className="home-2-button-container">
+          <button className="home-2-button-1" onClick={handleSystemCheck}>
+            System Check
+          </button>
+          <button className="home-2-button-1" onClick={handleDetectionCheck}>
+            Check Basic Detections
+          </button>
+          <button className="home-2-button-1" onClick={handleUploadPhoto}>
+            Upload Photo
+          </button>
+          <button className="home-2-button-1" onClick={handleCreateTest}>
+            Create Test
+          </button>
+          <button className="home-2-button-1" onClick={handleAttemptTest}>
+            Attempt Test
+          </button>
+          <button className="home-2-button-1" onClick={handleLogoutButton}>
+            Logout
+          </button>
+        </div>
+        <div className="home-2-user-profile" onClick={handleProfilePhoto}>
+          {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
+        </div>
+      </nav>
+      <div className="detection-horizontal-div-1">
+        <div className="home-2-vertical-div-1">
+          <h2>Only following detection works for demo</h2>
+          <ul className="home-2-instruction-lines">
+            <li className="home-2-instructions">Attention Monitoring</li>
+            <li className="home-2-instructions">Object Detection</li>
+            <li className="home-2-instructions">Multiple People Detected</li>
+          </ul>
+        </div>
+        <Webcam
+          ref={webcamRef}
+          style={{ zIndex: 9, width: 480, height: 480 }}
+          videoConstraints={{
+            width: 1280,
+            height: 720,
+            facingMode: "user",
+          }}
+          screenshotFormat="image/png"
+        />
+      </div>
     </div>
   );
 };

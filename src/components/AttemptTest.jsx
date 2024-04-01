@@ -5,7 +5,7 @@ import { db } from "../utils/firebase-config";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");
-  // const [testTime, setTestTime] = useState("");
+  const profilePhoto = localStorage.getItem("user_photo");
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
@@ -17,7 +17,6 @@ const AttemptTest = () => {
     }
 
     try {
-      // checking if the google Form link is present in Firestore
       const formLinkQuery = query(
         collection(db, "testDetails"),
         where("formLink", "==", formLink)
@@ -41,6 +40,34 @@ const AttemptTest = () => {
       alert("An error occurred. Please try again.");
     }
   };
+  const handleSystemCheck = () => {
+    navigate("/systemcheck");
+  };
+
+  const handleDetectionCheck = () => {
+    navigate("/detectioncheck");
+  };
+
+  const handleUploadPhoto = () => {
+    navigate("/uploadimage");
+  };
+
+  const handleCreateTest = () => {
+    navigate("/createtest");
+  };
+
+  const handleAttemptTest = () => {
+    navigate("/attempttest");
+  };
+
+  const handleProfilePhoto = () => {
+    navigate("/home");
+  };
+
+  const handleLogoutButton = async () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   const handleChange = (e) => {
     if (e.target.name === "formLink") {
@@ -50,7 +77,36 @@ const AttemptTest = () => {
 
   return (
     <div>
-      <form onSubmit={handleForm}>
+      <div className="home-2-body">
+        <nav className="home-2-navbar">
+          <a className="home-2-navbar-brand">Proctorise</a>
+          <div className="home-2-button-container">
+            <button className="home-2-button-1" onClick={handleSystemCheck}>
+              System Check
+            </button>
+            <button className="home-2-button-1" onClick={handleDetectionCheck}>
+              Check Basic Detections
+            </button>
+            <button className="home-2-button-1" onClick={handleUploadPhoto}>
+              Upload Photo
+            </button>
+            <button className="home-2-button-1" onClick={handleCreateTest}>
+              Create Test
+            </button>
+            <button className="home-2-button-1" onClick={handleAttemptTest}>
+              Attempt Test
+            </button>
+            <button className="home-2-button-1" onClick={handleLogoutButton}>
+              Logout
+            </button>
+          </div>
+
+          <div className="home-2-user-profile" onClick={handleProfilePhoto}>
+            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
+          </div>
+        </nav>
+      </div>
+      <form className="test-form" onSubmit={handleForm}>
         <label htmlFor="formLink">Form Link:</label>
         <input
           type="text"
