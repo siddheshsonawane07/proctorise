@@ -17,6 +17,7 @@ import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttemptTest from "./components/AttemptTest";
+import Temp from "./components/Temp";
 
 class App extends Component {
   render() {
@@ -25,6 +26,7 @@ class App extends Component {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/temp" element={<Temp />} />
             <Route path="/home" element={<Home2 />} />
             <Route path="/systemcheck" element={<SystemCheck />} />
             <Route path="/detectioncheck" element={<DetectionCheck />} />

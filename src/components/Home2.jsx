@@ -4,7 +4,6 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
 import "./css/Home2.css";
-import TestPage from "./TestPage";
 
 const Home2 = () => {
   const [user] = useAuthState(auth);
@@ -59,36 +58,33 @@ const Home2 = () => {
   };
 
   return (
-    <div className="mainCon">
+    <div className="home-2-body">
       <nav className="navbar">
-        <div className="logo-container">
-          <img
-            id="logo"
-            src="https://cdn-icons-png.flaticon.com/128/8763/8763240.png"
-            alt="logo"
-          />
-          <a className="navbar-brand">PROCTORISE</a>
+        {/* <div className="logo-container"> */}
+        {/* <img id="logo" src="../public/icons/logo-1.png" alt="logo" /> */}
+        {/* <a className="navbar-brand">Proctorise</a> */}
+        {/* </div> */}
+        <a className="navbar-brand">Proctorise</a>
+        <div className="button-container">
+          <button className="button-1" onClick={handleSystemCheck}>
+            System Check
+          </button>
+          <button className="button-1" onClick={handleDetectionCheck}>
+            Check Basic Detections
+          </button>
+          <button className="button-1" onClick={handleUploadPhoto}>
+            Upload Photo
+          </button>
+          <button className="button-1" onClick={handleCreateTest}>
+            Create Test
+          </button>
+          <button className="button-1" onClick={handleAttemptTest}>
+            Attempt Test
+          </button>
+          <button className="button-1" onClick={handleLogoutButton}>
+            Logout
+          </button>
         </div>
-        <div className="btn-container">
-  <button className="btn" onClick={handleSystemCheck}>
-    System Check
-  </button>
-  <button className="btn" onClick={handleDetectionCheck}>
-    Check Basic Detections
-  </button>
-  <button className="btn" onClick={handleUploadPhoto}>
-    Upload Photo
-  </button>
-  <button className="btn" onClick={handleCreateTest}>
-    Create Test
-  </button>
-  <button className="btn" onClick={handleAttemptTest}>
-    Attempt Test
-  </button>
-  <button className="btn" onClick={handleLogoutButton}>
-    Logout
-  </button>
-</div>
 
         <div className="user-profile">
           {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
@@ -103,8 +99,7 @@ const Home2 = () => {
               You must use a functioning webcam and microphone
             </li>
             <li className="instructions">
-              No cell phones or other secondary devices in the room or test
-              area
+              No cell phones or other secondary devices in the room or test area
             </li>
             <li className="instructions">
               Your desk/table must be clear of any materials except your
