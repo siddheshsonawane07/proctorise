@@ -91,8 +91,8 @@ const Home2 = () => {
         </div>
       </nav>
 
-      <div className="content-container">
-        <div className="instruction-container">
+      <div className="horizontal-div-1">
+        <div className="instruction-div">
           <h2>Instructions</h2>
           <ul className="instruction-lines">
             <li className="instructions">
@@ -117,7 +117,7 @@ const Home2 = () => {
           </ul>
         </div>
 
-        <div className="image-container">
+        <div className="image-div">
           {imageLink && (
             <img
               className="uploadedimg"
