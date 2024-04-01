@@ -59,68 +59,68 @@ const Home2 = () => {
 
   return (
     <div className="home-2-body">
-      <nav className="navbar">
+      <nav className="home-2-navbar">
         {/* <div className="logo-container"> */}
         {/* <img id="logo" src="../public/icons/logo-1.png" alt="logo" /> */}
         {/* <a className="navbar-brand">Proctorise</a> */}
         {/* </div> */}
-        <a className="navbar-brand">Proctorise</a>
-        <div className="button-container">
-          <button className="button-1" onClick={handleSystemCheck}>
+        <a className="home-2-navbar-brand">Proctorise</a>
+        <div className="home-2-button-container">
+          <button className="home-2-button-1" onClick={handleSystemCheck}>
             System Check
           </button>
-          <button className="button-1" onClick={handleDetectionCheck}>
+          <button className="home-2-button-1" onClick={handleDetectionCheck}>
             Check Basic Detections
           </button>
-          <button className="button-1" onClick={handleUploadPhoto}>
+          <button className="home-2-button-1" onClick={handleUploadPhoto}>
             Upload Photo
           </button>
-          <button className="button-1" onClick={handleCreateTest}>
+          <button className="home-2-button-1" onClick={handleCreateTest}>
             Create Test
           </button>
-          <button className="button-1" onClick={handleAttemptTest}>
+          <button className="home-2-button-1" onClick={handleAttemptTest}>
             Attempt Test
           </button>
-          <button className="button-1" onClick={handleLogoutButton}>
+          <button className="home-2-button-1" onClick={handleLogoutButton}>
             Logout
           </button>
         </div>
 
-        <div className="user-profile">
+        <div className="home-2-user-profile">
           {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
         </div>
       </nav>
 
-      <div className="horizontal-div-1">
-        <div className="instruction-div">
+      <div className="home-2-horizontal-div-1">
+        <div className="home-2-instruction-div">
           <h2>Instructions</h2>
-          <ul className="instruction-lines">
-            <li className="instructions">
+          <ul className="home-2-instruction-lines">
+            <li className="home-2-instructions">
               You must use a functioning webcam and microphone
             </li>
-            <li className="instructions">
+            <li className="home-2-instructions">
               No cell phones or other secondary devices in the room or test area
             </li>
-            <li className="instructions">
+            <li className="home-2-instructions">
               Your desk/table must be clear of any materials except your
               test-taking device
             </li>
-            <li className="instructions">
+            <li className="home-2-instructions">
               No one else can be in the room with you
             </li>
-            <li className="instructions">No talking</li>
-            <li className="instructions">
+            <li className="home-2-instructions">No talking</li>
+            <li className="home-2-instructions">
               The testing room must be well-lit and you must be clearly visible
             </li>
-            <li className="instructions">No dual screens/monitors</li>
-            <li className="instructions">Do not leave the camera</li>
+            <li className="ihome-2-instructions">No dual screens/monitors</li>
+            <li className="home-2-instructions">Do not leave the camera</li>
           </ul>
         </div>
 
-        <div className="image-div">
+        <div className="home-2-image-div">
           {imageLink && (
             <img
-              className="uploadedimg"
+              className="home-2-uploadedimg"
               src={imageLink}
               alt="No Photo Uploaded"
             />

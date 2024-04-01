@@ -4,24 +4,24 @@
   margin: 0;
 }
 
-.body {
+.home-1-body {
   margin: 0;
 }
 
-.title-1 {
+.home-title-1 {
   font-family: "Poppins", sans-serif;
   font-size: 2.5rem;
   font-weight: 350;
 }
 
-.title-2 {
+.home-1-title-2 {
   font-family: "Poppins", sans-serif;
   font-size: 2rem;
   text-align: center;
   margin-top: 4rem;
 }
 
-.title-3 {
+.home-1-title-3 {
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
   font-weight: bolder;
@@ -32,28 +32,32 @@
   text-align: center;
 }
 
-.subtitle-1 {
+.home-1-subtitle-1 {
   font-family: "Poppins", sans-serif;
   font-size: 1.2rem;
   text-align: center;
   margin-top: 0.4rem;
 }
 
-.subtitle-2 {
+.home-1-subtitle-2 {
   font-family: "Poppins", sans-serif;
   font-size: 1.2rem;
   text-align: center;
 }
 
-.content-1 {
+.home-1-content-1 {
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
   margin-right: 3.5rem;
   margin-top: 0.5rem;
 }
 
-.header {
-  background: linear-gradient(90deg, #207562 38%, #3f4b8d 96%);
+.home-1-header {
+  background: linear-gradient(
+    90deg,
+    rgba(32, 117, 98, 255) 38%,
+    rgba(63, 75, 141, 255) 96%
+  );
 
   color: #fff;
   padding: 5rem;
@@ -62,9 +66,10 @@
   flex-direction: column;
   align-items: center;
   margin: 0;
+  top: 0;
 }
 
-.button-1 {
+.home-1-button-1 {
   background-color: #3f4b8d;
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
@@ -80,19 +85,19 @@
   margin-top: 0.5rem;
 }
 
-.button-1:hover {
+.home-1-button-1:hover {
   background-color: #298e46;
 }
 
-.button-1:focus {
+.home-1-button-1:focus {
   outline: none;
 }
 
-.button-1:active {
+.home-1-button-1:active {
   background-color: #3f4b8d;
 }
 
-.button-2 {
+.home-1-button-2 {
   background-color: #2c974b;
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
@@ -109,53 +114,55 @@
   margin-right: 1rem;
 }
 
-.button-2:hover {
+.home-1-button-2:hover {
   background-color: #3f4b8d;
 }
 
-.button-2:focus {
+.home-1-button-2:focus {
   outline: none;
 }
 
-.button-2:active {
+.home-1-button-2:active {
   background-color: #2c974b;
 }
 
-.horizontal-div-1 {
+.home-1-horizontal-div-1 {
   display: flex;
   align-items: center;
-  margin-top: 2rem;
+  top: 0;
+  margin-top: 3rem;
 }
 
-.horizontal-div-2 {
+.home-1-horizontal-div-2 {
   display: flex;
   align-items: center;
   margin-top: 0.2rem;
   margin-right: 3.5rem;
 }
 
-.horizontal-div-3 {
+.home-1-horizontal-div-3 {
   display: flex;
   justify-content: center;
 }
 
-.vertical-div-1 {
+.home-1-vertical-div-1 {
   margin-top: 0rem;
+  padding: 0rem;
 }
 
-.graphics-1 {
+.home-1-graphics-1 {
   margin-left: 4.5rem;
   margin-right: 5rem;
   width: 25rem;
 }
 
-.graphics-2 {
+.home-1-graphics-2 {
   margin-left: 4.5rem;
   margin-right: 3.5rem;
   width: 40rem;
 }
 
-.card-row {
+.home-1-card-row {
   margin-top: 3rem;
   display: flex;
   margin-left: 3.8 rem;
@@ -163,17 +170,17 @@
   justify-content: space-evenly;
 }
 
-.card {
+.home-1-card {
   width: 22rem;
   height: 15rem;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  align-items: center;
+  align-items: center; /* Center vertically */
 }
 
-.card-icon {
+.home-1-card-icon {
   position: absolute; /* Position the icon absolutely */
   top: -1.6rem; /* Adjust top position to move it up */
   left: 50%; /* Center the icon horizontally */
@@ -182,7 +189,7 @@
   width: 3rem;
 }
 
-.card-title {
+.home-1-card-title {
   margin-top: 2rem;
   margin-right: 1.5rem;
   margin-left: 1.5rem;
@@ -192,7 +199,7 @@
   color: rgba(63, 75, 141, 255);
 }
 
-.card-content {
+.home-1-card-content {
   margin-top: 1.2rem;
   margin-right: 1.5rem;
   margin-left: 1.5rem;
@@ -201,7 +208,7 @@
   text-align: center;
 }
 
-.card-button {
+.home-1-card-button {
   background-color: #2c974b;
   border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
@@ -216,15 +223,15 @@
   transition: background-color 0.3s ease;
 }
 
-.card-button:hover {
+.home-1-card-button:hover {
   background-color: #3f4b8d;
 }
 
-.card-button:focus {
+.home-1-card-button:focus {
   outline: none;
 }
 
-.card-button:active {
+.home-1-card-button:active {
   background-color: #2c974b;
 }
 
