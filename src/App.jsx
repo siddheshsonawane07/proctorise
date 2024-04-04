@@ -36,7 +36,6 @@ class App extends Component {
             <Route path="/attempttest" element={<AttemptTest />} />
             <Route path="/404" element={<PageNotFound />} />
             <Route path="*" element={<Navigate to="/404" />} />
-            vcb
           </Routes>
         </Router>
         <ToastContainer />
