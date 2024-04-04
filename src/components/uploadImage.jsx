@@ -46,7 +46,7 @@ const UploadImage = () => {
       }
     }
   };
-  
+
   const handleSystemCheck = () => {
     navigate("/systemcheck");
   };
@@ -136,8 +136,7 @@ const UploadImage = () => {
       {image && (
         <>
           <button onClick={uploadImageFunction} className="home-2-button-1">
-            {" "}
-            Upload Photo{" "}
+            Upload Photo
           </button>
         </>
       )}
