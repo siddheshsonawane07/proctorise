@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ReactInternetSpeedMeter } from "react-internet-meter";
 import DetectRTC from "detectrtc";
 import "./css/SystemCheck.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
-  const [speedMbps, setSpeedMbps] = useState([0]);
   const [webcamEnabled, setWebcamEnabled] = useState();
+  const [internetSpeed, setInternetSpeed] = useState(0);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -16,7 +16,6 @@ const SystemCheck = () => {
         version: DetectRTC.browser.version,
       });
 
-      // Check webcam permissions using navigator.mediaDevices.getUserMedia
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then(() => setWebcamEnabled(true))
@@ -55,37 +54,51 @@ const SystemCheck = () => {
   }, []);
 
   return (
-    <div className="SysCheckContainer">
-      <h1 className="titleSC">System Compatibility Check</h1>
-      <ul className="SysCompatibilityCompo">
+    <div className=".detection-page-body">
+    <div className="system-check-container">
+      <h1 className="title">System Compatibility Check</h1>
+      <ul className="check-list">
         <li>
-          Browser: {browserInfo.name} {browserInfo.version}
+          <span className="check-label">Browser:</span>{" "}
+          {browserInfo.name} {browserInfo.version}
+          {parseInt(browserInfo.version) >= 90 && (
+            <span className="check-status">&#10004;</span>
+          )}
         </li>
-        <li>Webcam: {webcamEnabled === true ? "Enabled" : "Disabled"}</li>
-        <div>
-          <ReactInternetSpeedMeter
-            txtSubHeading="Internet connection is slow"
-            outputType=""
-            customClassName={null}
-            pingInterval={5000}
-            txtMainHeading="Opps..."
-            thresholdUnit="megabyte"
-            threshold={100}
-            // can add a static imageURL
-            imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
-            downloadSize="1561257"
-            callbackFunctionOnNetworkTest={(data) => setSpeedMbps(data)}
-          />
-        </div>
-        <li>Internet Speed: {speedMbps} Mbps</li>
+        <li>
+          <span className="check-label">Webcam:</span>{" "}
+          {webcamEnabled ? "Enabled" : "Disabled"}
+          {webcamEnabled && (
+            <span className="check-status">&#10004;</span>
+          )}
+        </li>
       </ul>
-      <video
-        className="SCVideo"
-        ref={videoRef}
-        width="480"
-        height="480"
-        autoPlay
-      ></video>
+      <div className="internet-speed-check">
+        <ReactInternetSpeedMeter
+          txtSubHeading="Internet connection is slow"
+          outputType=""
+          customClassName="internet-speed-meter"
+          pingInterval={5000}
+          txtMainHeading="Internet Speed:"
+          thresholdUnit="megabyte"
+          threshold={100}
+          imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
+          downloadSize="1561257"
+          callbackFunctionOnNetworkTest={(data) => setInternetSpeed(data)}
+        />
+        <span className="internet-speed">{internetSpeed} Mbps</span>
+      </div>
+      <div className="camera-container">
+        <h2>Live Camera Stream</h2>
+        <video
+          className="camera-stream"
+          ref={videoRef}
+          width="480"
+          height="360"
+          autoPlay
+        ></video>
+      </div>
+    </div>
     </div>
   );
 };
