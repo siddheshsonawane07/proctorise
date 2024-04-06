@@ -85,7 +85,7 @@ const TestPage = () => {
             showToast("Face not verified");
           }
         });
-      }, 3000);
+      }, 5000);
     };
 
     const objectDetection = (predictions) => {
@@ -159,7 +159,15 @@ const TestPage = () => {
     }, 3000);
 
     const countdown = setInterval(() => {
-      setTimer((prevTimer) => prevTimer - 1);
+      setTimer((prevTimer) => {
+        if (prevTimer === 0) {
+          clearInterval(countdown); // Stop the timer when it reaches zero
+          navigate("/home"); // Navigate to /home when timer reaches zero
+          return 0;
+        } else {
+          return prevTimer - 1;
+        }
+      });
     }, 1000);
 
     const handleVisibilityChange = () => {
@@ -196,7 +204,7 @@ const TestPage = () => {
     document.addEventListener("keydown", handleKeyDown);
 
     if (timer === 0) {
-      navigate("/home2");
+      navigate("/home");
     }
 
     // Cleanup functions

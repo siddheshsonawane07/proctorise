@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import PageNotFound from "./components/404";
 import Home from "./components/Home";
-//import HomeAnkit from "./components/AnkitHome";
 import Home2 from "./components/Home2";
 import SystemCheck from "./components/SystemCheck";
 import DetectionCheck from "./components/DetectionCheck";
@@ -17,7 +16,6 @@ import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttemptTest from "./components/AttemptTest";
-import Temp from "./components/Temp";
 
 class App extends Component {
   render() {
@@ -26,7 +24,6 @@ class App extends Component {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/temp" element={<Temp />} />
             <Route path="/home" element={<Home2 />} />
             <Route path="/systemcheck" element={<SystemCheck />} />
             <Route path="/detectioncheck" element={<DetectionCheck />} />
@@ -36,7 +33,6 @@ class App extends Component {
             <Route path="/attempttest" element={<AttemptTest />} />
             <Route path="/404" element={<PageNotFound />} />
             <Route path="*" element={<Navigate to="/404" />} />
-            vcb
           </Routes>
         </Router>
         <ToastContainer />

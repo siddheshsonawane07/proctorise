@@ -8,16 +8,14 @@ const CreateTest = () => {
     formLink: "",
     testTime: "",
   });
-  const [isLinkValid, setIsLinkValid] = useState(true);
-
   const profilePhoto = localStorage.getItem("user_photo");
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
     e.preventDefault();
 
-    if (!values.formLink || !values.testTime || isLinkValid == false) {
-      alert("Please fill in all fields correctly");
+    if (!values.formLink || !values.testTime) {
+      alert("Please fill in all fields");
       return;
     }
 
@@ -45,14 +43,6 @@ const CreateTest = () => {
   };
 
   const handleChange = (e) => {
-    const inputLink = e.target.value;
-    const regex = /^(ftp|http|https):\/\/[^ "]+$/;
-
-    if (regex.test(inputLink)) {
-      setIsLinkValid(true);
-    } else {
-      setIsLinkValid(false);
-    }
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
@@ -128,12 +118,11 @@ const CreateTest = () => {
 
         <label htmlFor="testTime">Test Time (in minutes):</label>
         <input
-          type="number"
+          type="text"
           name="testTime"
           value={values.testTime}
           onChange={(e) => handleChange(e)}
         />
-        {!isLinkValid && <p style={{ color: 'red' }}>Please enter a valid link.</p>}
         <button type="submit">Submit</button>
       </form>
     </div>
