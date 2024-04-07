@@ -1,6 +1,6 @@
 /* SystemCheck.css */
 
-.detection-page-body {
+.system-check-body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
@@ -8,8 +8,12 @@
     135deg,
     rgba(39, 117, 5, 0.9) 0%,
     rgba(0, 31, 255, 0.8) 100%
-  ); /* Update with your gradient */
-  color: #fff; /* Set default text color */
+  );
+  color: #fff;
+  min-height: 100vh; /* Ensure the container covers the entire viewport */
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
 }
 
 .system-check-container {
@@ -21,80 +25,58 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
-.title {
+.system-check-title {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
-  color: #ffcb4c; /* Set title color */
+  color: #ffcb4c;
 }
 
-.check-list {
+.system-check-list {
   list-style-type: none;
   padding: 0;
 }
 
-.check-list li {
+.system-check-list li {
   margin-bottom: 15px;
-  font-size: 18px; /* Set font size for checklist items */
+  font-size: 18px;
 }
 
-.check-label {
+.system-check-label {
   font-weight: bold;
-  color: #ffcb4c; /* Set label color */
+  color: #ffcb4c;
 }
 
-.check-status {
+.system-check-status {
   margin-left: 10px;
-  color: #8ed56f; /* Set status color */
 }
 
-.internet-speed-check {
+.system-check-green {
+  color: #8ed56f;
+}
+
+.system-internet-speed-check {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.internet-speed-meter {
+.system-internet-speed-meter {
   margin-right: 10px;
 }
 
-.internet-speed {
+.system-internet-speed {
   font-weight: bold;
-  color: #8ed56f; /* Set internet speed color */
+  color: #8ed56f;
 }
 
-.camera-container {
+.system-camera-container {
   margin-top: 20px;
 }
 
-.camera-stream {
-  width: 100%;
+.system-camera-stream {
+  width: 100%; /* Make video responsive */
+  max-width: 100%; /* Ensure it doesn't exceed container width */
   border-radius: 15px;
-  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); */
-}
-
-/* Adjustments for better spacing */
-
-@media (max-width: 768px) {
-  .system-check-container {
-    padding: 20px;
-  }
-  
-  .check-label {
-    font-size: 16px;
-  }
-
-  .check-status {
-    font-size: 16px;
-    margin-left: 5px;
-  }
-  
-  .internet-speed-check {
-    margin-bottom: 15px;
-  }
-  
-  .camera-container {
-    margin-top: 15px;
-  }
 }

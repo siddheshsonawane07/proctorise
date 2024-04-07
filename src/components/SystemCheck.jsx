@@ -54,51 +54,55 @@ const SystemCheck = () => {
   }, []);
 
   return (
-    <div className=".detection-page-body">
-    <div className="system-check-container">
-      <h1 className="title">System Compatibility Check</h1>
-      <ul className="check-list">
-        <li>
-          <span className="check-label">Browser:</span>{" "}
-          {browserInfo.name} {browserInfo.version}
-          {parseInt(browserInfo.version) >= 90 && (
-            <span className="check-status">&#10004;</span>
-          )}
-        </li>
-        <li>
-          <span className="check-label">Webcam:</span>{" "}
-          {webcamEnabled ? "Enabled" : "Disabled"}
-          {webcamEnabled && (
-            <span className="check-status">&#10004;</span>
-          )}
-        </li>
-      </ul>
-      <div className="internet-speed-check">
-        <ReactInternetSpeedMeter
-          txtSubHeading="Internet connection is slow"
-          outputType=""
-          customClassName="internet-speed-meter"
-          pingInterval={5000}
-          txtMainHeading="Internet Speed:"
-          thresholdUnit="megabyte"
-          threshold={100}
-          imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
-          downloadSize="1561257"
-          callbackFunctionOnNetworkTest={(data) => setInternetSpeed(data)}
-        />
-        <span className="internet-speed">{internetSpeed} Mbps</span>
+    <div className="system-check-body">
+      <div className="system-check-container">
+        <h1 className="system-check-title">System Compatibility Check</h1>
+        <ul className="system-check-list">
+          <li>
+            <span className="system-check-label">Browser:</span>{" "}
+            <span className={parseInt(browserInfo.version) >= 90 ? 'system-check-green' : ''}>
+              {browserInfo.name} {browserInfo.version}
+            </span>
+            {parseInt(browserInfo.version) >= 90 && (
+              <span className="system-check-status">&#10004;</span>
+            )}
+          </li>
+          <li>
+            <span className="system-check-label">Webcam:</span>{" "}
+            <span className={webcamEnabled ? 'system-check-green' : ''}>
+              {webcamEnabled ? "Enabled" : "Disabled"}
+            </span>
+            {webcamEnabled && (
+              <span className="system-check-status">&#10004;</span>
+            )}
+          </li>
+        </ul>
+        <div className="system-internet-speed-check">
+          <ReactInternetSpeedMeter
+            txtSubHeading="Internet connection is slow"
+            outputType=""
+            customClassName="system-internet-speed-meter"
+            pingInterval={5000}
+            txtMainHeading="Internet Speed:"
+            thresholdUnit="megabyte"
+            threshold={100}
+            imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
+            downloadSize="1561257"
+            callbackFunctionOnNetworkTest={(data) => setInternetSpeed(data)}
+          />
+          <span className="system-internet-speed">{internetSpeed} Mbps</span>
+        </div>
+        <div className="system-camera-container">
+          <h2>Live Camera Stream</h2>
+          <video
+            className="system-camera-stream"
+            ref={videoRef}
+            width="480"
+            height="360"
+            autoPlay
+          ></video>
+        </div>
       </div>
-      <div className="camera-container">
-        <h2>Live Camera Stream</h2>
-        <video
-          className="camera-stream"
-          ref={videoRef}
-          width="480"
-          height="360"
-          autoPlay
-        ></video>
-      </div>
-    </div>
     </div>
   );
 };
