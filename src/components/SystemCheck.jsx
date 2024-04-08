@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ReactInternetSpeedMeter } from "react-internet-meter";
 import DetectRTC from "detectrtc";
-// import "./css/Home.css";
+import "./css/SystemCheck.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});

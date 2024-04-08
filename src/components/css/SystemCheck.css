@@ -1,0 +1,81 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.system-check-body {
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+  color: #fff;
+  min-height: 100vh; /* Ensure the container covers the entire viewport */
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+.system-check-container {
+  padding: 30px;
+  border-radius: 15px;
+  margin: 30px auto;
+  max-width: 800px;
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.system-check-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ffcb4c;
+}
+
+.system-check-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.system-check-list li {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.system-check-label {
+  font-weight: bold;
+  color: #ffcb4c;
+}
+
+.system-check-status {
+  margin-left: 10px;
+}
+
+.system-check-green {
+  color: #8ed56f;
+}
+
+.system-internet-speed-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.system-internet-speed-meter {
+  margin-right: 10px;
+}
+
+.system-internet-speed {
+  font-weight: bold;
+  color: #8ed56f;
+}
+
+.system-camera-container {
+  margin-top: 20px;
+}
+
+.system-camera-stream {
+  width: 100%; /* Make video responsive */
+  max-width: 100%; /* Ensure it doesn't exceed container width */
+  border-radius: 15px;
+}
