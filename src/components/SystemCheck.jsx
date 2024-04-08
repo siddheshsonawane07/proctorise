@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ReactInternetSpeedMeter } from "react-internet-meter";
 import DetectRTC from "detectrtc";
-import "./css/SystemCheck.css";
+// import "./css/Home.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
@@ -60,7 +60,11 @@ const SystemCheck = () => {
         <ul className="system-check-list">
           <li>
             <span className="system-check-label">Browser:</span>{" "}
-            <span className={parseInt(browserInfo.version) >= 90 ? 'system-check-green' : ''}>
+            <span
+              className={
+                parseInt(browserInfo.version) >= 90 ? "system-check-green" : ""
+              }
+            >
               {browserInfo.name} {browserInfo.version}
             </span>
             {parseInt(browserInfo.version) >= 90 && (
@@ -69,7 +73,7 @@ const SystemCheck = () => {
           </li>
           <li>
             <span className="system-check-label">Webcam:</span>{" "}
-            <span className={webcamEnabled ? 'system-check-green' : ''}>
+            <span className={webcamEnabled ? "system-check-green" : ""}>
               {webcamEnabled ? "Enabled" : "Disabled"}
             </span>
             {webcamEnabled && (
