@@ -51,7 +51,6 @@ const TestPage = () => {
 
       await Promise.all(
         labels.map(async () => {
-          // console.log(imageLink);
           const img = await faceapi.fetchImage(imageLink);
           const detections = await faceapi
             .detectSingleFace(img)
@@ -88,7 +87,10 @@ const TestPage = () => {
       }, 5000);
     };
 
-    const objectDetection = (predictions) => {
+    const objectDetection = async (video) => {
+      const objectModel = await cocoSsd.load();
+      const predictions = await objectModel.detect(video);
+
       let faceCount = 0;
 
       predictions.forEach((prediction) => {
@@ -135,9 +137,7 @@ const TestPage = () => {
     };
     loadModels();
 
-    setInterval(async () => {
-      const objectModel = await cocoSsd.load();
-
+    const detectionsInterval = setInterval(async () => {
       const detectorConfig = {
         modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
       };
@@ -147,22 +147,21 @@ const TestPage = () => {
         detectorConfig
       );
 
-      const predictions = await objectModel.detect(webcamRef.current.video);
-      objectDetection(predictions);
-
       const poses = await detector.estimatePoses(webcamRef.current.video);
       if (poses.length > 0) {
         earsDetect(poses[0].keypoints, 0.5);
       } else {
         console.log("No ears detected");
       }
+
+      await objectDetection(webcamRef.current.video);
     }, 3000);
 
     const countdown = setInterval(() => {
       setTimer((prevTimer) => {
         if (prevTimer === 0) {
-          clearInterval(countdown); // Stop the timer when it reaches zero
-          navigate("/home"); // Navigate to /home when timer reaches zero
+          clearInterval(countdown);
+          navigate("/home");
           return 0;
         } else {
           return prevTimer - 1;
@@ -179,7 +178,6 @@ const TestPage = () => {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Prevent copy and paste
     const handleCopyPaste = (event) => {
       showToast(
         `${
@@ -192,9 +190,8 @@ const TestPage = () => {
     document.addEventListener("copy", handleCopyPaste);
     document.addEventListener("paste", handleCopyPaste);
 
-    // Prevent certain special keys
     const handleKeyDown = (event) => {
-      const restrictedKeys = [27, 16, 18, 17, 91, 9, 44]; // ESC, SHIFT, ALT, CONTROL, COMMAND, TAB, PRT SRC
+      const restrictedKeys = [27, 16, 18, 17, 91, 9, 44];
       if (restrictedKeys.includes(event.keyCode)) {
         showToast("This key is restricted.");
         event.preventDefault();
@@ -203,13 +200,10 @@ const TestPage = () => {
 
     document.addEventListener("keydown", handleKeyDown);
 
-    if (timer === 0) {
-      navigate("/home");
-    }
-
     // Cleanup functions
     return () => {
       clearInterval(countdown);
+      clearInterval(detectionsInterval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("copy", handleCopyPaste);
       document.removeEventListener("paste", handleCopyPaste);
@@ -253,7 +247,6 @@ const TestPage = () => {
       <div
         style={{
           "&::WebkitScrollbar": { width: 0, height: 0 },
-
           width: "100%",
           aspectRatio: "16/9",
         }}
@@ -274,4 +267,5 @@ const TestPage = () => {
     </div>
   );
 };
+
 export default TestPage;
