@@ -19,6 +19,7 @@ const TestPage = () => {
   const [toasts, setToasts] = useState([]);
   const [timer, setTimer] = useState(testTime * 60);
   const [visibilityCount, setVisibilityCount] = useState(0);
+  const [score, setScore] = useState(100); // Initial score
   const navigate = useNavigate();
 
   const showToast = (message, type) => {
@@ -39,6 +40,18 @@ const TestPage = () => {
     }
     const newToast = toast(message, toastOptions);
     setToasts((prevToasts) => [...prevToasts, newToast]);
+  };
+
+  const updateScore = (action, decrementScore) => {
+    setScore((prevScore) => {
+      const newScore = prevScore - decrementScore;
+      if (newScore <= 0) {
+        navigate("/home"); // Navigate to /home when score reaches 0
+        return 0;
+      }
+      showToast(`${action} detected, score decreased by ${decrementScore}`);
+      return newScore;
+    });
   };
 
   useEffect(() => {
@@ -81,7 +94,7 @@ const TestPage = () => {
               `Detected face: ${bestMatch.label} (Confidence: ${bestMatch.distance})`
             );
           } else {
-            showToast("Face not verified");
+            updateScore("Face not verified", 5);
           }
         });
       }, 5000);
@@ -99,12 +112,12 @@ const TestPage = () => {
         } else if (
           ["cell phone", "book", "laptop"].includes(prediction.class)
         ) {
-          showToast("Object Detected, Action has been Recorded");
+          updateScore("Object detected", 10);
         }
       });
 
       if (faceCount > 1) {
-        showToast("Multiple People Detected");
+        updateScore("Multiple people detected", 15);
       } else if (faceCount === 0) {
         console.log("No Face Detected");
       }
@@ -118,7 +131,7 @@ const TestPage = () => {
         keypointEarL.score < minConfidence ||
         keypointEarR.score < minConfidence
       ) {
-        showToast("You looked away from the screen");
+        updateScore("User looked away", 10);
       }
     };
 
@@ -172,17 +185,16 @@ const TestPage = () => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         setVisibilityCount((prevCount) => prevCount + 1);
-        showToast("Warning: Tab Changed");
+        updateScore("Tab changed", 20);
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const handleCopyPaste = (event) => {
-      showToast(
-        `${
-          event.type.charAt(0).toUpperCase() + event.type.slice(1)
-        }ing is not allowed.`
+      updateScore(
+        `${event.type.charAt(0).toUpperCase() + event.type.slice(1)}ing`,
+        5
       );
       event.preventDefault();
     };
@@ -193,7 +205,7 @@ const TestPage = () => {
     const handleKeyDown = (event) => {
       const restrictedKeys = [27, 16, 18, 17, 91, 9, 44];
       if (restrictedKeys.includes(event.keyCode)) {
-        showToast("This key is restricted.");
+        updateScore("Restricted key pressed", 10);
         event.preventDefault();
       }
     };
@@ -231,6 +243,7 @@ const TestPage = () => {
         }}
       >
         <p>Time remaining: {timer} </p>
+        <p>Score: {score}</p>
         <Webcam
           ref={webcamRef}
           style={{
