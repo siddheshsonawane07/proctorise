@@ -2,7 +2,7 @@ import Webcam from "react-webcam";
 import { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
-import { auth, app } from "../utils/firebase-config";
+import { auth, app } from "../../utils/firebase-config";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";

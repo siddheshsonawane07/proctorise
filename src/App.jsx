@@ -16,7 +16,6 @@ import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttemptTest from "./components/AttemptTest";
-import QnAComponent from "./components/Chatbot-Component";
 
 class App extends Component {
   render() {
@@ -25,11 +24,7 @@ class App extends Component {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home2 />} />.
-            <Route
-              path="/chatbot"
-              element={<QnAComponent question={"what is proctorise"} />}
-            />
+            <Route path="/home" element={<Home2 />} />
             <Route path="/systemcheck" element={<SystemCheck />} />
             <Route path="/detectioncheck" element={<DetectionCheck />} />
             <Route path="/uploadimage" element={<UploadImage />} />
