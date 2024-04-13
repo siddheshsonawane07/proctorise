@@ -485,13 +485,17 @@
 }
 
 .chatbot-container {
+  position: fixed;
+  z-index: 999;
+  margin-left: 50vw;
+  margin-top: 20vw;
   width: 350px;
   border-radius: 10px;
+  overflow: hidden;
   transition: transform 0.3s ease;
   transform: translateX(100%);
   background-color: #f5f5f5;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-  z-index: 999;
 }
 
 .chatbot-container.open {
@@ -515,6 +519,7 @@
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Rest of the CSS remains the same */
 .chatbot-content {
   height: 300px;
   display: flex;

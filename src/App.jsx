@@ -16,6 +16,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttemptTest from "./components/AttemptTest";
 import UploadImage from "./components/uploadImage";
+import QnAComponent from "./components/Chatbot";
 
 class App extends Component {
   render() {
@@ -26,6 +27,7 @@ class App extends Component {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home2 />} />
             <Route path="/systemcheck" element={<SystemCheck />} />
+            <Route path="/chatbot" element={<QnAComponent />} />
             <Route path="/detectioncheck" element={<DetectionCheck />} />
             <Route path="/uploadimage" element={<UploadImage />} />
             <Route path="/test" element={<TestPage />} />

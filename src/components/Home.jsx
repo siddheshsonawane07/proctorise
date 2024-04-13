@@ -5,6 +5,7 @@ import { auth } from "../utils/firebase-config";
 import HorizontalComponent2 from "./Horizontal-Component-2";
 import "./css/Home.css";
 import CardComponent from "./Card-Component";
+import CustomChatbot from "./Chatbot";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Home = () => {
 
   return (
     <div className="home-1-body">
+      <CustomChatbot />
       <div className="home-1-header">
         <div className="home-title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
