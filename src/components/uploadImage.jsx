@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { app, auth } from "../../utils/firebase-config";
+import { app, auth } from "../utils/firebase-config";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 

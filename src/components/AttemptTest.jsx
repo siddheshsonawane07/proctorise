@@ -1,20 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDocs, query, where, collection, addDoc } from "firebase/firestore";
-import { db } from "../../utils/firebase-config";
+import { getDocs, query, where, collection } from "firebase/firestore";
+import { db } from "../utils/firebase-config";
 
-const CreateTest = () => {
-  const [values, setValues] = useState({
-    formLink: "",
-    testTime: "",
-  });
+const AttemptTest = () => {
+  const [formLink, setFormLink] = useState("");
   const profilePhoto = localStorage.getItem("user_photo");
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
     e.preventDefault();
 
-    if (!values.formLink || !values.testTime) {
+    if (!formLink) {
       alert("Please fill in all fields");
       return;
     }
@@ -22,30 +19,27 @@ const CreateTest = () => {
     try {
       const formLinkQuery = query(
         collection(db, "testDetails"),
-        where("formLink", "==", values.formLink)
+        where("formLink", "==", formLink)
       );
+
       const existingDocs = await getDocs(formLinkQuery);
 
-      if (!existingDocs.empty) {
-        alert("This form link already exists. Please use a different one.");
-        return;
+      if (existingDocs.size > 0) {
+        existingDocs.forEach((doc) => {
+          const { testTime } = doc.data();
+          console.log("Test Time:", testTime);
+          setFormLink(formLink);
+          // setTestTime(testTime);
+          navigate("/test", { state: { formLink, testTime } });
+        });
+      } else {
+        console.log("Form link not found in Firestore");
       }
-
-      // adding test details to firestore
-      const docRef = await addDoc(collection(db, "testDetails"), values);
-      // console.log("Document written with ID: ", docRef.id);
-      alert("test creation successfull");
-      navigate("/home");
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error(error);
       alert("An error occurred. Please try again.");
     }
   };
-
-  const handleChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
   const handleSystemCheck = () => {
     navigate("/systemcheck");
   };
@@ -73,6 +67,12 @@ const CreateTest = () => {
   const handleLogoutButton = async () => {
     localStorage.clear();
     navigate("/");
+  };
+
+  const handleChange = (e) => {
+    if (e.target.name === "formLink") {
+      setFormLink(e.target.value);
+    }
   };
 
   return (
@@ -106,22 +106,13 @@ const CreateTest = () => {
           </div>
         </nav>
       </div>
-
-      <form className="test-form" onSubmit={(e) => handleForm(e)}>
+      <form className="test-form" onSubmit={handleForm}>
         <label htmlFor="formLink">Form Link:</label>
         <input
           type="text"
           name="formLink"
-          value={values.formLink}
-          onChange={(e) => handleChange(e)}
-        />
-
-        <label htmlFor="testTime">Test Time (in minutes):</label>
-        <input
-          type="text"
-          name="testTime"
-          value={values.testTime}
-          onChange={(e) => handleChange(e)}
+          value={formLink}
+          onChange={handleChange}
         />
         <button type="submit">Submit</button>
       </form>
@@ -129,4 +120,4 @@ const CreateTest = () => {
   );
 };
 
-export default CreateTest;
+export default AttemptTest;

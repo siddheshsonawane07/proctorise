@@ -1,10 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../utils/firebase-config";
-import HorizontalComponent2 from "../Horizontal-Component-2";
+import { auth } from "../utils/firebase-config";
+import HorizontalComponent2 from "./Horizontal-Component-2";
 import "./css/Home.css";
-import CardComponent from "../Card-Component";
+import CardComponent from "./Card-Component";
 import ChatbotComponent from "../chatbot/Chatbot-Component";
 
 const Home = () => {
@@ -112,7 +112,6 @@ const Home = () => {
           FAQS
         </button>
       </div>
-      <ChatbotComponent />
     </div>
   );
 };
