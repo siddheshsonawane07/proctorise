@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./css/Home.css";
+import { FaCommentAlt } from "react-icons/fa";
 
-const QnAComponent = () => {
+const Chatbot = () => {
+  const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,11 +25,13 @@ const QnAComponent = () => {
         }
       );
       const answerData = response.data.answers[0];
-      setAnswer(answerData.answer);
+      const newMessage = { text: question, sender: "user" };
+      const botResponse = { text: answerData.answer, sender: "bot" };
+      setMessages([...messages, newMessage, botResponse]);
+      setQuestion("");
       setError("");
     } catch (error) {
       console.error("Error fetching data:", error);
-      setAnswer("");
       setError("Error fetching data. Please try again.");
     }
   };
@@ -35,29 +40,37 @@ const QnAComponent = () => {
     setQuestion(e.target.value);
   };
 
+  const toggleChatbox = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Enter Your Question:
+    <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
+      <div className="chatbot-toggle-icon" onClick={toggleChatbox}>
+        <FaCommentAlt />
+      </div>
+      <div className="chatbot-content">
+        <div className="chatbot-messages">
+          {messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender}`}>
+              {message.text}
+            </div>
+          ))}
+        </div>
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
             value={question}
             onChange={handleChange}
+            placeholder="Type your question..."
             required
           />
-        </label>
-        <button type="submit">Get Answer</button>
-      </form>
-      {error && <p>{error}</p>}
-      {answer && (
-        <div>
-          <h2>Question: {question}</h2>
-          <p>Answer: {answer}</p>
-        </div>
-      )}
+          <button type="submit">Send</button>
+        </form>
+        {error && <p className="error">{error}</p>}
+      </div>
     </div>
   );
 };
 
-export default QnAComponent;
+export default Chatbot;
