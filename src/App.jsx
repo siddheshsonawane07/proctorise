@@ -11,11 +11,11 @@ import Home2 from "./components/Home2";
 import SystemCheck from "./components/SystemCheck";
 import DetectionCheck from "./components/DetectionCheck";
 import TestPage from "./components/TestPage";
-import UploadImage from "./components/UploadImage";
 import CreateTest from "./components/CreateTest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttemptTest from "./components/AttemptTest";
+import UploadImage from "./components/uploadImage";
 
 class App extends Component {
   render() {
