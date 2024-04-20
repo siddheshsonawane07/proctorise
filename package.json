@@ -5,11 +5,10 @@
   "type": "module",
   "proxy": "http://localhost:5173",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "deploy": "npm install --force && npm run build", 
-    "preinstall": "npm install --force"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@mediapipe/pose": "^0.5.1675469404",
