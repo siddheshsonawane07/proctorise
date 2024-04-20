@@ -46,7 +46,7 @@ const TestPage = () => {
     setScore((prevScore) => {
       const newScore = prevScore - decrementScore;
       if (newScore <= 0) {
-        navigate("/home"); // Navigate to /home when score reaches 0
+        navigate("/home");
         return 0;
       }
       showToast(`${action} detected, score decreased by ${decrementScore}`);
@@ -64,9 +64,19 @@ const TestPage = () => {
 
       await Promise.all(
         labels.map(async () => {
-          const img = await faceapi.fetchImage(imageLink);
+          const img = await fetch(imageLink)
+            .then((response) => response.blob())
+            .then((blob) => faceapi.fetchImage(blob));
           const detections = await faceapi
-            .detectSingleFace(img)
+            .detectSingleFace(
+              await fetch(imageLink, {
+                headers: {
+                  "Access-Control-Allow-Origin": window.origin,
+                },
+              })
+                .then((response) => response.blob())
+                .then((blob) => faceapi.fetchImage(blob))
+            )
             .withFaceLandmarks()
             .withFaceDescriptor();
           descriptions.push(detections.descriptor);
