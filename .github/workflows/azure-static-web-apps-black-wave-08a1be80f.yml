@@ -22,7 +22,7 @@ jobs:
           lfs: false
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm install --peer-legacy-deps
 
       - name: Build Application
         run: npm run build
