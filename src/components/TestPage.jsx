@@ -49,7 +49,7 @@ const TestPage = () => {
         navigate("/home");
         return 0;
       }
-      showToast(`${action} detected, score decreased by ${decrementScore}`);
+      showToast(`${action}, score decreased by ${decrementScore}`);
       return newScore;
     });
   };
@@ -64,19 +64,9 @@ const TestPage = () => {
 
       await Promise.all(
         labels.map(async () => {
-          const img = await fetch(imageLink)
-            .then((response) => response.blob())
-            .then((blob) => faceapi.fetchImage(blob));
+          const img = await faceapi.fetchImage(imageLink);
           const detections = await faceapi
-            .detectSingleFace(
-              await fetch(imageLink, {
-                headers: {
-                  "Access-Control-Allow-Origin": window.origin,
-                },
-              })
-                .then((response) => response.blob())
-                .then((blob) => faceapi.fetchImage(blob))
-            )
+            .detectSingleFace(img)
             .withFaceLandmarks()
             .withFaceDescriptor();
           descriptions.push(detections.descriptor);
@@ -129,7 +119,7 @@ const TestPage = () => {
       if (faceCount > 1) {
         updateScore("Multiple people detected", 15);
       } else if (faceCount === 0) {
-        console.log("No Face Detected");
+        updateScore("No one detected", 5);
       }
     };
 
