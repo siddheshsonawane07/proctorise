@@ -23,7 +23,7 @@ const Home = () => {
 
   return (
     <div className="home-1-body">
-      <CustomChatbot />
+      {/* <CustomChatbot /> */}
       <div className="home-1-header">
         <div className="home-title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
