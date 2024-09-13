@@ -1,26 +1,21 @@
 import React from "react";
-
 import HorizontalComponent2 from "./Horizontal-Component-2";
-import { useDispatch } from "react-redux";
 import CardComponent from "./Card-Component";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "./css/Home.css";
 
 const Home = () => {
-  // const handleGoogleSignIn = async () => {
-  //   try {
-  //     const provider = new GoogleAuthProvider();
-  //     const result = await signInWithPopup(auth, provider);
-  //     const { uid, displayName, email, photoURL } = result.user;
+  const navigate = useNavigate();
+  const userStatus = useSelector((state) => state.user.isLoggedIn);
 
-  //     // const action = loginSuccess({ uid, displayName, email, photoURL });
-
-  //     dispatch(loginSuccess({ uid, displayName, email, photoURL }));
-  //     navigate("/home");
-  //   } catch (error) {
-  //     console.error("Error signing in with Google:", error);
-  //   }
-  // };
+  const handleTryForFreeButton = () => {
+    if (userStatus === true) {
+      navigate("/home");
+    } else {
+      navigate("/register");
+    }
+  };
 
   return (
     <div className="home-1-body">
@@ -29,7 +24,9 @@ const Home = () => {
         <div className="home-title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
-        <button className="home-1-button-1">TRY FOR FREE</button>
+        <button className="home-1-button-1" onClick={handleTryForFreeButton}>
+          TRY FOR FREE
+        </button>
       </div>
       <div className="home-1-horizontal-div-1">
         <img
@@ -46,7 +43,15 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
-          <button className="home-1-button-2">REQUEST A DEMO</button>
+          <button
+            className="home-1-button-2"
+            onClick={() => {
+              window.location.href =
+                "https://youtu.be/0ag2b3mMcko?si=l3ZtkibxQQPPBHAE";
+            }}
+          >
+            REQUEST A DEMO
+          </button>
         </div>
       </div>
       <div className="home-1-title-2">
