@@ -85,63 +85,8 @@ const DetectionCheck = () => {
     }
   }, 8000);
 
-  const handleSystemCheck = () => {
-    navigate("/systemcheck");
-  };
-
-  const handleDetectionCheck = () => {
-    navigate("/detectioncheck");
-  };
-
-  const handleUploadPhoto = () => {
-    navigate("/uploadimage");
-  };
-
-  const handleCreateTest = () => {
-    navigate("/createtest");
-  };
-
-  const handleAttemptTest = () => {
-    navigate("/attempttest");
-  };
-
-  const handleProfilePhoto = () => {
-    navigate("/home");
-  };
-
-  const handleLogoutButton = async () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
   return (
     <div>
-      <nav className="home-2-navbar">
-        <a className="home-2-navbar-brand">Proctorise</a>
-        <div className="home-2-button-container">
-          <button className="home-2-button-1" onClick={handleSystemCheck}>
-            System Check
-          </button>
-          <button className="home-2-button-1" onClick={handleDetectionCheck}>
-            Check Basic Detections
-          </button>
-          <button className="home-2-button-1" onClick={handleUploadPhoto}>
-            Upload Photo
-          </button>
-          <button className="home-2-button-1" onClick={handleCreateTest}>
-            Create Test
-          </button>
-          <button className="home-2-button-1" onClick={handleAttemptTest}>
-            Attempt Test
-          </button>
-          <button className="home-2-button-1" onClick={handleLogoutButton}>
-            Logout
-          </button>
-        </div>
-        <div className="home-2-user-profile" onClick={handleProfilePhoto}>
-          {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
-        </div>
-      </nav>
       <div className="detection-horizontal-div-1">
         <div className="home-2-vertical-div-1">
           <h2>Only following detection works for demo</h2>

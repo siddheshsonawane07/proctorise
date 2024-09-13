@@ -47,35 +47,6 @@ const UploadImage = () => {
     }
   };
 
-  const handleSystemCheck = () => {
-    navigate("/systemcheck");
-  };
-
-  const handleDetectionCheck = () => {
-    navigate("/detectioncheck");
-  };
-
-  const handleUploadPhoto = () => {
-    navigate("/uploadimage");
-  };
-
-  const handleCreateTest = () => {
-    navigate("/createtest");
-  };
-
-  const handleAttemptTest = () => {
-    navigate("/attempttest");
-  };
-
-  const handleProfilePhoto = () => {
-    navigate("/home");
-  };
-
-  const handleLogoutButton = async () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
   useEffect(() => {
     if (progress) {
       navigate("/home");
@@ -84,35 +55,6 @@ const UploadImage = () => {
 
   return (
     <div>
-      <div className="home-2-body">
-        <nav className="home-2-navbar">
-          <a className="home-2-navbar-brand">Proctorise</a>
-          <div className="home-2-button-container">
-            <button className="home-2-button-1" onClick={handleSystemCheck}>
-              System Check
-            </button>
-            <button className="home-2-button-1" onClick={handleDetectionCheck}>
-              Check Basic Detections
-            </button>
-            <button className="home-2-button-1" onClick={handleUploadPhoto}>
-              Upload Photo
-            </button>
-            <button className="home-2-button-1" onClick={handleCreateTest}>
-              Create Test
-            </button>
-            <button className="home-2-button-1" onClick={handleAttemptTest}>
-              Attempt Test
-            </button>
-            <button className="home-2-button-1" onClick={handleLogoutButton}>
-              Logout
-            </button>
-          </div>
-
-          <div className="home-2-user-profile" onClick={handleProfilePhoto}>
-            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
-          </div>
-        </nav>
-      </div>
       <Webcam
         ref={webcamRef}
         style={{

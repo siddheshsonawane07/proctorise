@@ -8,6 +8,11 @@ import Home from "./components/Home.jsx";
 import Home2 from "./components/Home2.jsx";
 import LoginSignup from "./components/LoginSignup.jsx";
 import ProtectedRoute from "./utils/ProtectedRoute.jsx";
+import CreateTest from "./components/CreateTest.jsx";
+import UploadImage from "./components/UploadImage.jsx";
+import AttemptTest from "./components/AttemptTest.jsx";
+import TestPage from "./components/TestPage.jsx";
+import DetectionCheck from "./components/DetectionCheck.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +31,26 @@ const router = createBrowserRouter([
       {
         path: "/home",
         element: <Home2 />,
-        index: true,
+      },
+      {
+        path: "/createtest",
+        element: <CreateTest />,
+      },
+      {
+        path: "/detectioncheck",
+        element: <DetectionCheck />,
+      },
+      {
+        path: "/attempttest",
+        element: <AttemptTest />,
+      },
+      {
+        path: "/systemcheck",
+        element: <TestPage />,
+      },
+      {
+        path: "/uploadimage",
+        element: <UploadImage />,
       },
     ],
   },

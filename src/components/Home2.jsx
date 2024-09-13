@@ -3,7 +3,7 @@ import "./css/Home.css";
 import { useSelector } from "react-redux";
 
 const Home2 = () => {
-  const displayName = useSelector((state) => state.user.displayName);
+  const displayName = useSelector((state) => state.user.email);
 
   return (
     <div className="home-2-horizontal-div-1">
