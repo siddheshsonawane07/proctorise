@@ -1,25 +1,26 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../utils/firebase-config";
+
 import HorizontalComponent2 from "./Horizontal-Component-2";
-import "./css/Home.css";
+import { useDispatch } from "react-redux";
 import CardComponent from "./Card-Component";
-import CustomChatbot from "./Chatbot";
+import { useNavigate } from "react-router-dom";
+import "./css/Home.css";
 
 const Home = () => {
-  const navigate = useNavigate();
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      console.log(result.user.displayName);
-      localStorage.setItem("userId", result.user);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-    }
-  };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     const provider = new GoogleAuthProvider();
+  //     const result = await signInWithPopup(auth, provider);
+  //     const { uid, displayName, email, photoURL } = result.user;
+
+  //     // const action = loginSuccess({ uid, displayName, email, photoURL });
+
+  //     dispatch(loginSuccess({ uid, displayName, email, photoURL }));
+  //     navigate("/home");
+  //   } catch (error) {
+  //     console.error("Error signing in with Google:", error);
+  //   }
+  // };
 
   return (
     <div className="home-1-body">
@@ -28,9 +29,7 @@ const Home = () => {
         <div className="home-title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
-        <button className="home-1-button-1" onClick={handleGoogleSignIn}>
-          TRY FOR FREE
-        </button>
+        <button className="home-1-button-1">TRY FOR FREE</button>
       </div>
       <div className="home-1-horizontal-div-1">
         <img
