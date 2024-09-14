@@ -1,17 +1,18 @@
 import React, { useState, useRef } from "react";
 import Webcam from "react-webcam";
-import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { app, auth } from "../utils/firebase-config";
+import { ref, uploadBytesResumable } from "firebase/storage";
+import { app, auth, storage } from "../utils/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 const UploadImage = () => {
-  const storage = getStorage(app);
   const [image, setImage] = useState(null);
   const [progress, setProgress] = useState(false);
   const webcamRef = useRef(null);
   const navigate = useNavigate();
-  const profilePhoto = localStorage.getItem("user_photo");
+  const dispatch = useDispatch();
+  const userEmail = useSelector((state) => state.user.email);
 
   const capturePhoto = () => {
     if (webcamRef.current && webcamRef.current.video) {
@@ -31,11 +32,10 @@ const UploadImage = () => {
   const uploadImageFunction = async () => {
     if (image) {
       try {
-        const storageRef = ref(storage, `/images/${user.email}`);
+        const storageRef = ref(storage, `/images/${userEmail}`);
 
         const imageBlob = await fetch(image);
         const imageBytes = await imageBlob.blob();
-
         const uploadTask = await uploadBytesResumable(storageRef, imageBytes);
         setProgress(true);
         alert("image uploaded");

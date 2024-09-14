@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../utils/FirebaseConfig";
 import "./css/Home.css";
-import { useSelector } from "react-redux";
 
 const Home2 = () => {
-  const displayName = useSelector((state) => state.user.email);
+  const [referenceImage, setReferenceImage] = useState(null);
+  const userEmail = useSelector((state) => state.user.email);
+
+  useEffect(() => {
+    if (userEmail) {
+      const checkReferenceImage = async () => {
+        console.log(userEmail);
+        const storageRef = ref(storage, `/images/${userEmail}`);
+        try {
+          const imageLink = await getDownloadURL(storageRef);
+          setReferenceImage(imageLink);
+          console.log("userEmail:   " + userEmail);
+          console.log("imageLink:    " + imageLink);
+        } catch (error) {
+          console.error("Error fetching image:", error.message);
+        }
+      };
+
+      checkReferenceImage();
+    }
+  }, [userEmail]);
 
   return (
     <div className="home-2-horizontal-div-1">
@@ -41,12 +63,11 @@ const Home2 = () => {
       </div>
 
       <div className="home-2-image-div">
-        {/* <img
+        <img
           className="home-2-uploadedimg"
-          src={imageLink}
+          src={referenceImage}
           alt="No photo uploaded for reference. Please click Upload Photo"
-        /> */}
-        {displayName}
+        />
       </div>
     </div>
   );

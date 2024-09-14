@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection } from "firebase/firestore";
-import { db } from "../utils/firebase-config";
+import { db } from "../utils/FirebaseConfig";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");

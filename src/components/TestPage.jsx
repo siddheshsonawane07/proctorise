@@ -1,8 +1,8 @@
 import Webcam from "react-webcam";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { auth, app } from "../utils/firebase-config";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { auth, storage } from "../utils/FirebaseConfig";
+import { ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
@@ -12,9 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const TestPage = () => {
   const { state } = useLocation();
   const { formLink, testTime } = state || {};
-  const [user] = useAuthState(auth);
   const webcamRef = useRef(null);
-  const storage = getStorage(app);
   const [toasts, setToasts] = useState([]);
   const [timer, setTimer] = useState(testTime * 60);
   const [visibilityCount, setVisibilityCount] = useState(0);

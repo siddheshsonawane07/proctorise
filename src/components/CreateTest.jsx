@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection, addDoc } from "firebase/firestore";
-import { db } from "../utils/firebase-config";
+import { db } from "../utils/FirebaseConfig";
 
 const CreateTest = () => {
   const [values, setValues] = useState({

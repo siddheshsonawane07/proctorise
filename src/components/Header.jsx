@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-import { auth, app } from "../utils/firebase-config";
+import { auth, app, storage } from "../utils/FirebaseConfig";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import UserProfile from "./UserProfile";
@@ -9,7 +9,6 @@ import UserProfile from "./UserProfile";
 const Header = () => {
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setImageLink] = useState(null);
-  const storage = getStorage(app);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userEmail = useSelector((state) => state.user.email);
@@ -33,6 +32,10 @@ const Header = () => {
   //     checkStorageRef();
   //   }
   // }, [user, storage]);
+
+  const handleHome = () => {
+    navigate("/home");
+  };
 
   const handleCreateTest = () => {
     navigate("/createtest");
@@ -62,11 +65,12 @@ const Header = () => {
             Proctorise
           </a>
           <div className="home-2-button-container">
-            <Link to="/systemcheck">
-              <button className="home-2-button-1" onClick={handleSystemCheck}>
-                System Check
-              </button>
-            </Link>
+            <button className="home-2-button-1" onClick={handleHome}>
+              Home
+            </button>
+            <button className="home-2-button-1" onClick={handleSystemCheck}>
+              System Check
+            </button>
             <button className="home-2-button-1" onClick={handleDetectionCheck}>
               Check Basic Detections
             </button>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutSuccess } from "../redux/userSlice";
+import { persistor } from "../redux/store";
 import "./css/Home.css";
 
 const UserProfile = () => {
@@ -18,22 +19,26 @@ const UserProfile = () => {
     navigate("/updateprofile");
   };
 
-  const handleLogoutButton = () => {
-    dispatch(logoutSuccess());
-    navigate("/");
+  const handleLogoutButton = async () => {
+    try {
+      dispatch(logoutSuccess()); // Clear user data in Redux store
+      console.log("Clearing persisted state");
+      await persistor.purge(); // Ensure purging completes
+      console.log("Persisted state cleared");
+      navigate("/"); // Redirect to home page
+    } catch (error) {
+      console.error("Error clearing persisted state:", error);
+    }
   };
 
   return (
     <div className="home-2-user-profile">
-      {photoURL && (
-        <img
-          id="profPhoto"
-          src={photoURL}
-          alt="Profile"
-          onClick={toggleDropdown}
-        />
-      )}
-
+      <img
+        id="profPhoto"
+        src={photoURL}
+        alt="Profile"
+        onClick={toggleDropdown}
+      />
       {dropdownVisible && (
         <div className="dropdown-menu">
           <ul>
