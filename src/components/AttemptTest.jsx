@@ -5,7 +5,6 @@ import { db } from "../utils/FirebaseConfig";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");
-  const profilePhoto = localStorage.getItem("user_photo");
   const navigate = useNavigate();
 
   const handleForm = async (e) => {

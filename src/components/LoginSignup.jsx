@@ -8,7 +8,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/userSlice";
+import { loginSuccess } from "../redux/UserSlice";
 import { useNavigate } from "react-router-dom";
 
 const LoginSignup = () => {

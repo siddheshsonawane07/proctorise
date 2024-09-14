@@ -1,17 +1,16 @@
 import React, { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import { ref, uploadBytesResumable } from "firebase/storage";
-import { app, auth, storage } from "../utils/FirebaseConfig";
+import { storage } from "../utils/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const UploadImage = () => {
   const [image, setImage] = useState(null);
   const [progress, setProgress] = useState(false);
   const webcamRef = useRef(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const userEmail = useSelector((state) => state.user.email);
 
   const capturePhoto = () => {

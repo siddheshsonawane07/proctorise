@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logoutSuccess } from "../redux/userSlice";
+import { logoutSuccess } from "../redux/UserSlice";
 import { persistor } from "../redux/store";
+import { FaUserCog } from "react-icons/fa";
+
 import "./css/Home.css";
 
 const UserProfile = () => {
@@ -13,10 +15,6 @@ const UserProfile = () => {
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
-  };
-
-  const handleUpdateProfile = () => {
-    navigate("/updateprofile");
   };
 
   const handleLogoutButton = async () => {
@@ -33,16 +31,22 @@ const UserProfile = () => {
 
   return (
     <div className="home-2-user-profile">
-      <img
-        id="profPhoto"
-        src={photoURL}
-        alt="Profile"
-        onClick={toggleDropdown}
-      />
+      {photoURL ? (
+        <img
+          id="profPhoto"
+          src={photoURL}
+          onClick={toggleDropdown}
+          className="home-2-user-profile-icon"
+        />
+      ) : (
+        <FaUserCog
+          onClick={toggleDropdown}
+          className="home-2-user-profile-icon"
+        />
+      )}
       {dropdownVisible && (
         <div className="dropdown-menu">
           <ul>
-            <li onClick={handleUpdateProfile}>Update Profile</li>
             <li onClick={handleLogoutButton}>Logout</li>
           </ul>
         </div>

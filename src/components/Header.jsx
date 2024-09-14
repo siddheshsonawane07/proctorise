@@ -1,37 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-import { auth, app, storage } from "../utils/FirebaseConfig";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import UserProfile from "./UserProfile";
 
 const Header = () => {
-  const [hasStorageRef, setHasStorageRef] = useState(false);
-  const [imageLink, setImageLink] = useState(null);
+
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const userEmail = useSelector((state) => state.user.email);
-
-  // useEffect(() => {
-  //   const checkStorageRef = async () => {
-  //     const image = user. photoURL;
-  //     localStorage.setItem("user_photo", image);
-  //     setProfilePhoto(image);
-  //     const storageRef = ref(storage, `/images/${user.email}`);
-  //     try {
-  //       const imageLink = await getDownloadURL(storageRef);
-  //       setHasStorageRef(true);
-  //       setImageLink(imageLink);
-  //     } catch (error) {
-  //       setHasStorageRef(false);
-  //     }
-  //   };
-
-  //   if (user) {
-  //     checkStorageRef();
-  //   }
-  // }, [user, storage]);
 
   const handleHome = () => {
     navigate("/home");

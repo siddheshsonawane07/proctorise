@@ -341,12 +341,11 @@
   cursor: pointer;
 }
 
-.home-2-user-profile img {
-  width: 3rem;
-  height: 3rem;
+.home-2-user-profile-icon {
+  width: 3.8rem;
+  height: 3.8rem;
   border-radius: 50%;
 }
-
 .home-2-horizontal-div-1 {
   flex-grow: 1;
   display: flex;

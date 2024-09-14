@@ -1,6 +1,6 @@
 import React from "react";
-import HorizontalComponent2 from "./Horizontal-Component-2";
-import CardComponent from "./Card-Component";
+import HorizontalComponent2 from "./HorizontalComponent2";
+import CardComponent from "./CardComponent";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./css/Home.css";

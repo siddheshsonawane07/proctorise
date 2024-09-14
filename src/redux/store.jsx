@@ -1,5 +1,5 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userSlice from "./userSlice";
+import userSlice from "./UserSlice";
 import storage from "redux-persist/lib/storage";
 import {
   persistStore,
@@ -8,7 +8,6 @@ import {
   REHYDRATE,
   PAUSE,
   PERSIST,
-  PURGE,
   REGISTER,
 } from "redux-persist";
 const persistConfig = {

@@ -35,6 +35,14 @@ const SystemCheck = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+
+        // Capture video frames asynchronously
+        const processFrames = () => {
+          // Do GPU-heavy operations here asynchronously
+          requestAnimationFrame(processFrames); // Non-blocking
+        };
+
+        requestAnimationFrame(processFrames);
       } catch (error) {
         console.error("Error accessing camera:", error);
       }
