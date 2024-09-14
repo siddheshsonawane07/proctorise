@@ -3,6 +3,8 @@ import { auth } from "../utils/firebase-config";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../redux/userSlice";
@@ -15,7 +17,6 @@ const LoginSignup = () => {
   const nameRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userEmail = useSelector((state) => state.user.email);
 
   const handleSignup = (e) => {
     e.preventDefault();
@@ -26,9 +27,9 @@ const LoginSignup = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        const { uid, displayName, email, photoUrl } = user;
+        const { uid, displayName, email, photoURL } = user;
 
-        dispatch(loginSuccess({ uid, displayName, email, photoUrl }));
+        dispatch(loginSuccess({ uid, displayName, email, photoURL }));
         navigate("/home");
       })
       .catch((error) => {
@@ -46,14 +47,26 @@ const LoginSignup = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        const { uid, displayName, email, photoUrl } = user;
+        const { uid, displayName, email, photoURL } = user;
 
-        dispatch(loginSuccess({ uid, displayName, email, photoUrl }));
+        dispatch(loginSuccess({ uid, displayName, email, photoURL }));
         navigate("/home");
       })
       .catch((error) => {
         console.log("Error: ", error.message);
       });
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const { uid, displayName, email, photoURL } = result.user;
+      dispatch(loginSuccess({ uid, displayName, email, photoURL }));
+      navigate("/home");
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
   };
 
   return (
@@ -76,13 +89,10 @@ const LoginSignup = () => {
         )}
         <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
       </form>
-
       <button onClick={() => setIsLogin(!isLogin)}>
         {isLogin ? "Switch to Signup" : "Switch to Login"}
       </button>
-
-      {/* Display user email if logged in */}
-      {userEmail && <p>Logged in as: {userEmail}</p>}
+      <button onClick={handleGoogleSignIn}>Signin with Google</button>
     </div>
   );
 };

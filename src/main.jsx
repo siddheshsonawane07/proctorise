@@ -13,6 +13,7 @@ import UploadImage from "./components/UploadImage.jsx";
 import AttemptTest from "./components/AttemptTest.jsx";
 import TestPage from "./components/TestPage.jsx";
 import DetectionCheck from "./components/DetectionCheck.jsx";
+import UpdateProfile from "./components/UpdateProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "/uploadimage",
         element: <UploadImage />,
+      },
+      {
+        path: "/updateprofile",
+        element: <UpdateProfile />,
       },
     ],
   },

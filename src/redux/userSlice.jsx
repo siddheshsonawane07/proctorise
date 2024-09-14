@@ -4,7 +4,7 @@ const initialState = {
   uid: null,
   displayName: null,
   email: null,
-  photoUrl: null,
+  photoURL: null,
   isLoggedIn: false,
 };
 
@@ -13,18 +13,19 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
-      const { uid, displayName, email, photoUrl } = action.payload;
+      const { uid, displayName, email, photoURL } = action.payload;
       state.uid = uid;
       state.displayName = displayName;
       state.email = email;
-      state.photoUrl = photoUrl;
+      state.photoURL = photoURL;
       state.isLoggedIn = true;
+      console.log({ uid, displayName, email, photoURL });
     },
     logoutSuccess: (state) => {
       state.uid = null;
       state.displayName = null;
       state.email = null;
-      state.photoUrl = null;
+      state.photoURL = null;
       state.isLoggedIn = false;
     },
   },

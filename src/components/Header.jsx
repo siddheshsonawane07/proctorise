@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { auth, app } from "../utils/firebase-config";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import userSlice, { logoutSuccess } from "../redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import UserProfile from "./UserProfile";
 
 const Header = () => {
   const [hasStorageRef, setHasStorageRef] = useState(false);
   const [imageLink, setImageLink] = useState(null);
-  const [profilePhoto, setProfilePhoto] = useState(null);
   const storage = getStorage(app);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const userEmail = useSelector((state) => state.user.email);
 
   // useEffect(() => {
   //   const checkStorageRef = async () => {
-  //     const image = user.photoURL;
+  //     const image = user. photoURL;
   //     localStorage.setItem("user_photo", image);
   //     setProfilePhoto(image);
   //     const storageRef = ref(storage, `/images/${user.email}`);
@@ -34,11 +33,6 @@ const Header = () => {
   //     checkStorageRef();
   //   }
   // }, [user, storage]);
-
-  const handleLogoutButton = () => {
-    dispatch(logoutSuccess());
-    navigate("/");
-  };
 
   const handleCreateTest = () => {
     navigate("/createtest");
@@ -58,10 +52,6 @@ const Header = () => {
 
   const handleAttemptTest = () => {
     navigate("/attempttest");
-  };
-
-  const handleProfilePhoto = () => {
-    navigate("/home");
   };
 
   return (
@@ -89,14 +79,11 @@ const Header = () => {
             <button className="home-2-button-1" onClick={handleAttemptTest}>
               Attempt Test
             </button>
-            <button className="home-2-button-1" onClick={handleLogoutButton}>
-              Logout
-            </button>
           </div>
-
-          <div className="home-2-user-profile" onClick={handleProfilePhoto}>
-            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
-          </div>
+          {/* <div className="home-2-user-profile">
+            {photoURL && <img id="profPhoto" src={photoURL} />}
+          </div> */}
+          <UserProfile />
         </nav>
       </div>
     </>

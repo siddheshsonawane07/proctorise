@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { app, auth } from "../utils/firebase-config";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -10,7 +9,6 @@ const UploadImage = () => {
   const storage = getStorage(app);
   const [image, setImage] = useState(null);
   const [progress, setProgress] = useState(false);
-  const [user] = useAuthState(auth);
   const webcamRef = useRef(null);
   const navigate = useNavigate();
   const profilePhoto = localStorage.getItem("user_photo");
