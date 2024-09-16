@@ -5,7 +5,6 @@ import { logoutSuccess } from "../redux/UserSlice";
 import { persistor } from "../redux/store";
 import { FaUserCog } from "react-icons/fa";
 
-import "./css/Home.css";
 
 const UserProfile = () => {
   const dispatch = useDispatch();

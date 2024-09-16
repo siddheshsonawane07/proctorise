@@ -1,4 +1,3 @@
-import "./css/Home.css";
 
 const HorizontalComponent2 = ({ imgSrc, title, content }) => {
   return (

@@ -14,6 +14,7 @@ import AttemptTest from "./components/AttemptTest.jsx";
 import TestPage from "./components/TestPage.jsx";
 import DetectionCheck from "./components/DetectionCheck.jsx";
 import SystemCheck from "./components/SystemCheck.jsx";
+import PageNotFound from "./components/PageNotFound.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <LoginSignup />,
     index: true,
+  },
+  {
+    path: "*",
+    element: <PageNotFound />,
   },
   {
     element: <ProtectedRoute />,

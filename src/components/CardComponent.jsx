@@ -1,4 +1,3 @@
-import "./css/Home.css";
 
 const CardComponent = ({ imgSrc, title, content, buttonType }) => {
   return (

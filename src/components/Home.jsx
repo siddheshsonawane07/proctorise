@@ -3,7 +3,6 @@ import HorizontalComponent2 from "./HorizontalComponent2";
 import CardComponent from "./CardComponent";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import "./css/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,12 +17,10 @@ const Home = () => {
   };
 
   return (
-    <div className="home-1-body">
+    <div>
       {/* <CustomChatbot /> */}
-      <div className="home-1-header">
-        <div className="home-title-1">
-          Proctored exams: Secure your online assessments using Proctorise{" "}
-        </div>
+      <div>
+        <p>Proctored exams: Secure your online assessments using Proctorise</p>
         <button className="home-1-button-1" onClick={handleTryForFreeButton}>
           TRY FOR FREE
         </button>

@@ -1,6 +1,5 @@
 // import React, { useState } from "react";
 // import axios from "axios";
-// import "./css/Home.css";
 // import { FaCommentAlt } from "react-icons/fa";
 
 // const CustomChatbot = () => {
