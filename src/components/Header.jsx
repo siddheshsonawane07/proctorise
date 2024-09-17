@@ -18,10 +18,6 @@ const Header = () => {
     navigate("/systemcheck");
   };
 
-  const handleDetectionCheck = () => {
-    navigate("/detectioncheck");
-  };
-
   const handleUploadPhoto = () => {
     navigate("/uploadimage");
   };
@@ -43,9 +39,6 @@ const Header = () => {
             </button>
             <button className="home-2-button-1" onClick={handleSystemCheck}>
               System Check
-            </button>
-            <button className="home-2-button-1" onClick={handleDetectionCheck}>
-              Check Basic Detections
             </button>
             <button className="home-2-button-1" onClick={handleUploadPhoto}>
               Upload Photo

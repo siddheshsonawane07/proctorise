@@ -12,10 +12,10 @@ import CreateTest from "./components/CreateTest.jsx";
 import UploadImage from "./components/UploadImage.jsx";
 import AttemptTest from "./components/AttemptTest.jsx";
 import TestPage from "./components/TestPage.jsx";
-import DetectionCheck from "./components/DetectionCheck.jsx";
 import SystemCheck from "./components/SystemCheck.jsx";
 import App from "./App";
 import "./components/css/Home.css";
+
 const router = createBrowserRouter([
   {
     element: <App />,
@@ -39,10 +39,6 @@ const router = createBrowserRouter([
           {
             path: "/createtest",
             element: <CreateTest />,
-          },
-          {
-            path: "/detectioncheck",
-            element: <DetectionCheck />,
           },
           {
             path: "/attempttest",

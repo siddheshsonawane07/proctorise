@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection } from "firebase/firestore";
 import { db } from "../utils/FirebaseConfig";
+import "./css/Home.css";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");
@@ -47,7 +48,7 @@ const AttemptTest = () => {
   };
 
   return (
-    <div>
+    <div className="test-form-container">
       <form className="test-form" onSubmit={handleForm}>
         <label htmlFor="formLink">Form Link:</label>
         <input

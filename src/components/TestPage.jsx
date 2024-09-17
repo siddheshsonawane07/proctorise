@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
-import { storage } from "../utils/FirebaseConfig";
+import { auth, storage } from "../utils/FirebaseConfig";
 import { ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
@@ -9,9 +9,12 @@ import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import * as faceapi from "@vladmandic/face-api";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 
-const TestPage = () => {
+if (!tf.getBackend()) {
+  tf.setBackend("webgl").then(() => console.log("WebGL backend initialized"));
+}
+
+const TestPage = React.memo(() => {
   const { state } = useLocation();
   const { formLink, testTime } = state || {};
   const webcamRef = useRef(null);
@@ -19,8 +22,6 @@ const TestPage = () => {
   const [timer, setTimer] = useState(testTime * 60);
   const [visibilityCount, setVisibilityCount] = useState(0);
   const [score, setScore] = useState(100);
-  const userEmail = useSelector((state) => state.user.email);
-  const userName = useSelector((state) => state.user.displayName);
   const navigate = useNavigate();
 
   const showToast = useCallback(
@@ -64,15 +65,17 @@ const TestPage = () => {
   useEffect(() => {
     let detectionsInterval;
     let countdown;
+    let faceDetectionNet, faceLandmark68Net, faceRecognitionNet;
 
     const setupFaceRecognition = async (video) => {
-      const labels = [userName];
-      const storageRef = ref(storage, `/images/${userEmail}`);
+      const user = auth.currentUser;
+      const labels = [user.displayName];
+      const storageRef = ref(storage, `/images/${user.email}`);
       const imageLink = await getDownloadURL(storageRef);
 
       const img = await faceapi.fetchImage(imageLink);
       const detection = await faceapi
-        .detectSingleFace(img)
+        .detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
         .withFaceLandmarks()
         .withFaceDescriptor();
 
@@ -84,7 +87,7 @@ const TestPage = () => {
 
       return async () => {
         const detections = await faceapi
-          .detectAllFaces(video)
+          .detectAllFaces(video, new faceapi.SsdMobilenetv1Options())
           .withFaceLandmarks()
           .withFaceDescriptors();
 
@@ -133,12 +136,15 @@ const TestPage = () => {
     };
 
     const loadModels = async () => {
-      await tf.setBackend("webgl");
-      await tf.ready();
+      // Load face-api.js models
+      faceDetectionNet = new faceapi.SsdMobilenetv1();
+      faceLandmark68Net = new faceapi.FaceLandmark68Net();
+      faceRecognitionNet = new faceapi.FaceRecognitionNet();
+
       await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-        faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+        faceDetectionNet.loadFromUri("/models"),
+        faceLandmark68Net.loadFromUri("/models"),
+        faceRecognitionNet.loadFromUri("/models"),
       ]);
 
       const faceRecognition = await setupFaceRecognition(
@@ -272,6 +278,6 @@ const TestPage = () => {
       </div>
     </div>
   );
-};
+});
 
 export default TestPage;

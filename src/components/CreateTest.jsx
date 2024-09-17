@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection, addDoc } from "firebase/firestore";
 import { db } from "../utils/FirebaseConfig";
+import "./css/Home.css";
 
 const CreateTest = () => {
   const [values, setValues] = useState({
     formLink: "",
     testTime: "",
   });
-  const profilePhoto = localStorage.getItem("user_photo");
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
@@ -47,7 +47,7 @@ const CreateTest = () => {
   };
 
   return (
-    <div>
+    <div className="test-form-container">
       <form className="test-form" onSubmit={(e) => handleForm(e)}>
         <label htmlFor="formLink">Form Link:</label>
         <input

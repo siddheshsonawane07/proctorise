@@ -13,10 +13,8 @@ const App = () => {
     // Check on initial render
     checkScreenSize();
 
-    // Add event listener for window resize
     window.addEventListener("resize", checkScreenSize);
 
-    // Clean up event listener on component unmount
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 

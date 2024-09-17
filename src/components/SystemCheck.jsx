@@ -66,51 +66,49 @@ const SystemCheck = () => {
       <div className="system-check-container">
         <ul className="system-check-list">
           <li>
-            <span className="system-check-label">Browser:</span>{" "}
-            <span
+            <div className="system-check-label">Browser:</div>
+            <div
               className={
                 parseInt(browserInfo.version) >= 90 ? "system-check-green" : ""
               }
             >
               {browserInfo.name} {browserInfo.version}
-            </span>
-            {parseInt(browserInfo.version) >= 90 && (
-              <span className="system-check-status">&#10004;</span>
-            )}
+            </div>
           </li>
           <li>
-            <span className="system-check-label">Webcam:</span>{" "}
-            <span className={webcamEnabled ? "system-check-green" : ""}>
+            <div className="system-check-label">Webcam:</div>
+            <div className={webcamEnabled ? "system-check-green" : ""}>
               {webcamEnabled ? "Enabled" : "Disabled"}
-            </span>
-            {webcamEnabled && (
-              <span className="system-check-status">&#10004;</span>
-            )}
+            </div>
+          </li>
+          <li>
+            <ReactInternetSpeedMeter
+              txtSubHeading="Internet connection is slow"
+              outputType=""
+              pingInterval={5000}
+              txtMainHeading="Internet Speed:"
+              thresholdUnit="megabyte"
+              threshold={100}
+              imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
+              downloadSize="1561257"
+              callbackFunctionOnNetworkTest={(data) => setInternetSpeed(data)}
+            />
+            <div className="system-check-label">Internet Speed:</div>
+            <div className="system-check-green">{internetSpeed} Mbps</div>
           </li>
         </ul>
-        <div className="system-internet-speed-check">
-          <ReactInternetSpeedMeter
-            txtSubHeading="Internet connection is slow"
-            outputType=""
-            customClassName="system-internet-speed-meter"
-            pingInterval={5000}
-            txtMainHeading="Internet Speed:"
-            thresholdUnit="megabyte"
-            threshold={100}
-            imageUrl="https://www.lifewire.com/thmb/8yo0YsYWVIT1-U25jwT9XK5kNko=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/speed-test-580e7a2b5f9b58564ce47143.png"
-            downloadSize="1561257"
-            callbackFunctionOnNetworkTest={(data) => setInternetSpeed(data)}
-          />
-          <span className="system-internet-speed">{internetSpeed} Mbps</span>
-        </div>
         <div className="system-camera-container">
-          <h2>Live Camera Stream</h2>
+          <div className="system-check-label">Live Camera Stream</div>
           <video
             className="system-camera-stream"
             ref={videoRef}
-            width="480"
-            height="360"
             autoPlay
+            style={{
+              width: "100%",
+              maxWidth: "480px", // Keep this consistent
+              height: "auto",
+              borderRadius: "10px",
+            }}
           ></video>
         </div>
       </div>

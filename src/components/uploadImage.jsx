@@ -5,6 +5,7 @@ import { storage } from "../utils/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import "./css/Home.css";
 
 const UploadImage = () => {
   const [image, setImage] = useState(null);
@@ -37,7 +38,7 @@ const UploadImage = () => {
         const imageBytes = await imageBlob.blob();
         const uploadTask = await uploadBytesResumable(storageRef, imageBytes);
         setProgress(true);
-        alert("image uploaded");
+        alert("Image uploaded");
       } catch (error) {
         console.log(error);
       }
@@ -49,36 +50,38 @@ const UploadImage = () => {
       navigate("/home");
     }
   }, [progress]);
-
+  
   return (
-    <div>
-      <Webcam
-        ref={webcamRef}
-        style={{
-          marginTop: 60,
-          textAlign: "center",
-          zIndex: 9,
-          width: 480,
-          height: 480,
-        }}
-        videoConstraints={{
-          width: 1280,
-          height: 720,
-          facingMode: "user",
-        }}
-        screenshotFormat="image/png"
-      />
-      <h1>{progress}</h1>
-      <button onClick={capturePhoto} className="home-2-button-1">
-        Capture Photo
-      </button>
-      {image && (
-        <>
+    <div className="upload-image-container">
+      <div className="webcam-container">
+        <Webcam
+          ref={webcamRef}
+          videoConstraints={{
+            width: 1280,
+            height: 720,
+            facingMode: "user",
+          }}
+          screenshotFormat="image/png"
+          style={{
+            width: "100%",
+            maxWidth: "480px",
+            height: "auto",
+            borderRadius: "10px",
+          }}
+        />
+      </div>
+
+      <div className="upload-buttons">
+        <button onClick={capturePhoto} className="home-2-button-1">
+          Capture Photo
+        </button>
+
+        {image && (
           <button onClick={uploadImageFunction} className="home-2-button-1">
             Upload Photo
           </button>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };
