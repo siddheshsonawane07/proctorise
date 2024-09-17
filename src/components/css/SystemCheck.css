@@ -75,7 +75,7 @@ body {
 }
 
 .system-camera-stream {
-  width: 100%; /* Make video responsive */
-  max-width: 100%; /* Ensure it doesn't exceed container width */
+  width: 100%;
+  max-width: 100%;
   border-radius: 15px;
 }

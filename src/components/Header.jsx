@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import UserProfile from "./UserProfile";
+import "./css/Home.css";
 
 const Header = () => {
-
   const navigate = useNavigate();
 
   const handleHome = () => {

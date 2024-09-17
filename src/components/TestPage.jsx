@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
-import { auth, storage } from "../utils/FirebaseConfig";
+import { storage } from "../utils/FirebaseConfig";
 import { ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";

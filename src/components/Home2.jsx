@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "../utils/FirebaseConfig";
 import "./css/Home.css";
