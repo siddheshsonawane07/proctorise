@@ -14,48 +14,53 @@ import AttemptTest from "./components/AttemptTest.jsx";
 import TestPage from "./components/TestPage.jsx";
 import DetectionCheck from "./components/DetectionCheck.jsx";
 import SystemCheck from "./components/SystemCheck.jsx";
-
+import App from "./App";
+import "./components/css/Home.css";
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Home />,
-    index: true,
-  },
-  {
-    path: "/register",
-    element: <LoginSignup />,
-    index: true,
-  },
-  {
-    element: <ProtectedRoute />,
+    element: <App />,
     children: [
       {
-        path: "/home",
-        element: <Home2 />,
+        path: "/",
+        element: <Home />,
+        index: true,
       },
       {
-        path: "/createtest",
-        element: <CreateTest />,
+        path: "/register",
+        element: <LoginSignup />,
       },
       {
-        path: "/detectioncheck",
-        element: <DetectionCheck />,
-      },
-      {
-        path: "/attempttest",
-        element: <AttemptTest />,
-      },
-      {
-        path: "/systemcheck",
-        element: <SystemCheck />,
-      },
-      {
-        path: "/uploadimage",
-        element: <UploadImage />,
-      },
-      {
-        path: "/test",
-        element: <TestPage />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "/home",
+            element: <Home2 />,
+          },
+          {
+            path: "/createtest",
+            element: <CreateTest />,
+          },
+          {
+            path: "/detectioncheck",
+            element: <DetectionCheck />,
+          },
+          {
+            path: "/attempttest",
+            element: <AttemptTest />,
+          },
+          {
+            path: "/systemcheck",
+            element: <SystemCheck />,
+          },
+          {
+            path: "/uploadimage",
+            element: <UploadImage />,
+          },
+          {
+            path: "/test",
+            element: <TestPage />,
+          },
+        ],
       },
     ],
   },

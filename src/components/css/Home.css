@@ -861,7 +861,7 @@
   margin-right: 0.5rem;
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 00px) {
   .login-signup-container {
     padding: 1.5rem;
   }
@@ -876,4 +876,41 @@
   .login-signup-google {
     font-size: 0.9rem;
   }
+}
+
+.desktop-only-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(32, 117, 98, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+  color: white;
+  text-align: center;
+}
+
+.desktop-only-content {
+  padding: 20px;
+  max-width: 80%;
+}
+
+.desktop-only-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.desktop-only-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.desktop-only-message {
+  font-size: 16px;
+  line-height: 1.5;
 }
