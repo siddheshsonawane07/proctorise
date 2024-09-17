@@ -82,29 +82,58 @@ const LoginSignup = () => {
   };
 
   return (
-    <div>
-      <h2>{isLogin ? "Login" : "Signup"}</h2>
-      <form onSubmit={isLogin ? handleLogin : handleSignup}>
-        Email Id
-        <input type="email" ref={emailRef} placeholder="Email" required />
-        Password
+    <div className="login-signup-container">
+      <h2 className="login-signup-title">{isLogin ? "Login" : "Signup"}</h2>
+      <form
+        className="login-signup-form"
+        onSubmit={isLogin ? handleLogin : handleSignup}
+      >
+        <label className="login-signup-label">Email Id</label>
         <input
+          className="login-signup-input"
+          type="email"
+          ref={emailRef}
+          placeholder="Email"
+          required
+        />
+
+        <label className="login-signup-label">Password</label>
+        <input
+          className="login-signup-input"
           type="password"
           ref={passwordRef}
           placeholder="Password"
           required
         />
+
         {!isLogin && (
           <>
-            Name <input type="text" ref={nameRef} placeholder="Name" required />
+            <label className="login-signup-label">Name</label>
+            <input
+              className="login-signup-input"
+              type="text"
+              ref={nameRef}
+              placeholder="Name"
+              required
+            />
           </>
         )}
-        <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+
+        <button className="login-signup-button" type="submit">
+          {isLogin ? "Login" : "Sign Up"}
+        </button>
       </form>
-      <button onClick={() => setIsLogin(!isLogin)}>
+
+      <button
+        className="login-signup-switch"
+        onClick={() => setIsLogin(!isLogin)}
+      >
         {isLogin ? "Switch to Signup" : "Switch to Login"}
       </button>
-      <button onClick={handleGoogleSignIn}>Sign in with Google</button>
+
+      <button className="login-signup-google" onClick={handleGoogleSignIn}>
+        <span className="login-signup-google-icon">G</span> Sign in with Google
+      </button>
     </div>
   );
 };

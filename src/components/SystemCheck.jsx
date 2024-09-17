@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ReactInternetSpeedMeter } from "react-internet-meter";
 import DetectRTC from "detectrtc";
-import "./css/SystemCheck.css";
+import "./css/Home.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
@@ -64,7 +64,6 @@ const SystemCheck = () => {
   return (
     <div className="system-check-body">
       <div className="system-check-container">
-        <h1 className="system-check-title">System Compatibility Check</h1>
         <ul className="system-check-list">
           <li>
             <span className="system-check-label">Browser:</span>{" "}
