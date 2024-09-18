@@ -14,6 +14,7 @@ import AttemptTest from "./components/AttemptTest.jsx";
 import "./components/css/Home.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "./components/Loader.jsx";
 
 const UploadImage = lazy(() => import("./components/UploadImage.jsx"));
 const SystemCheck = lazy(() => import("./components/SystemCheck.jsx"));
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
           {
             path: "/attempttest",
             element: (
-              <Suspense fallback={<div>Loading Test Page...</div>}>
+              <Suspense fallback={<Loader />}>
                 <AttemptTest />
               </Suspense>
             ),
@@ -54,19 +55,23 @@ const router = createBrowserRouter([
           {
             path: "/systemcheck",
             element: (
-              <Suspense fallback={<div>Loading Test Page...</div>}>
+              <Suspense fallback={<Loader />}>
                 <SystemCheck />
               </Suspense>
             ),
           },
           {
             path: "/uploadimage",
-            element: <UploadImage />,
+            element: (
+              <Suspense fallback={<Loader />}>
+                <UploadImage />
+              </Suspense>
+            ),
           },
           {
             path: "/test",
             element: (
-              <Suspense fallback={<div>Loading Test Page...</div>}>
+              <Suspense fallback={<Loader />}>
                 <TestPage />
               </Suspense>
             ),
