@@ -33,7 +33,7 @@ const AttemptTest = () => {
           navigate("/test", { state: { formLink, testTime } });
         });
       } else {
-        console.log("Form link not found in Firestore");
+        alert("Form link not found in the database");
       }
     } catch (error) {
       console.error(error);

@@ -15,7 +15,7 @@ const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(true);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const nameRef = useRef(null); // Only used for signup
+  const nameRef = useRef(null); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

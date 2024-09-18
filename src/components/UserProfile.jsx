@@ -19,11 +19,11 @@ const UserProfile = () => {
 
   const handleLogoutButton = async () => {
     try {
-      dispatch(logoutSuccess()); // Clear user data in Redux store
-      console.log("Clearing persisted state");
-      await persistor.purge(); // Ensure purging completes
-      console.log("Persisted state cleared");
-      navigate("/"); // Redirect to home page
+      dispatch(logoutSuccess());
+      // console.log("Clearing persisted state");
+      await persistor.purge(); 
+      // console.log("Persisted state cleared");
+      navigate("/");
     } catch (error) {
       console.error("Error clearing persisted state:", error);
     }

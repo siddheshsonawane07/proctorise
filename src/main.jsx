@@ -15,6 +15,8 @@ import TestPage from "./components/TestPage.jsx";
 import SystemCheck from "./components/SystemCheck.jsx";
 import App from "./App";
 import "./components/css/Home.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
@@ -66,6 +68,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={appStore}>
     <PersistGate loading={null} persistor={persistor}>
       <RouterProvider router={router} />
+      <ToastContainer />
     </PersistGate>
   </Provider>
 );

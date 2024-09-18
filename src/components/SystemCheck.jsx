@@ -5,9 +5,10 @@ import "./css/Home.css";
 
 const SystemCheck = () => {
   const [browserInfo, setBrowserInfo] = useState({});
-  const [webcamEnabled, setWebcamEnabled] = useState();
+  const [webcamEnabled, setWebcamEnabled] = useState(false);
   const [internetSpeed, setInternetSpeed] = useState(0);
   const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     const checkSystemInfo = () => {
@@ -18,45 +19,22 @@ const SystemCheck = () => {
 
       navigator.mediaDevices
         .getUserMedia({ video: true })
-        .then(() => setWebcamEnabled(true))
+        .then((stream) => {
+          setWebcamEnabled(true);
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
         .catch(() => setWebcamEnabled(false));
     };
 
     checkSystemInfo();
-  }, []);
-
-  useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-
-        // Capture video frames asynchronously
-        const processFrames = () => {
-          // Do GPU-heavy operations here asynchronously
-          requestAnimationFrame(processFrames); // Non-blocking
-        };
-
-        requestAnimationFrame(processFrames);
-      } catch (error) {
-        console.error("Error accessing camera:", error);
-      }
-    };
-
-    startCamera();
 
     return () => {
-      if (videoRef.current) {
-        const stream = videoRef.current.srcObject;
-        if (stream) {
-          const tracks = stream.getTracks();
-          tracks.forEach((track) => track.stop());
-        }
+      if (streamRef.current) {
+        const tracks = streamRef.current.getTracks();
+        tracks.forEach((track) => track.stop());
       }
     };
   }, []);
@@ -105,7 +83,7 @@ const SystemCheck = () => {
             autoPlay
             style={{
               width: "100%",
-              maxWidth: "480px", // Keep this consistent
+              maxWidth: "480px",
               height: "auto",
               borderRadius: "10px",
             }}

@@ -11,13 +11,13 @@ const Home2 = () => {
   useEffect(() => {
     if (userEmail) {
       const checkReferenceImage = async () => {
-        console.log(userEmail);
+        // console.log(userEmail);
         const storageRef = ref(storage, `/images/${userEmail}`);
         try {
           const imageLink = await getDownloadURL(storageRef);
           setReferenceImage(imageLink);
-          console.log("userEmail:   " + userEmail);
-          console.log("imageLink:    " + imageLink);
+          // console.log("userEmail:   " + userEmail);
+          // console.log("imageLink:    " + imageLink);
         } catch (error) {
           console.error("Error fetching image:", error.message);
         }
