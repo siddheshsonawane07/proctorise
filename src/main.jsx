@@ -1,22 +1,23 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import { appStore, persistor } from "./redux/store.jsx";
+import App from "./App.jsx";
 import Home from "./components/Home.jsx";
 import Home2 from "./components/Home2.jsx";
 import LoginSignup from "./components/LoginSignup.jsx";
 import ProtectedRoute from "./utils/ProtectedRoute.jsx";
 import CreateTest from "./components/CreateTest.jsx";
-import UploadImage from "./components/UploadImage.jsx";
 import AttemptTest from "./components/AttemptTest.jsx";
-import TestPage from "./components/TestPage.jsx";
-import SystemCheck from "./components/SystemCheck.jsx";
-import App from "./App";
 import "./components/css/Home.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+const UploadImage = lazy(() => import("./components/UploadImage.jsx"));
+const SystemCheck = lazy(() => import("./components/SystemCheck.jsx"));
+const TestPage = lazy(() => import("./components/TestPage"));
 
 const router = createBrowserRouter([
   {
@@ -44,11 +45,19 @@ const router = createBrowserRouter([
           },
           {
             path: "/attempttest",
-            element: <AttemptTest />,
+            element: (
+              <Suspense fallback={<div>Loading Test Page...</div>}>
+                <AttemptTest />
+              </Suspense>
+            ),
           },
           {
             path: "/systemcheck",
-            element: <SystemCheck />,
+            element: (
+              <Suspense fallback={<div>Loading Test Page...</div>}>
+                <SystemCheck />
+              </Suspense>
+            ),
           },
           {
             path: "/uploadimage",
@@ -56,7 +65,11 @@ const router = createBrowserRouter([
           },
           {
             path: "/test",
-            element: <TestPage />,
+            element: (
+              <Suspense fallback={<div>Loading Test Page...</div>}>
+                <TestPage />
+              </Suspense>
+            ),
           },
         ],
       },

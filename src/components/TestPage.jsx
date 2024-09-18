@@ -1,22 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
-import { storage } from "../utils/FirebaseConfig";
-import { ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import * as faceapi from "@vladmandic/face-api";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 const TestPage = () => {
   const { state } = useLocation();
-  const { formLink, testTime } = state || {};
+  const { formLink, testTime, imageLink, labels } = state || {};
   const webcamRef = useRef(null);
-  const userEmail = useSelector((state) => state.user.email);
-  const userName = useSelector((state) => state.user.displayName);
+
   const [toasts, setToasts] = useState([]);
   const [timer, setTimer] = useState(testTime * 60);
   const [visibilityCount, setVisibilityCount] = useState(0);
@@ -57,10 +53,6 @@ const TestPage = () => {
 
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
-      const labels = [`${userName}`];
-      const storageRef = ref(storage, `/images/${userEmail}`);
-      const imageLink = await getDownloadURL(storageRef);
-
       const descriptions = [];
 
       await Promise.all(

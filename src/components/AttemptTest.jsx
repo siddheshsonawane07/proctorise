@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection } from "firebase/firestore";
-import { db } from "../utils/FirebaseConfig";
+import { db, storage } from "../utils/FirebaseConfig";
+import { ref, getDownloadURL } from "firebase/storage";
+import { useSelector } from "react-redux";
 import "./css/Home.css";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");
+  const userEmail = useSelector((state) => state.user.email);
+  const userName = useSelector((state) => state.user.displayName);
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
@@ -23,6 +27,9 @@ const AttemptTest = () => {
       );
 
       const existingDocs = await getDocs(formLinkQuery);
+      const labels = [`${userName}`];
+      const storageRef = ref(storage, `/images/${userEmail}`);
+      const imageLink = await getDownloadURL(storageRef);
 
       if (existingDocs.size > 0) {
         existingDocs.forEach((doc) => {
@@ -30,7 +37,9 @@ const AttemptTest = () => {
           console.log("Test Time:", testTime);
           setFormLink(formLink);
           // setTestTime(testTime);
-          navigate("/test", { state: { formLink, testTime } });
+          navigate("/test", {
+            state: { formLink, testTime, imageLink, labels },
+          });
         });
       } else {
         alert("Form link not found in the database");
