@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, query, where, collection } from "firebase/firestore";
-import { db } from "../utils/firebase-config";
+import { db, storage } from "../utils/FirebaseConfig";
+import { ref, getDownloadURL } from "firebase/storage";
+import { useSelector } from "react-redux";
+import "./css/Home.css";
 
 const AttemptTest = () => {
   const [formLink, setFormLink] = useState("");
-  const profilePhoto = localStorage.getItem("user_photo");
+  const userEmail = useSelector((state) => state.user.email);
+  const userName = useSelector((state) => state.user.displayName);
   const navigate = useNavigate();
 
   const handleForm = async (e) => {
@@ -23,6 +27,9 @@ const AttemptTest = () => {
       );
 
       const existingDocs = await getDocs(formLinkQuery);
+      const labels = [`${userName}`];
+      const storageRef = ref(storage, `/images/${userEmail}`);
+      const imageLink = await getDownloadURL(storageRef);
 
       if (existingDocs.size > 0) {
         existingDocs.forEach((doc) => {
@@ -30,43 +37,17 @@ const AttemptTest = () => {
           console.log("Test Time:", testTime);
           setFormLink(formLink);
           // setTestTime(testTime);
-          navigate("/test", { state: { formLink, testTime } });
+          navigate("/test", {
+            state: { formLink, testTime, imageLink, labels },
+          });
         });
       } else {
-        console.log("Form link not found in Firestore");
+        alert("Form link not found in the database");
       }
     } catch (error) {
       console.error(error);
       alert("An error occurred. Please try again.");
     }
-  };
-  const handleSystemCheck = () => {
-    navigate("/systemcheck");
-  };
-
-  const handleDetectionCheck = () => {
-    navigate("/detectioncheck");
-  };
-
-  const handleUploadPhoto = () => {
-    navigate("/uploadimage");
-  };
-
-  const handleCreateTest = () => {
-    navigate("/createtest");
-  };
-
-  const handleAttemptTest = () => {
-    navigate("/attempttest");
-  };
-
-  const handleProfilePhoto = () => {
-    navigate("/home");
-  };
-
-  const handleLogoutButton = async () => {
-    localStorage.clear();
-    navigate("/");
   };
 
   const handleChange = (e) => {
@@ -76,36 +57,7 @@ const AttemptTest = () => {
   };
 
   return (
-    <div>
-      <div className="home-2-body">
-        <nav className="home-2-navbar">
-          <a className="home-2-navbar-brand">Proctorise</a>
-          <div className="home-2-button-container">
-            <button className="home-2-button-1" onClick={handleSystemCheck}>
-              System Check
-            </button>
-            <button className="home-2-button-1" onClick={handleDetectionCheck}>
-              Check Basic Detections
-            </button>
-            <button className="home-2-button-1" onClick={handleUploadPhoto}>
-              Upload Photo
-            </button>
-            <button className="home-2-button-1" onClick={handleCreateTest}>
-              Create Test
-            </button>
-            <button className="home-2-button-1" onClick={handleAttemptTest}>
-              Attempt Test
-            </button>
-            <button className="home-2-button-1" onClick={handleLogoutButton}>
-              Logout
-            </button>
-          </div>
-
-          <div className="home-2-user-profile" onClick={handleProfilePhoto}>
-            {profilePhoto && <img id="profPhoto" src={profilePhoto} />}
-          </div>
-        </nav>
-      </div>
+    <div className="test-form-container">
       <form className="test-form" onSubmit={handleForm}>
         <label htmlFor="formLink">Form Link:</label>
         <input

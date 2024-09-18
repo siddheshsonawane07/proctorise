@@ -1,11 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
-/* Common Styles */
 * {
   margin: 0;
 }
 
-/* Home 1 Styles */
 .home-1-body {
   margin: 0;
 }
@@ -154,15 +152,15 @@
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  align-items: center; /* Center vertically */
+  align-items: center;
 }
 
 .home-1-card-icon {
-  position: absolute; /* Position the icon absolutely */
-  top: -1.6rem; /* Adjust top position to move it up */
-  left: 50%; /* Center the icon horizontally */
-  transform: translateX(-50%); /* Center the icon horizontally */
-  z-index: 1; /* Move the icon above the card content */
+  position: absolute;
+  top: -1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
   width: 3rem;
 }
 
@@ -227,72 +225,6 @@
   margin-left: 7.5rem;
 }
 
-/* Media Queries for Responsive Design */
-
-@media only screen and (max-width: 768px) {
-  .home-1-title-2 {
-    font-size: 1.8rem;
-  }
-
-  .home-1-button-1,
-  .home-1-button-2 {
-    font-size: 0.9rem;
-  }
-
-  .home-1-content-1 {
-    margin-right: 2rem;
-  }
-
-  .home-1-horizontal-div-1 {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .home-1-graphics-1,
-  .home-1-graphics-2 {
-    margin: 2rem 0;
-  }
-
-  .home-1-card-row {
-    flex-wrap: wrap;
-  }
-
-  .home-1-card {
-    width: 100%;
-    margin-top: 2rem;
-  }
-}
-
-@media only screen and (max-width: 576px) {
-  .home-title-1 {
-    font-size: 2rem;
-  }
-
-  .home-1-title-2 {
-    font-size: 1.5rem;
-  }
-
-  .home-1-button-1,
-  .home-1-button-2 {
-    font-size: 0.8rem;
-  }
-
-  .home-1-content-1 {
-    margin-right: 1rem;
-  }
-
-  .home-1-graphics-1,
-  .home-1-graphics-2 {
-    margin: 1rem 0;
-  }
-
-  .home-1-card {
-    width: calc(50% - 1rem);
-    margin: 1rem;
-  }
-}
-
-/* Home 2 Styles */
 .home-2-navbar {
   position: fixed;
   top: 0;
@@ -311,6 +243,7 @@
   margin-left: 3.5rem;
   color: #fff;
   margin-top: 1.5rem;
+  text-decoration: none;
 }
 
 .home-2-button-container {
@@ -340,12 +273,11 @@
   cursor: pointer;
 }
 
-.home-2-user-profile img {
-  width: 3rem;
-  height: 3rem;
+.home-2-user-profile-icon {
+  width: 3.8rem;
+  height: 3.8rem;
   border-radius: 50%;
 }
-
 .home-2-horizontal-div-1 {
   flex-grow: 1;
   display: flex;
@@ -373,11 +305,11 @@
   font-family: "Poppins", sans-serif;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #333; /* Dark gray text color */
+  color: #333;
 }
 
 .home-2-instruction-lines {
-  list-style-type: none; /* Remove bullet points */
+  list-style-type: none;
   padding: 0;
 }
 
@@ -385,7 +317,7 @@
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
   line-height: 1.5;
-  color: #555; /* Medium gray text color */
+  color: #555;
   margin-bottom: 1rem;
 }
 
@@ -403,14 +335,6 @@
   max-height: 300px;
 }
 
-/* Media Queries for Responsive Design */
-@media only screen and (max-width: 768px) {
-  .home-2-vertical-div-1 {
-    flex-basis: 100%;
-  }
-}
-
-/* Check Detections Page */
 .detection-horizontal-div-1 {
   display: flex;
   align-items: center;
@@ -418,70 +342,91 @@
   margin-right: 3.5rem;
 }
 
-/* Create Test Page */
+.test-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Center form vertically */
+  padding: 1rem; /* For smaller screen padding */
+  background-color: #f7f7f7; /* Subtle background color */
+}
+
 .test-form {
-  max-width: 500px;
-  margin-top: 10rem;
-  padding-left: 4rem;
-  padding-right: 4rem;
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  max-width: 450px;
+  width: 100%; /* Ensure form is responsive */
+  margin-top: 5rem;
+  padding: 2rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Slightly bigger shadow for emphasis */
+  background-color: #fff; /* Clean background */
   font-family: "Poppins", sans-serif;
 }
 
 .test-form label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+  margin-bottom: 0.8rem; /* Slightly increased margin */
+  font-size: 1.1rem; /* Slightly larger font */
+  color: #333; /* Darker font color for readability */
 }
 
 .test-form input {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding-top: 0.8rem;
+  width: 93.5%;
+  margin-bottom: 1.2rem; /* Increased spacing */
+  padding: 0.8rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
+  transition: border-color 0.3s ease; /* Smooth transition for focus */
+}
+
+.test-form input:focus {
+  border-color: #2c974b; /* Green border on focus */
+  outline: none;
+  box-shadow: 0 0 5px rgba(44, 151, 75, 0.4); /* Subtle focus shadow */
 }
 
 .test-form button {
   width: 100%;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: 0.8rem;
   background-color: #2c974b;
   color: #fff;
   border: none;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Add transition for hover */
 }
 
 .test-form button:hover {
-  background-color: #207562;
+  background-color: #207562; /* Darker shade on hover */
+  transform: translateY(-2px); /* Slight hover lift effect */
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .test-form {
-    max-width: 90%;
-    padding: 1rem;
-  }
+.upload-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #f7f7f7;
+  min-height: 100vh; /* Full page height */
 }
 
-@media (max-width: 480px) {
-  .test-form {
-    max-width: 100%;
-    padding: 0.5rem;
-  }
+.webcam-container {
+  margin-top: 2rem;
+  position: relative;
+}
 
-  .test-form input,
-  .test-form button {
-    font-size: 0.9rem;
-  }
+.webcam-container video {
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Add shadow to the webcam feed */
+}
+
+.upload-buttons {
+  display: flex;
+  gap: 1rem; /* Space between the buttons */
+  margin-top: 2rem;
 }
 
 .chatbot-container {
@@ -498,7 +443,6 @@
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); */
 }
 
-
 .chatbot-container.open {
   position: absolute;
   right: 20px;
@@ -506,39 +450,34 @@
   width: 22vw;
   border-radius: 10px;
   border: 3px solid rgb(174, 174, 174);
-  /* overflow-y: scroll;  */
   padding: 0.3rem;
   transition: transform 0.3s ease;
-  /* transform: translateX(10%); */
   animation: blink 1s alternate 0.1 cubic-bezier(0.075, 0.82, 0.165, 1);
   background-color: #f5f5f5;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-  
 }
 
 @keyframes blink {
-  0%{
+  0% {
     opacity: 1%;
     transform: translateY(10%);
   }
-  25%{
+  25% {
     opacity: 2%;
     transform: translateY(11%);
   }
-  50%{
+  50% {
     opacity: 5%;
     transform: translateY(12%);
   }
-  75%{
+  75% {
     opacity: 7%;
     transform: translateY(13%);
   }
-  100%{
+  100% {
     opacity: 100%;
     transform: translateY(14%);
   }
- 
-  
 }
 
 .chatbot-toggle-icon {
@@ -554,20 +493,18 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 10000; 
+  z-index: 10000;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Rest of the CSS remains the same */
 .chatbot-content {
   display: none;
 }
 
-.chatbot-content.open{
+.chatbot-content.open {
   height: 300px;
   display: flex;
   flex-direction: column;
-
 }
 
 .chatbot-messages {
@@ -576,8 +513,6 @@
   width: fit-content;
   overflow-y: scroll;
   flex-direction: column;
-  
-
 }
 
 .message {
@@ -585,20 +520,15 @@
   margin-bottom: 8px;
   border-radius: 5px;
   max-width: 90%;
-
 }
 
 .user {
   background-color: #7f44ff;
-  /* align-self: stre; */
-  
-  /* right: 10px; */
   color: white;
   width: fit-content;
   height: fit-content;
-  
-  
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .bot {
@@ -607,8 +537,6 @@
   width: fit-content;
 
   color: white;
-
-
 }
 
 .chatbot-container input[type="text"] {
@@ -635,4 +563,302 @@
 
 .error {
   color: red;
+}
+
+.home-2-user-profile {
+  position: relative;
+}
+
+#profPhoto {
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-menu li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+.system-check-body {
+  margin-top: 13%;
+}
+
+.system-check-container {
+  font-family: "Poppins", sans-serif;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(32, 117, 98, 0.1) 0%,
+    rgba(63, 75, 141, 0.1) 100%
+  );
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.system-check-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.system-check-list li {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.system-check-list li:hover {
+  transform: translateX(5px);
+}
+
+.system-check-label {
+  font-weight: 600;
+  color: rgba(63, 75, 141, 1);
+  margin-right: 0.5rem;
+}
+
+.system-check-status {
+  font-weight: 500;
+}
+
+.system-check-green {
+  padding: 0;
+  margin: 0;
+
+  color: #2c974b;
+}
+
+.system-internet-speed-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background-color: rgba(32, 117, 98, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.system-internet-speed-meter {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+  color: rgba(63, 75, 141, 1);
+}
+
+.system-internet-speed {
+  font-weight: 600;
+  color: #2c974b;
+  font-size: 1.2rem;
+}
+
+.system-camera-container {
+  margin-top: 1.5rem;
+}
+
+.system-camera-stream {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.system-camera-stream:hover {
+  transform: scale(1.02);
+}
+
+.login-signup-container {
+  font-family: "Poppins", sans-serif;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(32, 117, 98, 0.1) 0%,
+    rgba(63, 75, 141, 0.1) 100%
+  );
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-signup-title {
+  font-size: 2rem;
+  color: rgba(63, 75, 141, 1);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-signup-label {
+  font-weight: 600;
+  color: rgba(63, 75, 141, 0.8);
+  margin-bottom: 0.5rem;
+}
+
+.login-signup-input {
+  font-family: "Poppins", sans-serif;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(63, 75, 141, 0.3);
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.login-signup-input:focus {
+  outline: none;
+  border-color: rgba(32, 117, 98, 0.8);
+}
+
+.login-signup-button {
+  font-family: "Poppins", sans-serif;
+  background-color: #2c974b;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.login-signup-button:hover {
+  background-color: #207562;
+}
+
+.login-signup-switch {
+  font-family: "Poppins", sans-serif;
+  background-color: transparent;
+  border: 1px solid rgba(63, 75, 141, 0.5);
+  color: rgba(63, 75, 141, 1);
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.login-signup-switch:hover {
+  background-color: rgba(63, 75, 141, 0.1);
+}
+
+.login-signup-google {
+  font-family: "Poppins", sans-serif;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-signup-google:hover {
+  background-color: #3367d6;
+}
+
+.login-signup-google-icon {
+  margin-right: 0.5rem;
+}
+
+.desktop-only-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(32, 117, 98, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+  color: white;
+  text-align: center;
+}
+
+.desktop-only-content {
+  padding: 20px;
+  max-width: 80%;
+}
+
+.desktop-only-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.desktop-only-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.desktop-only-message {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(32, 117, 98, 0.1);
+  font-family: "Poppins", sans-serif;
+}
+
+.loader-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(63, 75, 141, 0.3);
+  border-top: 5px solid rgba(32, 117, 98, 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loader-text {
+  margin-top: 20px;
+  font-size: 18px;
+  color: rgba(63, 75, 141, 1);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

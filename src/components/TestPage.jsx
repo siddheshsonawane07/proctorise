@@ -1,21 +1,18 @@
+import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { useEffect, useRef, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
-import { auth, app } from "../utils/firebase-config";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs-core";
+import "@tensorflow/tfjs-backend-webgl";
 import * as faceapi from "@vladmandic/face-api";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const TestPage = () => {
   const { state } = useLocation();
-  const { formLink, testTime } = state || {};
-  const [user] = useAuthState(auth);
+  const { formLink, testTime, imageLink, labels } = state || {};
   const webcamRef = useRef(null);
-  const storage = getStorage(app);
+
   const [toasts, setToasts] = useState([]);
   const [timer, setTimer] = useState(testTime * 60);
   const [visibilityCount, setVisibilityCount] = useState(0);
@@ -56,10 +53,6 @@ const TestPage = () => {
 
   useEffect(() => {
     const getLabeledFaceDescriptions = async () => {
-      const labels = [`${user.displayName}`];
-      const storageRef = ref(storage, `/images/${user.email}`);
-      const imageLink = await getDownloadURL(storageRef);
-
       const descriptions = [];
 
       await Promise.all(
@@ -136,6 +129,7 @@ const TestPage = () => {
     };
 
     const loadModels = async () => {
+      await tf.setBackend("webgl");
       await tf.ready();
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),

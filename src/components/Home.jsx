@@ -1,23 +1,19 @@
 import React from "react";
+import HorizontalComponent2 from "./HorizontalComponent2";
+import CardComponent from "./CardComponent";
 import { useNavigate } from "react-router-dom";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../utils/firebase-config";
-import HorizontalComponent2 from "./Horizontal-Component-2";
+import { useSelector } from "react-redux";
 import "./css/Home.css";
-import CardComponent from "./Card-Component";
-import CustomChatbot from "./Chatbot";
 
 const Home = () => {
   const navigate = useNavigate();
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      console.log(result.user.displayName);
-      localStorage.setItem("userId", result.user);
+  const userStatus = useSelector((state) => state.user.isLoggedIn);
+
+  const handleTryForFreeButton = () => {
+    if (userStatus === true) {
       navigate("/home");
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
+    } else {
+      navigate("/register");
     }
   };
 
@@ -28,7 +24,7 @@ const Home = () => {
         <div className="home-title-1">
           Proctored exams: Secure your online assessments using Proctorise{" "}
         </div>
-        <button className="home-1-button-1" onClick={handleGoogleSignIn}>
+        <button className="home-1-button-1" onClick={handleTryForFreeButton}>
           TRY FOR FREE
         </button>
       </div>
@@ -47,7 +43,15 @@ const Home = () => {
             exam/test provides utmost strictness to an examination drive and
             eliminates any unwanted incident.
           </div>
-          <button className="home-1-button-2">REQUEST A DEMO</button>
+          <button
+            className="home-1-button-2"
+            onClick={() => {
+              window.location.href =
+                "https://youtu.be/0ag2b3mMcko?si=l3ZtkibxQQPPBHAE";
+            }}
+          >
+            REQUEST A DEMO
+          </button>
         </div>
       </div>
       <div className="home-1-title-2">
