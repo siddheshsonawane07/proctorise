@@ -1,3 +1,24 @@
-# React + Vite
+# Proctorise
 
-Deployed at https://proctorise.netlify.app/
+Proctorise is an advanced AI Proctoring System designed to uphold exam integrity. By leveraging AI monitoring and facial recognition, it ensures secure and fair assessments.  
+Features include the detection of unauthorized objects, detection of multiple people, detection of restricted keys, and automatic test termination.
+
+## Features
+- **Attention Monitoring**  
+- **Real-time Monitoring**  
+- **Detection of Multiple People**  
+- **Detection of Restricted Keys**  
+- **Automated Alerts**  
+- **Automatic Test Termination**  
+- **Secure Platform**  
+
+## Technologies Used
+- **React.js** for the frontend  
+- **TensorFlow Movenet** for real-time monitoring and behavior detection  
+- **TensorFlow COCO-SSD** for detecting unwanted objects  
+- **Face-Api.js** for identity verification  
+- **Firebase** for authenticating and storing user data, as well as managing test session links  
+
+## Live Demo
+The project is deployed and available at: [Proctorise](https://proctorise.netlify.app/)
+
