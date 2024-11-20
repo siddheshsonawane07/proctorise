@@ -1,6 +1,6 @@
 # Proctorise
 
-Proctorise is an advanced AI Proctoring System designed to uphold exam integrity. By leveraging AI monitoring and facial recognition, it ensures secure and fair assessments.  
+Proctorise is an advanced Machine Learning website based Proctoring System designed to uphold exam integrity.
 
 ## Features
 - **Attention Monitoring**  
