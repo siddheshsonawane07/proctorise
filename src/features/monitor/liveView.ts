@@ -7,8 +7,8 @@ export const LIVE_VIEW_MS = 2 * 60_000;
 const STUN: RTCIceServer[] = [{ urls: "stun:stun.cloudflare.com:3478" }];
 
 /**
- * STUN always; TURN credentials from the Edge Function when it is deployed (the Cloudflare key
- * stays in Supabase secrets, Phase-7-Critic #6). Without it, only direct connections work.
+ * STUN always; TURN credentials from the Edge Function when it is deployed, so the Cloudflare
+ * credential never reaches a browser (Phase-7-Critic #6). Without it, only direct connections work.
  */
 async function iceServers(): Promise<RTCIceServer[]> {
   try {
