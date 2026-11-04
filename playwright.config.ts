@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const desktop = /desktop\.spec\.ts/;
 const phone = /phone\.spec\.ts/;
-const auth = /auth\.spec\.ts/;
+const stack = /(auth|teacher)\.spec\.ts/;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -22,7 +22,7 @@ export default defineConfig({
   projects: [
     { name: "chromium", testMatch: desktop, use: { ...devices["Desktop Chrome"] } },
     // Needs the local Supabase stack; skipped without it (see e2e/support/supabase.ts).
-    { name: "auth", testMatch: auth, use: { ...devices["Desktop Chrome"] } },
+    { name: "stack", testMatch: stack, use: { ...devices["Desktop Chrome"] } },
     { name: "firefox", testMatch: desktop, use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", testMatch: desktop, use: { ...devices["Desktop Safari"] } },
     { name: "android", testMatch: phone, use: { ...devices["Pixel 7"] } },

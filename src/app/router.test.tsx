@@ -32,7 +32,11 @@ function renderAt(path: string, as?: Profile) {
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   });
   const session = as ? ({ user: { id: as.id, email: "a@example.test" } } as Session) : null;
-  if (as) queryClient.setQueryData(["profile", as.id], as);
+  if (as) {
+    queryClient.setQueryData(["profile", as.id], as);
+    queryClient.setQueryData(["classes", "teaching", as.id], []);
+    queryClient.setQueryData(["classes", "joined", as.id], []);
+  }
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
     <QueryClientProvider client={queryClient}>
@@ -84,6 +88,18 @@ describe("signing in", () => {
     renderAt("/app", profile({ role: "teacher", teacher_status: "approved" }));
     expect(await screen.findByText("Classes you teach will appear here.")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Are you a teacher?" })).not.toBeInTheDocument();
+  });
+
+  it("keeps a student out of the question bank", async () => {
+    renderAt("/app/bank", profile());
+    expect(
+      await screen.findByRole("heading", { name: "You don't have access" }),
+    ).toBeInTheDocument();
+  });
+
+  it("lets a student join a class", async () => {
+    renderAt("/app", profile());
+    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
   });
 
   it("keeps a student out of the admin page", async () => {

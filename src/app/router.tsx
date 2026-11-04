@@ -10,7 +10,7 @@ import { SignIn } from "../features/auth/SignIn";
 import { SignUp } from "../features/auth/SignUp";
 import { ForgotPassword } from "../features/auth/ForgotPassword";
 import { ResetPassword } from "../features/auth/ResetPassword";
-import { RequireAdmin, RequireAuth } from "../features/auth/RequireAuth";
+import { RequireAdmin, RequireAuth, RequireTeacher } from "../features/auth/RequireAuth";
 
 export const routes: RouteObject[] = [
   {
@@ -26,6 +26,33 @@ export const routes: RouteObject[] = [
         element: <RequireAuth />,
         children: [
           { path: "app", element: <AppHome /> },
+          {
+            path: "app/classes/:classId",
+            lazy: async () => ({
+              Component: (await import("../features/classes/ClassPage")).ClassPage,
+            }),
+          },
+          {
+            element: <RequireTeacher />,
+            children: [
+              {
+                path: "app/bank",
+                lazy: async () => ({ Component: (await import("../features/bank/Bank")).Bank }),
+              },
+              {
+                path: "app/tests/:testId/edit",
+                lazy: async () => ({
+                  Component: (await import("../features/builder/Builder")).Builder,
+                }),
+              },
+              {
+                path: "app/tests/:testId/preview",
+                lazy: async () => ({
+                  Component: (await import("../features/builder/Preview")).Preview,
+                }),
+              },
+            ],
+          },
           {
             element: <RequireAdmin />,
             children: [

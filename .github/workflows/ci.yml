@@ -42,7 +42,7 @@ jobs:
 
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox webkit
-      - name: Browser tests (the auth project skips itself without a stack)
+      - name: Browser tests (the stack project skips itself without one)
         run: npm run test:e2e
 
       - uses: actions/upload-artifact@v4
@@ -89,7 +89,7 @@ jobs:
 
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test --project=auth
+      - run: npx playwright test --project=stack
 
       - uses: actions/upload-artifact@v4
         if: failure()

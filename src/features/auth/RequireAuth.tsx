@@ -4,6 +4,7 @@ import { Notice } from "../../app/ui/Notice";
 import { useSession } from "./session";
 import { useProfile } from "./useProfile";
 import { ConfirmAdult } from "./ConfirmAdult";
+import { isTeacher } from "./roles";
 
 /** The signed-in part of the app. For the UI only: row-level security is the real guard. */
 export function RequireAuth() {
@@ -32,6 +33,14 @@ export function RequireAdmin() {
   const profile = useProfile();
   if (profile.data?.role !== "admin") {
     return <Notice title="You don't have access">This page is for the admin.</Notice>;
+  }
+  return <Outlet />;
+}
+
+export function RequireTeacher() {
+  const profile = useProfile();
+  if (!isTeacher(profile.data)) {
+    return <Notice title="You don't have access">This page is for teachers.</Notice>;
   }
   return <Outlet />;
 }

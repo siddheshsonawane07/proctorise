@@ -54,6 +54,127 @@ export type Database = {
         };
         Relationships: [];
       };
+      class_members: {
+        Row: {
+          class_id: string;
+          joined_at: string;
+          status: Database["public"]["Enums"]["member_status"];
+          student_id: string;
+          time_multiplier: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          class_id: string;
+          joined_at?: string;
+          status?: Database["public"]["Enums"]["member_status"];
+          student_id: string;
+          time_multiplier?: number;
+        };
+        Update: {
+          class_id?: string;
+          joined_at?: string;
+          status?: Database["public"]["Enums"]["member_status"];
+          student_id?: string;
+          time_multiplier?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "class_members_class_id_fkey";
+            columns: ["class_id"];
+            isOneToOne: false;
+            referencedRelation: "classes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "class_members_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      class_teachers: {
+        Row: {
+          added_at: string;
+          class_id: string;
+          kind: Database["public"]["Enums"]["class_teacher_kind"];
+          teacher_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          added_at?: string;
+          class_id: string;
+          kind: Database["public"]["Enums"]["class_teacher_kind"];
+          teacher_id: string;
+        };
+        Update: {
+          added_at?: string;
+          class_id?: string;
+          kind?: Database["public"]["Enums"]["class_teacher_kind"];
+          teacher_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "class_teachers_class_id_fkey";
+            columns: ["class_id"];
+            isOneToOne: false;
+            referencedRelation: "classes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "class_teachers_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      classes: {
+        Row: {
+          archived_at: string | null;
+          created_at: string;
+          id: string;
+          join_code: string;
+          join_open: boolean;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          archived_at?: string | null;
+          created_at?: string;
+          id?: string;
+          join_code: string;
+          join_open?: boolean;
+          name: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          created_at?: string;
+          id?: string;
+          join_code?: string;
+          join_open?: boolean;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      join_failures: {
+        Row: {
+          at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          at?: string;
+          user_id: string;
+        };
+        Update: {
+          at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           adult_confirmed_at: string | null;
@@ -94,11 +215,272 @@ export type Database = {
         };
         Relationships: [];
       };
+      question_keys: {
+        Row: {
+          case_sensitive: boolean;
+          correct: NonNullable<Json>;
+          question_id: string;
+          tolerance: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          case_sensitive?: boolean;
+          correct: NonNullable<Json>;
+          question_id: string;
+          tolerance?: number;
+        };
+        Update: {
+          case_sensitive?: boolean;
+          correct?: NonNullable<Json>;
+          question_id?: string;
+          tolerance?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "question_keys_question_id_fkey";
+            columns: ["question_id"];
+            isOneToOne: true;
+            referencedRelation: "questions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      questions: {
+        Row: {
+          created_at: string;
+          id: string;
+          options: NonNullable<Json>;
+          owner_id: string;
+          points: number;
+          prompt: string;
+          tags: string[];
+          type: Database["public"]["Enums"]["question_type"];
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          options?: NonNullable<Json>;
+          owner_id: string;
+          points?: number;
+          prompt: string;
+          tags?: string[];
+          type: Database["public"]["Enums"]["question_type"];
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          options?: NonNullable<Json>;
+          owner_id?: string;
+          points?: number;
+          prompt?: string;
+          tags?: string[];
+          type?: Database["public"]["Enums"]["question_type"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "questions_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      test_item_keys: {
+        Row: {
+          case_sensitive: boolean;
+          correct: NonNullable<Json>;
+          item_id: string;
+          tolerance: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          case_sensitive: boolean;
+          correct: NonNullable<Json>;
+          item_id: string;
+          tolerance: number;
+        };
+        Update: {
+          case_sensitive?: boolean;
+          correct?: NonNullable<Json>;
+          item_id?: string;
+          tolerance?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "test_item_keys_item_id_fkey";
+            columns: ["item_id"];
+            isOneToOne: true;
+            referencedRelation: "test_items";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      test_items: {
+        Row: {
+          id: string;
+          options: NonNullable<Json>;
+          points: number;
+          position: number;
+          prompt: string;
+          test_id: string;
+          type: Database["public"]["Enums"]["question_type"];
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          options: NonNullable<Json>;
+          points: number;
+          position: number;
+          prompt: string;
+          test_id: string;
+          type: Database["public"]["Enums"]["question_type"];
+        };
+        Update: {
+          id?: string;
+          options?: NonNullable<Json>;
+          points?: number;
+          position?: number;
+          prompt?: string;
+          test_id?: string;
+          type?: Database["public"]["Enums"]["question_type"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "test_items_test_id_fkey";
+            columns: ["test_id"];
+            isOneToOne: false;
+            referencedRelation: "tests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      test_questions: {
+        Row: {
+          points: number | null;
+          position: number;
+          question_id: string;
+          test_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          points?: number | null;
+          position: number;
+          question_id: string;
+          test_id: string;
+        };
+        Update: {
+          points?: number | null;
+          position?: number;
+          question_id?: string;
+          test_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "test_questions_question_id_fkey";
+            columns: ["question_id"];
+            isOneToOne: false;
+            referencedRelation: "questions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "test_questions_test_id_fkey";
+            columns: ["test_id"];
+            isOneToOne: false;
+            referencedRelation: "tests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tests: {
+        Row: {
+          class_id: string;
+          closes_at: string;
+          created_at: string;
+          created_by: string | null;
+          duration_min: number;
+          id: string;
+          instructions: string;
+          max_attempts: number;
+          opens_at: string;
+          proctoring: NonNullable<Json>;
+          published_at: string | null;
+          results_release: Database["public"]["Enums"]["results_release"];
+          retention_days: number;
+          shuffle_items: boolean;
+          shuffle_options: boolean;
+          status: Database["public"]["Enums"]["test_status"];
+          title: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          class_id: string;
+          closes_at?: string;
+          created_at?: string;
+          created_by?: string | null;
+          duration_min?: number;
+          id?: string;
+          instructions?: string;
+          max_attempts?: number;
+          opens_at?: string;
+          proctoring?: NonNullable<Json>;
+          published_at?: string | null;
+          results_release?: Database["public"]["Enums"]["results_release"];
+          retention_days?: number;
+          shuffle_items?: boolean;
+          shuffle_options?: boolean;
+          status?: Database["public"]["Enums"]["test_status"];
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          class_id?: string;
+          closes_at?: string;
+          created_at?: string;
+          created_by?: string | null;
+          duration_min?: number;
+          id?: string;
+          instructions?: string;
+          max_attempts?: number;
+          opens_at?: string;
+          proctoring?: NonNullable<Json>;
+          published_at?: string | null;
+          results_release?: Database["public"]["Enums"]["results_release"];
+          retention_days?: number;
+          shuffle_items?: boolean;
+          shuffle_options?: boolean;
+          status?: Database["public"]["Enums"]["test_status"];
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tests_class_id_fkey";
+            columns: ["class_id"];
+            isOneToOne: false;
+            referencedRelation: "classes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tests_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      add_co_teacher: { Args: { p_class_id: string; p_email: string }; Returns: undefined };
       admin_list_people: {
         Args: { p_status?: Database["public"]["Enums"]["teacher_status"] };
         Returns: {
@@ -117,17 +499,100 @@ export type Database = {
         Args: { p_status: Database["public"]["Enums"]["teacher_status"]; p_user_id: string };
         Returns: undefined;
       };
+      can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
+      check_question: {
+        Args: {
+          p_correct: Json;
+          p_options: Json;
+          p_tolerance: number;
+          p_type: Database["public"]["Enums"]["question_type"];
+        };
+        Returns: undefined;
+      };
+      class_roster: {
+        Args: { p_class_id: string };
+        Returns: {
+          email: string;
+          full_name: string;
+          joined_at: string;
+          status: Database["public"]["Enums"]["member_status"];
+          student_id: string;
+          time_multiplier: number;
+        }[];
+      };
+      class_teacher_list: {
+        Args: { p_class_id: string };
+        Returns: {
+          email: string;
+          full_name: string;
+          kind: Database["public"]["Enums"]["class_teacher_kind"];
+          teacher_id: string;
+        }[];
+      };
       confirm_adult: { Args: Record<PropertyKey, never>; Returns: undefined };
+      create_class: { Args: { p_name: string }; Returns: string };
+      draft_questions: {
+        Args: { p_test_id: string };
+        Returns: {
+          bank_points: number;
+          options: Json;
+          owner_id: string;
+          points: number;
+          prompt: string;
+          question_id: string;
+          sort_order: number;
+          type: Database["public"]["Enums"]["question_type"];
+        }[];
+      };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_approved_teacher: { Args: Record<PropertyKey, never>; Returns: boolean };
+      is_class_member: { Args: { p_class_id: string }; Returns: boolean };
+      is_class_owner: { Args: { p_class_id: string }; Returns: boolean };
+      is_class_teacher: { Args: { p_class_id: string }; Returns: boolean };
+      join_class: { Args: { p_code: string }; Returns: Json };
+      new_join_code: { Args: Record<PropertyKey, never>; Returns: string };
+      publish_test: { Args: { p_test_id: string }; Returns: undefined };
+      remove_co_teacher: { Args: { p_class_id: string; p_teacher_id: string }; Returns: undefined };
       request_teacher: { Args: { p_institution: string; p_note: string }; Returns: undefined };
+      rotate_join_code: { Args: { p_class_id: string }; Returns: string };
+      save_question: {
+        Args: {
+          p_case_sensitive?: boolean;
+          p_correct: Json;
+          p_id: string;
+          p_options: Json;
+          p_points: number;
+          p_prompt: string;
+          p_tags: string[];
+          p_tolerance?: number;
+          p_type: Database["public"]["Enums"]["question_type"];
+        };
+        Returns: string;
+      };
+      set_member: {
+        Args: {
+          p_class_id: string;
+          p_status: Database["public"]["Enums"]["member_status"];
+          p_student_id: string;
+          p_time_multiplier: number;
+        };
+        Returns: undefined;
+      };
+      test_class: { Args: { p_test_id: string }; Returns: string };
+      unpublish_test: { Args: { p_test_id: string }; Returns: undefined };
+      valid_proctoring: { Args: { p: Json }; Returns: boolean };
       write_audit: {
         Args: { p_action: string; p_details?: Json; p_target_id: string; p_target_type: string };
         Returns: undefined;
       };
     };
     Enums: {
+      class_teacher_kind: "owner" | "co_teacher";
+      member_status: "active" | "removed";
+      question_type: "single" | "multiple" | "true_false" | "short_text" | "numeric";
+      results_release: "immediate" | "manual" | "after_close";
       teacher_status: "none" | "requested" | "approved" | "rejected" | "suspended";
+      test_status: "draft" | "published" | "closed";
       user_role: "student" | "teacher" | "admin";
     };
     CompositeTypes: {
@@ -243,7 +708,12 @@ export const Constants = {
   },
   public: {
     Enums: {
+      class_teacher_kind: ["owner", "co_teacher"],
+      member_status: ["active", "removed"],
+      question_type: ["single", "multiple", "true_false", "short_text", "numeric"],
+      results_release: ["immediate", "manual", "after_close"],
       teacher_status: ["none", "requested", "approved", "rejected", "suspended"],
+      test_status: ["draft", "published", "closed"],
       user_role: ["student", "teacher", "admin"],
     },
   },

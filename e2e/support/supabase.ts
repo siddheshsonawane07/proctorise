@@ -29,6 +29,7 @@ export async function createUser(input: {
   password: string;
   fullName: string;
   admin?: boolean;
+  teacher?: boolean;
 }): Promise<string> {
   const res = await call("/auth/v1/admin/users", {
     method: "POST",
@@ -41,10 +42,12 @@ export async function createUser(input: {
   });
   if (!res.ok) throw new Error(`createUser: ${res.status} ${await res.text()}`);
   const { id } = (await res.json()) as { id: string };
-  if (input.admin) {
+  if (input.admin || input.teacher) {
     const promote = await call(`/rest/v1/profiles?id=eq.${id}`, {
       method: "PATCH",
-      body: JSON.stringify({ role: "admin" }),
+      body: JSON.stringify(
+        input.admin ? { role: "admin" } : { role: "teacher", teacher_status: "approved" },
+      ),
     });
     if (!promote.ok) throw new Error(`promote: ${promote.status} ${await promote.text()}`);
   }
