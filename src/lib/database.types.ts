@@ -389,6 +389,46 @@ export type Database = {
           },
         ];
       };
+      flag_reviews: {
+        Row: {
+          event_id: number;
+          note: string | null;
+          reviewed_at: string;
+          reviewer_id: string | null;
+          verdict: Database["public"]["Enums"]["flag_verdict"];
+        };
+        ComputedFields: never;
+        Insert: {
+          event_id: number;
+          note?: string | null;
+          reviewed_at?: string;
+          reviewer_id?: string | null;
+          verdict: Database["public"]["Enums"]["flag_verdict"];
+        };
+        Update: {
+          event_id?: number;
+          note?: string | null;
+          reviewed_at?: string;
+          reviewer_id?: string | null;
+          verdict?: Database["public"]["Enums"]["flag_verdict"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flag_reviews_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: true;
+            referencedRelation: "proctor_events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "flag_reviews_reviewer_id_fkey";
+            columns: ["reviewer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       identity_enrolments: {
         Row: {
           consent_version: string;
@@ -829,7 +869,9 @@ export type Database = {
       attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
       attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
       can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
+      can_read_topic: { Args: { p_topic: string }; Returns: boolean };
       can_use_pairing_channel: { Args: { p_topic: string }; Returns: boolean };
+      can_write_topic: { Args: { p_topic: string }; Returns: boolean };
       check_question: {
         Args: {
           p_correct: Json;
@@ -875,6 +917,10 @@ export type Database = {
       confirm_adult: { Args: Record<PropertyKey, never>; Returns: undefined };
       create_class: { Args: { p_name: string }; Returns: string };
       create_pairing: { Args: { p_test_id: string }; Returns: Json };
+      dismiss_kind: {
+        Args: { p_attempt_id: string; p_kind: string; p_note?: string };
+        Returns: number;
+      };
       draft_questions: {
         Args: { p_test_id: string };
         Returns: {
@@ -888,7 +934,12 @@ export type Database = {
           type: Database["public"]["Enums"]["question_type"];
         }[];
       };
+      event_class: { Args: { p_event_id: number }; Returns: string };
       evidence_slot_open: { Args: { p_path: string }; Returns: boolean };
+      extend_attempt: {
+        Args: { p_attempt_id: string; p_minutes: number; p_reason: string };
+        Returns: string;
+      };
       finalize_expired_attempts: { Args: Record<PropertyKey, never>; Returns: number };
       finish_attempt: {
         Args: { p_attempt_id: string; p_status: Database["public"]["Enums"]["attempt_status"] };
@@ -911,6 +962,24 @@ export type Database = {
       is_class_owner: { Args: { p_class_id: string }; Returns: boolean };
       is_class_teacher: { Args: { p_class_id: string }; Returns: boolean };
       join_class: { Args: { p_code: string }; Returns: Json };
+      live_overview: {
+        Args: { p_test_id: string };
+        Returns: {
+          attempt_id: string;
+          deadline_at: string;
+          full_name: string;
+          high_count: number;
+          integrity: Database["public"]["Enums"]["integrity_status"];
+          last_at: string;
+          last_kind: string;
+          phone_paired: boolean;
+          started_at: string;
+          status: Database["public"]["Enums"]["attempt_status"];
+          student_id: string;
+          unreviewed: number;
+          warn_count: number;
+        }[];
+      };
       mark_answer: {
         Args: { p_attempt_id: string; p_item_id: string; p_points: number };
         Returns: undefined;
@@ -971,6 +1040,14 @@ export type Database = {
         };
         Returns: boolean;
       };
+      review_flag: {
+        Args: {
+          p_event_id: number;
+          p_note?: string;
+          p_verdict: Database["public"]["Enums"]["flag_verdict"];
+        };
+        Returns: undefined;
+      };
       rotate_join_code: { Args: { p_class_id: string }; Returns: string };
       save_answer: {
         Args: { p_attempt_id: string; p_item_id: string; p_response: Json };
@@ -1005,6 +1082,14 @@ export type Database = {
         };
         Returns: number;
       };
+      set_integrity: {
+        Args: {
+          p_attempt_id: string;
+          p_note?: string;
+          p_verdict: Database["public"]["Enums"]["integrity_status"];
+        };
+        Returns: undefined;
+      };
       set_member: {
         Args: {
           p_class_id: string;
@@ -1017,6 +1102,7 @@ export type Database = {
       start_attempt: { Args: { p_session: string; p_test_id: string }; Returns: Json };
       submit_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
       teaches_student: { Args: { p_student_id: string }; Returns: boolean };
+      terminate_attempt: { Args: { p_attempt_id: string; p_reason: string }; Returns: undefined };
       test_class: { Args: { p_test_id: string }; Returns: string };
       test_results: {
         Args: { p_test_id: string };
@@ -1038,6 +1124,8 @@ export type Database = {
       unpublish_test: { Args: { p_test_id: string }; Returns: undefined };
       update_proctor_events: { Args: { p_updates: Json }; Returns: undefined };
       valid_proctoring: { Args: { p: Json }; Returns: boolean };
+      void_attempt: { Args: { p_attempt_id: string; p_reason: string }; Returns: undefined };
+      warn_student: { Args: { p_attempt_id: string; p_message: string }; Returns: undefined };
       write_audit: {
         Args: { p_action: string; p_details?: Json; p_target_id: string; p_target_type: string };
         Returns: undefined;
@@ -1046,6 +1134,7 @@ export type Database = {
     Enums: {
       attempt_status: "in_progress" | "submitted" | "auto_submitted" | "terminated" | "voided";
       class_teacher_kind: "owner" | "co_teacher";
+      flag_verdict: "dismissed" | "confirmed";
       integrity_status: "clean" | "flagged" | "reviewed_ok" | "reviewed_violation";
       member_status: "active" | "removed";
       proctor_device: "laptop" | "phone";
@@ -1171,6 +1260,7 @@ export const Constants = {
     Enums: {
       attempt_status: ["in_progress", "submitted", "auto_submitted", "terminated", "voided"],
       class_teacher_kind: ["owner", "co_teacher"],
+      flag_verdict: ["dismissed", "confirmed"],
       integrity_status: ["clean", "flagged", "reviewed_ok", "reviewed_violation"],
       member_status: ["active", "removed"],
       proctor_device: ["laptop", "phone"],

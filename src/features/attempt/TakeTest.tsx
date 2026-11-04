@@ -14,6 +14,7 @@ import { IdentityGate, type IdentityResult } from "../proctoring/IdentityGate";
 import { ProctorSession, type SessionStatus } from "../proctoring/session";
 import { CONSENT_VERSION } from "../proctoring/identity";
 import { PhonePairing } from "../pairing/PhonePairing";
+import { useAttemptChannel } from "../monitor/useAttemptChannel";
 import {
   recordConsent,
   saveAnswer,
@@ -188,6 +189,10 @@ function TestScreen({
   const navigate = useNavigate();
   const submit = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, Json>>(payload.answers);
+  const answersRef = useRef(answers);
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
   const [index, setIndex] = useState(0);
   const [save, setSave] = useState<SaveState>({ kind: "saved" });
   const [confirming, setConfirming] = useState(false);
@@ -195,7 +200,10 @@ function TestScreen({
   // Server time minus local time, so the countdown follows the server's clock (Phase-4-Critic #1).
   // Measured at start and again after every save.
   const [offset, setOffset] = useState(() => Date.parse(payload.server_now) - Date.now());
-  const remaining = Date.parse(payload.deadline_at) - (useClock(1000) + offset);
+  // The teacher can move it (extra time), so it is state, refreshed from the server.
+  const [deadline, setDeadline] = useState(() => Date.parse(payload.deadline_at));
+  const [teacherMessage, setTeacherMessage] = useState<string | null>(null);
+  const remaining = deadline - (useClock(1000) + offset);
   // Set below, once `finish` exists: a teacher's automatic rule may end the attempt (D7).
   const autoSubmit = useRef<() => void>(() => {});
   const proctoring = useProctorSession(payload, proctor, offset, () => autoSubmit.current());
@@ -235,6 +243,26 @@ function TestScreen({
   useEffect(() => {
     autoSubmit.current = () => void finish();
   }, [finish]);
+
+  const live = useAttemptChannel({
+    attemptId: payload.attempt_id,
+    testId: payload.test_id,
+    camera: proctor?.camera ?? null,
+    summary: () => ({
+      attempt_id: payload.attempt_id,
+      answered: payload.items.filter((i) => !isBlank(answersRef.current[i.id])).length,
+      total: payload.items.length,
+      camera: proctoring.value?.camera ?? null,
+      screen: proctoring.value?.screen ?? null,
+      phone: proctoring.value?.phone ?? null,
+    }),
+    onWarning: setTeacherMessage,
+    onDeadline: (iso) => setDeadline(Date.parse(iso)),
+    onEnded: () => {
+      void proctoring.stop();
+      navigate(`/app/results/${payload.attempt_id}`, { replace: true });
+    },
+  });
 
   const timeUp = remaining <= 0;
   const finishedOnce = useRef(false);
@@ -296,6 +324,27 @@ function TestScreen({
         </p>
       </div>
       {save.kind === "refused" && <Message kind="error">{save.message}</Message>}
+      {live.viewing && (
+        <p role="status" className="rounded-md border border-info p-3 text-sm">
+          Your teacher is viewing your camera right now.
+        </p>
+      )}
+      {teacherMessage && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="teacher-message"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-surface/95 p-6"
+        >
+          <div className="max-w-md space-y-4 text-center">
+            <h2 id="teacher-message" className="text-xl font-semibold">
+              A message from your teacher
+            </h2>
+            <p>{teacherMessage}</p>
+            <Button onClick={() => setTeacherMessage(null)}>I understand</Button>
+          </div>
+        </div>
+      )}
       {status?.warnings[0] && (
         <p role="alert" className="rounded-md border border-warn p-3 text-sm">
           {status.warnings[0].text}

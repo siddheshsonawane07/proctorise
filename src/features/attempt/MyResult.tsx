@@ -15,7 +15,11 @@ export function MyResult() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-semibold">
-        {r.status === "auto_submitted" ? "Submitted when time ran out" : "Submitted"}
+        {r.status === "auto_submitted"
+          ? "Submitted when time ran out"
+          : r.status === "terminated"
+            ? "Your teacher ended this attempt"
+            : "Submitted"}
       </h1>
       {!r.released ? (
         <p className="text-text-muted">

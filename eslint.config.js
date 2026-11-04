@@ -6,7 +6,14 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["dist", "playwright-report", "test-results", "public/models"]),
+  globalIgnores([
+    "dist",
+    "playwright-report",
+    "test-results",
+    "public/models",
+    "public/vendor",
+    "supabase/functions",
+  ]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [js.configs.recommended, tseslint.configs.recommended],

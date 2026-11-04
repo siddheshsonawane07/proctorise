@@ -48,6 +48,24 @@ export const routes: RouteObject[] = [
             element: <RequireTeacher />,
             children: [
               {
+                path: "app/tests/:testId/live",
+                lazy: async () => ({
+                  Component: (await import("../features/monitor/LiveGrid")).LiveGrid,
+                }),
+              },
+              {
+                path: "app/tests/:testId/review",
+                lazy: async () => ({
+                  Component: (await import("../features/monitor/Review")).Review,
+                }),
+              },
+              {
+                path: "app/attempts/:attemptId/report",
+                lazy: async () => ({
+                  Component: (await import("../features/monitor/Report")).Report,
+                }),
+              },
+              {
                 path: "app/tests/:testId/results",
                 lazy: async () => ({
                   Component: (await import("../features/results/Results")).Results,

@@ -456,6 +456,14 @@ function PublishedTest({ test }: { test: TestRow }) {
           Open from {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)} ·{" "}
           {test.duration_min} minutes · {items.data?.length ?? "…"} questions
         </p>
+        <div className="flex flex-wrap gap-4">
+          <Link to={`/app/tests/${test.id}/live`} className="font-medium text-accent underline">
+            Watch live
+          </Link>
+          <Link to={`/app/tests/${test.id}/review`} className="font-medium text-accent underline">
+            Review flags
+          </Link>
+        </div>
         <Link
           to={`/app/tests/${test.id}/results`}
           className="inline-block font-medium text-accent underline"

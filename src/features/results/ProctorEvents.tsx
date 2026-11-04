@@ -3,34 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
 import { Loading, Message } from "../../app/ui/form";
 import { unwrap } from "../classes/api";
-
-const LABEL: Record<string, string> = {
-  face_missing: "Face not in view",
-  multiple_faces: "Another person in view",
-  looking_away: "Looking away for long",
-  object_phone: "Phone in view",
-  object_book: "Book or notes in view",
-  speech: "Talking",
-  identity_mismatch: "Face didn't match the photo",
-  identity_passed: "Identity checked",
-  tab_hidden: "Left the test page",
-  window_blur: "Switched window",
-  fullscreen_exit: "Left full screen",
-  screen_share_stopped: "Screen sharing stopped",
-  second_display: "Second screen connected",
-  camera_lost: "Camera stopped",
-  copy_paste: "Tried to copy or paste",
-  context_menu: "Right-clicked",
-  shortcut: "Used a keyboard shortcut",
-  phone_gone: "Phone camera disconnected",
-  phone_hidden: "Phone page hidden (app switched or screen locked)",
-  phone_moved: "Phone camera moved",
-  phone_person: "Another person in the phone's view",
-  phone_object: "Phone or notes in the phone's view",
-  phone_camera_lost: "Phone camera stopped",
-  phone_replaced: "Phone replaced",
-  phone_setup_unconfirmed: "Phone view not confirmed at setup",
-};
+import { EVENT_LABEL as LABEL } from "../proctoring/labels";
 
 /** What the proctoring engine recorded on one attempt. The full review is phase 7's. */
 export function ProctorEvents({ attemptId }: { attemptId: string }) {
