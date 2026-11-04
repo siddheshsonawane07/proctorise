@@ -31,3 +31,6 @@ dist-ssr
 # Tests
 playwright-report
 test-results
+
+# Written by gitleaks in CI
+results.sarif
