@@ -10,5 +10,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
+    // Unit tests never reach a server; these only satisfy readEnv().
+    env: {
+      VITE_SUPABASE_URL: "http://127.0.0.1:55321",
+      VITE_SUPABASE_PUBLISHABLE_KEY: "test-key",
+    },
   },
 });

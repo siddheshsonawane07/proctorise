@@ -1,22 +1,35 @@
-import { z } from "zod";
+export type Env = {
+  VITE_SUPABASE_URL: string;
+  VITE_SUPABASE_PUBLISHABLE_KEY: string;
+};
 
-const schema = z.object({
-  VITE_SUPABASE_URL: z.url({ protocol: /^https$/ }),
-  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
-});
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1"]);
 
-export type Env = z.infer<typeof schema>;
+/** https everywhere, except the local Supabase stack (`npm run db:start`), which is plain http. */
+function isAllowedUrl(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || (url.protocol === "http:" && LOCAL_HOSTS.has(url.hostname));
+  } catch {
+    return false;
+  }
+}
 
 /**
  * The browser's configuration. Both values are public by design; the secret key never reaches
- * the browser. Throws, naming the missing variable, rather than letting the app start half-wired.
- * Called by the Supabase client from phase 2; nothing needs it before then.
+ * the browser. Throws, naming what is wrong, rather than letting the app start half-wired.
  */
 export function readEnv(source: Record<string, unknown> = import.meta.env): Env {
-  const result = schema.safeParse(source);
-  if (!result.success) {
-    const names = result.error.issues.map((issue) => issue.path.join(".")).join(", ");
-    throw new Error(`Missing or invalid environment variables: ${names}. See .env.example.`);
+  const bad: string[] = [];
+  const url = source.VITE_SUPABASE_URL;
+  const key = source.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (!isAllowedUrl(url)) bad.push("VITE_SUPABASE_URL");
+  if (typeof key !== "string" || key === "") bad.push("VITE_SUPABASE_PUBLISHABLE_KEY");
+  if (bad.length > 0) {
+    throw new Error(
+      `Missing or invalid environment variables: ${bad.join(", ")}. See .env.example.`,
+    );
   }
-  return result.data;
+  return { VITE_SUPABASE_URL: url as string, VITE_SUPABASE_PUBLISHABLE_KEY: key as string };
 }

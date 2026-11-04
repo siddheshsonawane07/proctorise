@@ -3,10 +3,14 @@ import { RootLayout } from "./layouts/RootLayout";
 import { DesktopOnly } from "./layouts/DesktopOnly";
 import { PhoneOnly } from "./layouts/PhoneOnly";
 import { Landing } from "./routes/Landing";
-import { SignIn } from "./routes/SignIn";
 import { AppHome } from "./routes/AppHome";
 import { NotFound } from "./routes/NotFound";
 import { RouteError } from "./routes/RouteError";
+import { SignIn } from "../features/auth/SignIn";
+import { SignUp } from "../features/auth/SignUp";
+import { ForgotPassword } from "../features/auth/ForgotPassword";
+import { ResetPassword } from "../features/auth/ResetPassword";
+import { RequireAdmin, RequireAuth } from "../features/auth/RequireAuth";
 
 export const routes: RouteObject[] = [
   {
@@ -15,18 +19,38 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <Landing /> },
       { path: "sign-in", element: <SignIn /> },
-      { path: "app", element: <AppHome /> },
-      // The desktop-only gate covers the test itself, nothing else: teachers may read results
-      // on a tablet, and the phone page must open on a phone.
+      { path: "sign-up", element: <SignUp /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
       {
-        element: <DesktopOnly />,
+        element: <RequireAuth />,
         children: [
+          { path: "app", element: <AppHome /> },
           {
-            path: "app/attempt/:attemptId",
-            lazy: async () => ({ Component: (await import("./routes/Attempt")).Attempt }),
+            element: <RequireAdmin />,
+            children: [
+              {
+                path: "app/admin/teachers",
+                lazy: async () => ({
+                  Component: (await import("../features/admin/Teachers")).Teachers,
+                }),
+              },
+            ],
+          },
+          // The desktop-only gate covers the test itself, nothing else: teachers may read
+          // results on a tablet, and the phone page must open on a phone.
+          {
+            element: <DesktopOnly />,
+            children: [
+              {
+                path: "app/attempt/:attemptId",
+                lazy: async () => ({ Component: (await import("./routes/Attempt")).Attempt }),
+              },
+            ],
           },
         ],
       },
+      // The phone has no account of its own: it is paired by a one-time code (phase 6).
       {
         element: <PhoneOnly />,
         children: [
