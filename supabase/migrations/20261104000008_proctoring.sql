@@ -111,7 +111,8 @@ after insert on public.proctor_events
 for each row when (new.severity = 'high')
 execute function public.flag_attempt_on_high();
 
--- Closing an event, or raising its severity, after it opened. Severity only goes up.
+-- Closing an event, raising its severity, or attaching its snapshot, after it opened. Severity only
+-- goes up; a snapshot is attached once, and only one reserved for the same attempt.
 create function public.update_proctor_events(p_updates jsonb) returns void
 language plpgsql security definer set search_path = ''
 as $$
@@ -124,7 +125,11 @@ begin
   for v_update in select * from jsonb_array_elements(p_updates) loop
     update public.proctor_events e
     set ended_at = coalesce((v_update ->> 'ended_at')::timestamptz, e.ended_at),
-        severity = greatest(e.severity, coalesce((v_update ->> 'severity')::public.proctor_severity, e.severity))
+        severity = greatest(e.severity, coalesce((v_update ->> 'severity')::public.proctor_severity, e.severity)),
+        snapshot_path = coalesce(e.snapshot_path, (
+          select ev.path from public.evidence ev
+          where ev.path = v_update ->> 'snapshot_path' and ev.attempt_id = e.attempt_id
+        ))
     where e.client_id = (v_update ->> 'client_id')::uuid
       and exists (
         select 1 from public.attempts a

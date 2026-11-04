@@ -11,6 +11,7 @@ import { unwrap } from "../classes/api";
 import { useTest } from "../builder/api";
 import { describeAnswer } from "../questions/describe";
 import type { ResultItem } from "../attempt/api";
+import { ProctorEvents } from "./ProctorEvents";
 
 type Row = Database["public"]["Functions"]["test_results"]["Returns"][number];
 
@@ -141,7 +142,14 @@ export function Results() {
               ))}
             </tbody>
           </table>
-          {open && <AttemptAnswers attemptId={open} testId={testId} />}
+          {open && (
+            <>
+              <Card title="Proctoring">
+                <ProctorEvents attemptId={open} />
+              </Card>
+              <AttemptAnswers attemptId={open} testId={testId} />
+            </>
+          )}
         </>
       )}
     </div>

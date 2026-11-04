@@ -19,6 +19,7 @@ export type EventKind =
   | "object_book"
   | "speech"
   | "identity_mismatch"
+  | "identity_passed"
   | "tab_hidden"
   | "window_blur"
   | "fullscreen_exit"

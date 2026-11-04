@@ -37,6 +37,14 @@ export function AppHome() {
       )}
       {teacher && <TeachingClasses />}
       <JoinedClasses showEmpty={!teacher} />
+      <Card title="Your photo for tests">
+        <p className="text-text-muted">
+          Some tests check it's you by comparing your face with a photo you take here.
+        </p>
+        <Link to="/app/identity" className="text-accent underline">
+          Set up or replace your photo
+        </Link>
+      </Card>
       {profile.role === "student" && <BecomeTeacher profile={profile} />}
     </div>
   );

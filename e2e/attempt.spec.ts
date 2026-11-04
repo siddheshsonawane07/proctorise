@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   asService,
   asUser,
@@ -14,6 +14,15 @@ test.skip(!hasStack, "needs the local Supabase stack (npm run db:start)");
 test.setTimeout(120_000);
 
 const PASSWORD = "correct-horse-battery";
+
+/** Every test has a lobby: agree, then start; the full-screen cover may be up in headless. */
+async function enter(page: Page, button: "Start the test" | "Continue the test") {
+  await page.getByLabel("I understand and agree").check();
+  await page.getByRole("button", { name: button }).click();
+  const cover = page.getByRole("button", { name: "Return to full screen" });
+  await page.waitForTimeout(300);
+  if (await cover.isVisible()) await cover.click();
+}
 
 /** A class with one student and a published three-question test, made through the API. */
 async function setUp(durationMin: number) {
@@ -63,6 +72,16 @@ async function setUp(durationMin: number) {
       class_id: classId,
       title: "Atoms",
       duration_min: durationMin,
+      // Browser checks only: this file is about time and answers, not the camera (proctor.spec.ts).
+      proctoring: {
+        preset: "light",
+        identity_check: false,
+        phone_required: false,
+        screen_share_required: false,
+        snapshot_interval_s: 300,
+        auto_submit_screen_share_s: null,
+        auto_submit_phone_gone_min: null,
+      },
       opens_at: new Date(Date.now() - 60_000).toISOString(),
       closes_at: new Date(Date.now() + 86_400_000).toISOString(),
     }),
@@ -103,7 +122,7 @@ test("answers survive closing the browser, and the server keeps the time", async
   await first.getByRole("button", { name: "Sign in" }).click();
   await expect(first.getByRole("heading", { name: /^Hello/ })).toBeVisible();
   await first.goto(`/app/take/${testId}`);
-  await first.getByRole("button", { name: "Start the test" }).click();
+  await enter(first, "Start the test");
   await first.getByLabel("H2O").check();
   await first.getByRole("button", { name: "Next" }).click();
   await first.getByLabel("True").check();
@@ -116,7 +135,7 @@ test("answers survive closing the browser, and the server keeps the time", async
   const second = await (await browser.newContext({ storageState: storage })).newPage();
   record(second);
   await second.goto(`/app/take/${testId}`);
-  await second.getByRole("button", { name: "Continue the test" }).click();
+  await enter(second, "Continue the test");
   await expect(second.getByLabel("H2O")).toBeChecked();
   const label = await second.getByLabel(/^Time left/).getAttribute("aria-label");
   const [, mm, ss] = label!.match(/(\d\d):(\d\d)/)!;

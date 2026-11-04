@@ -4,6 +4,7 @@ import type { Json } from "../../lib/database.types";
 import { unwrap } from "../classes/api";
 import type { ViewItem } from "../questions/QuestionView";
 import { useSession } from "../auth/session";
+import type { Proctoring } from "../builder/proctoring";
 
 export type AttemptPayload = {
   attempt_id: string;
@@ -15,6 +16,7 @@ export type AttemptPayload = {
   server_now: string;
   title: string;
   instructions: string;
+  proctoring: Proctoring;
   items: ViewItem[];
   answers: Record<string, Json>;
 };
@@ -112,4 +114,10 @@ export function useMyResult(attemptId: string) {
     queryFn: async () =>
       unwrap(await supabase.rpc("my_result", { p_attempt_id: attemptId })) as unknown as MyResult,
   });
+}
+
+export async function recordConsent(attemptId: string, version: string) {
+  unwrap(
+    await supabase.rpc("record_attempt_consent", { p_attempt_id: attemptId, p_version: version }),
+  );
 }

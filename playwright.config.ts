@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const desktop = /desktop\.spec\.ts/;
 const phone = /phone\.spec\.ts/;
 const stack = /(auth|teacher|attempt)\.spec\.ts/;
+const proctor = /proctor\.spec\.ts/;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -23,6 +24,17 @@ export default defineConfig({
     { name: "chromium", testMatch: desktop, use: { ...devices["Desktop Chrome"] } },
     // Needs the local Supabase stack; skipped without it (see e2e/support/supabase.ts).
     { name: "stack", testMatch: stack, use: { ...devices["Desktop Chrome"] } },
+    // Chromium's fake camera and microphone, with permission given (also needs the stack).
+    {
+      name: "proctor",
+      testMatch: proctor,
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
+    },
     { name: "firefox", testMatch: desktop, use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", testMatch: desktop, use: { ...devices["Desktop Safari"] } },
     { name: "android", testMatch: phone, use: { ...devices["Pixel 7"] } },

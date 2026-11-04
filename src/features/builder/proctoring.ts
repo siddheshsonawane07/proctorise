@@ -61,3 +61,8 @@ export function isValidProctoring(value: unknown): value is Proctoring {
     (p.auto_submit_phone_gone_min === null || within(p.auto_submit_phone_gone_min, 1, 30))
   );
 }
+
+/** The camera is needed for camera checks and for the identity check; light alone needs neither. */
+export function needsCamera(p: Proctoring): boolean {
+  return p.preset !== "light" || p.identity_check;
+}

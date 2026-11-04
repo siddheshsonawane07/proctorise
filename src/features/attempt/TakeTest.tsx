@@ -7,8 +7,14 @@ import { messageFrom } from "../../lib/errors";
 import type { Json } from "../../lib/database.types";
 import { formatRemaining, formatWhen } from "../../lib/time";
 import { useTest } from "../builder/api";
+import type { Proctoring } from "../builder/proctoring";
 import { QuestionView } from "../questions/QuestionView";
+import { SystemCheck, type CheckedDevices } from "../proctoring/SystemCheck";
+import { IdentityGate, type IdentityResult } from "../proctoring/IdentityGate";
+import { ProctorSession, type SessionStatus } from "../proctoring/session";
+import { CONSENT_VERSION } from "../proctoring/identity";
 import {
+  recordConsent,
   saveAnswer,
   useMyAttempts,
   useStartAttempt,
@@ -17,29 +23,60 @@ import {
 } from "./api";
 import { SaveQueue, type SaveState } from "./saveQueue";
 
+type ProctorDevices = CheckedDevices & { identity: IdentityResult | null };
+
 export function TakeTest() {
   const { testId = "" } = useParams();
   const test = useTest(testId);
   const attempts = useMyAttempts();
   const start = useStartAttempt();
   const [payload, setPayload] = useState<AttemptPayload | null>(null);
+  const [devices, setDevices] = useState<CheckedDevices | null>(null);
+  const [handOver, setHandOver] = useState(false);
+  const [consented, setConsented] = useState(false);
+  const [identity, setIdentity] = useState<IdentityResult | null>(null);
   const clock = useClock(30_000);
+  const onDevices = useCallback((d: CheckedDevices | null) => setDevices(d), []);
 
-  if (payload) return <TestScreen payload={payload} />;
+  if (payload) {
+    const p = payload.proctoring;
+    if (devices?.camera && p.identity_check && !identity) {
+      return <IdentityGate camera={devices.camera} onDone={setIdentity} />;
+    }
+    return <TestScreen payload={payload} proctor={devices ? { ...devices, identity } : null} />;
+  }
   if (test.isPending || attempts.isPending) return <Loading />;
   if (!test.data || test.data.status === "draft") {
     return <Notice title="Test not found">It doesn't exist, or it isn't open to you.</Notice>;
   }
 
   const t = test.data;
+  const settings = t.proctoring as Proctoring;
   const mine = (attempts.data ?? []).filter((a) => a.test_id === testId);
   const open = mine.find((a) => a.status === "in_progress");
-  const now = clock;
-  const windowOpen = now >= Date.parse(t.opens_at) && now < Date.parse(t.closes_at);
+  const windowOpen = clock >= Date.parse(t.opens_at) && clock < Date.parse(t.closes_at);
   const left = t.max_attempts - mine.length;
+  // Every test is watched at least in the browser; light just has no camera checks.
+  const needsChecks = true;
+  const canGo = !needsChecks || (devices !== null && consented);
+  const willStart = !!open || (windowOpen && left > 0);
+
+  function begin() {
+    if (needsChecks) {
+      // Full screen must be asked for inside the click itself.
+      void document.documentElement.requestFullscreen?.().catch(() => {});
+      setHandOver(true);
+    }
+    start.mutate(testId, {
+      onSuccess: async (p) => {
+        if (needsChecks) await recordConsent(p.attempt_id, CONSENT_VERSION).catch(() => {});
+        setPayload(p);
+      },
+    });
+  }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <h1 className="text-2xl font-semibold">{t.title}</h1>
       {t.instructions && <Markdown>{t.instructions}</Markdown>}
       <Card title="Before you start">
@@ -54,32 +91,59 @@ export function TakeTest() {
           </li>
           <li>
             {left > 0 && !open
-              ? `You can take it ${left === 1 ? "once more" : `${left} more times`}.`
+              ? `You can take it ${left === 1 ? "once" : `${left} times`}.`
               : `Attempts used: ${mine.length} of ${t.max_attempts}.`}
           </li>
         </ul>
       </Card>
+
+      {needsChecks && willStart && (
+        <>
+          <SystemCheck proctoring={settings} onChange={onDevices} handOver={handOver} />
+          <Card title="What is checked">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-text-muted">
+              {settings.preset !== "light" && (
+                <li>
+                  Your camera and microphone are checked for a missing face, another person, a phone
+                  or notes, and talking. Nothing is recorded but a still picture at those moments,
+                  and one every {interval(settings.snapshot_interval_s)}. No sound is recorded.
+                </li>
+              )}
+              {settings.identity_check && <li>Your face is compared with your photo.</li>}
+              {settings.screen_share_required && <li>A still of your screen at those moments.</li>}
+              <li>Leaving the test page or full screen is recorded.</li>
+              <li>
+                Your teacher reviews every flag. The software never fails or ends your test on its
+                own. Pictures are deleted after {t.retention_days} days.
+              </li>
+            </ul>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+              />
+              I understand and agree
+            </label>
+          </Card>
+        </>
+      )}
+
       {start.isError && <Message kind="error">{messageFrom(start.error)}</Message>}
       {open ? (
-        <Button
-          onClick={() => start.mutate(testId, { onSuccess: setPayload })}
-          disabled={start.isPending}
-        >
+        <Button onClick={begin} disabled={start.isPending || !canGo}>
           Continue the test
         </Button>
       ) : !windowOpen ? (
         <Message kind="error">
-          {now < Date.parse(t.opens_at)
+          {clock < Date.parse(t.opens_at)
             ? `This test opens ${formatWhen(t.opens_at)}.`
             : "This test has closed."}
         </Message>
       ) : left <= 0 ? (
         <Message kind="ok">You've used all your attempts.</Message>
       ) : (
-        <Button
-          onClick={() => start.mutate(testId, { onSuccess: setPayload })}
-          disabled={start.isPending}
-        >
+        <Button onClick={begin} disabled={start.isPending || !canGo}>
           {start.isPending ? "Starting…" : "Start the test"}
         </Button>
       )}
@@ -96,6 +160,11 @@ export function TakeTest() {
   );
 }
 
+function interval(seconds: number): string {
+  if (seconds < 60) return `${seconds} seconds`;
+  return seconds === 60 ? "minute" : `${seconds / 60} minutes`;
+}
+
 const SAVE_TEXT: Record<SaveState["kind"], string> = {
   saved: "All answers saved",
   saving: "Saving…",
@@ -103,7 +172,13 @@ const SAVE_TEXT: Record<SaveState["kind"], string> = {
   refused: "An answer couldn't be saved",
 };
 
-function TestScreen({ payload }: { payload: AttemptPayload }) {
+function TestScreen({
+  payload,
+  proctor,
+}: {
+  payload: AttemptPayload;
+  proctor: ProctorDevices | null;
+}) {
   const navigate = useNavigate();
   const submit = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, Json>>(payload.answers);
@@ -115,6 +190,7 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
   // Measured at start and again after every save.
   const [offset, setOffset] = useState(() => Date.parse(payload.server_now) - Date.now());
   const remaining = Date.parse(payload.deadline_at) - (useClock(1000) + offset);
+  const proctoring = useProctorSession(payload, proctor, offset);
 
   // One queue for the life of this attempt's screen.
   const [queue] = useState(
@@ -139,12 +215,14 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
     };
   }, [queue]);
 
+  const { stop } = proctoring;
   const finish = useCallback(async () => {
     await queue.flush();
+    await stop();
     submit.mutate(payload.attempt_id, {
       onSuccess: () => navigate(`/app/results/${payload.attempt_id}`, { replace: true }),
     });
-  }, [queue, submit, payload.attempt_id, navigate]);
+  }, [queue, stop, submit, payload.attempt_id, navigate]);
 
   const timeUp = remaining <= 0;
   const finishedOnce = useRef(false);
@@ -178,6 +256,7 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
   const items = payload.items;
   const item = items[index]!;
   const unanswered = items.filter((i) => isBlank(answers[i.id])).length;
+  const status = proctoring.value;
 
   if (timeUp) {
     return (
@@ -195,6 +274,7 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
         <h1 className="text-lg font-semibold">{payload.title}</h1>
         <p role="status" aria-live="polite" className="text-sm text-text-muted">
           {SAVE_TEXT[save.kind]}
+          {status && ` · ${statusText(status)}`}
         </p>
         <p
           className={`font-mono text-lg ${remaining < 60_000 ? "text-high" : ""}`}
@@ -204,6 +284,27 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
         </p>
       </div>
       {save.kind === "refused" && <Message kind="error">{save.message}</Message>}
+      {status?.warnings[0] && (
+        <p role="alert" className="rounded-md border border-warn p-3 text-sm">
+          {status.warnings[0].text}
+        </p>
+      )}
+      {status && !status.fullscreen && (
+        <Cover
+          title="Return to full screen"
+          text="The test runs in full screen. Leaving it was recorded."
+          action="Return to full screen"
+          onAction={() => void document.documentElement.requestFullscreen?.().catch(() => {})}
+        />
+      )}
+      {status?.screen === "stopped" && (
+        <Cover
+          title="Screen sharing stopped"
+          text="This test needs your whole screen shared. That it stopped was recorded."
+          action="Share my screen again"
+          onAction={() => void proctoring.reshare()}
+        />
+      )}
 
       <nav aria-label="Questions" className="flex flex-wrap gap-2">
         {items.map((it, i) => (
@@ -272,6 +373,111 @@ function TestScreen({ payload }: { payload: AttemptPayload }) {
         )}
       </div>
       {submit.isError && <Message kind="error">{messageFrom(submit.error)}</Message>}
+    </div>
+  );
+}
+
+function statusText(status: SessionStatus): string {
+  return [
+    status.camera ? "Camera on" : "Camera off",
+    status.screen === "shared"
+      ? "Screen shared"
+      : status.screen === "stopped"
+        ? "Screen not shared"
+        : null,
+    status.engine === "loading"
+      ? "Starting checks"
+      : status.engine === "unavailable"
+        ? "Camera checks unavailable"
+        : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/**
+ * Runs the proctoring session for the life of the test screen. The stop is deferred a tick so
+ * React's development double-mount doesn't end the session it has just started.
+ */
+function useProctorSession(
+  payload: AttemptPayload,
+  proctor: ProctorDevices | null,
+  offset: number,
+) {
+  const [value, setValue] = useState<SessionStatus | null>(null);
+  const [session] = useState(() =>
+    proctor
+      ? new ProctorSession({
+          attemptId: payload.attempt_id,
+          proctoring: payload.proctoring,
+          camera: proctor.camera,
+          screen: proctor.screen,
+          offsetMs: offset,
+          reference: proctor.identity?.reference ?? null,
+          onStatus: setValue,
+        })
+      : null,
+  );
+  const [identity] = useState(proctor?.identity ?? null);
+  const started = useRef(false);
+  const pendingStop = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!session) return;
+    if (pendingStop.current) clearTimeout(pendingStop.current);
+    if (!started.current) {
+      started.current = true;
+      void session.start().then(() => {
+        if (identity) session.recordIdentity(identity.passed, identity.score);
+      });
+    }
+    return () => {
+      pendingStop.current = setTimeout(() => void session.stop(), 0);
+    };
+  }, [session, identity]);
+
+  const stop = useCallback(async () => {
+    await session?.stop();
+    if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+  }, [session]);
+
+  return {
+    value,
+    stop,
+    reshare: async () => {
+      const s = await navigator.mediaDevices
+        .getDisplayMedia({ video: { displaySurface: "monitor" } as MediaTrackConstraints })
+        .catch(() => null);
+      if (s) session?.replaceScreen(s);
+    },
+  };
+}
+
+function Cover({
+  title,
+  text,
+  action,
+  onAction,
+}: {
+  title: string;
+  text: string;
+  action: string;
+  onAction: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cover-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-surface p-6"
+    >
+      <div className="max-w-md space-y-4 text-center">
+        <h2 id="cover-title" className="text-xl font-semibold">
+          {title}
+        </h2>
+        <p className="text-text-muted">{text}</p>
+        <Button onClick={onAction}>{action}</Button>
+      </div>
     </div>
   );
 }

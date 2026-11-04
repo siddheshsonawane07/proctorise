@@ -20,6 +20,8 @@ const copies = [
       "models/blazeface.bin",
       "models/faceres.json",
       "models/faceres.bin",
+      "models/facemesh.json",
+      "models/facemesh.bin",
     ],
     to: "human",
   },

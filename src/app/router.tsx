@@ -33,6 +33,12 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: "app/identity",
+            lazy: async () => ({
+              Component: (await import("../features/proctoring/Enrolment")).Enrolment,
+            }),
+          },
+          {
             path: "app/results/:attemptId",
             lazy: async () => ({
               Component: (await import("../features/attempt/MyResult")).MyResult,
