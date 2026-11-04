@@ -27,3 +27,7 @@ dist-ssr
 .netlify
 
 .vercel
+
+# Tests
+playwright-report
+test-results

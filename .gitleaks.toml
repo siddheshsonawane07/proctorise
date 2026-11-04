@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+# The old app's Firebase web config (commits before phase 1). A Firebase web key is public by
+# design and the file is deleted on `next`; nothing else is allowlisted.
+[allowlist]
+description = "Old Firebase web config, public by design"
+paths = ['''src/utils/FirebaseConfig\.jsx''']

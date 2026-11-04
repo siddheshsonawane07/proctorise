@@ -1,0 +1,3 @@
+# Single-page app: every path serves index.html, and the router decides. Read by Cloudflare
+# Pages and Netlify alike.
+/* /index.html 200

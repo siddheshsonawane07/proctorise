@@ -1,0 +1,7 @@
+dist
+public/models
+package-lock.json
+playwright-report
+test-results
+README.md
+CLAUDE.md
