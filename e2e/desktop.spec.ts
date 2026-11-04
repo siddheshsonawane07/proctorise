@@ -15,9 +15,9 @@ test("a deep link opens the app, not a server 404", async ({ page }) => {
 
 // The desktop-only gate itself is unit-tested (src/app/router.test.tsx), signed in.
 test("the test page asks a signed-out visitor to sign in", async ({ page }) => {
-  await page.goto("/app/attempt/123");
+  await page.goto("/app/take/123");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
-  expect(new URL(page.url()).searchParams.get("next")).toBe("/app/attempt/123");
+  expect(new URL(page.url()).searchParams.get("next")).toBe("/app/take/123");
 });
 
 test("the phone page asks a desktop to use a phone", async ({ page }) => {

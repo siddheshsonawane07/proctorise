@@ -88,3 +88,19 @@ export async function latestEmailLink(to: string): Promise<string> {
   }
   throw new Error(`No email reached ${to}`);
 }
+
+/** Calls a database function as a person, with their token. Throws on an error response. */
+export async function rpcAs<T = unknown>(token: string, fn: string, args: object): Promise<T> {
+  const res = await asUser(token, `/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    body: JSON.stringify(args),
+  });
+  const body = await res.text();
+  if (!res.ok) throw new Error(`${fn}: ${res.status} ${body}`);
+  return (body ? JSON.parse(body) : null) as T;
+}
+
+/** A REST call with the secret key: for setting up what a test needs, never for checking it. */
+export function asService(path: string, init: RequestInit = {}) {
+  return call(path, init);
+}

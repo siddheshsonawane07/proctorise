@@ -23,6 +23,123 @@ export type Database = {
   };
   public: {
     Tables: {
+      answers: {
+        Row: {
+          attempt_id: string;
+          graded_by: string | null;
+          item_id: string;
+          points_awarded: number | null;
+          response: NonNullable<Json>;
+          saved_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempt_id: string;
+          graded_by?: string | null;
+          item_id: string;
+          points_awarded?: number | null;
+          response: NonNullable<Json>;
+          saved_at?: string;
+        };
+        Update: {
+          attempt_id?: string;
+          graded_by?: string | null;
+          item_id?: string;
+          points_awarded?: number | null;
+          response?: NonNullable<Json>;
+          saved_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "answers_attempt_id_fkey";
+            columns: ["attempt_id"];
+            isOneToOne: false;
+            referencedRelation: "attempts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "answers_graded_by_fkey";
+            columns: ["graded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "answers_item_id_fkey";
+            columns: ["item_id"];
+            isOneToOne: false;
+            referencedRelation: "test_items";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      attempts: {
+        Row: {
+          attempt_no: number;
+          deadline_at: string;
+          id: string;
+          integrity: Database["public"]["Enums"]["integrity_status"];
+          item_order: string[];
+          max_score: number | null;
+          option_orders: NonNullable<Json>;
+          primary_session: string;
+          score: number | null;
+          started_at: string;
+          status: Database["public"]["Enums"]["attempt_status"];
+          student_id: string;
+          submitted_at: string | null;
+          test_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempt_no: number;
+          deadline_at: string;
+          id?: string;
+          integrity?: Database["public"]["Enums"]["integrity_status"];
+          item_order: string[];
+          max_score?: number | null;
+          option_orders?: NonNullable<Json>;
+          primary_session: string;
+          score?: number | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["attempt_status"];
+          student_id: string;
+          submitted_at?: string | null;
+          test_id: string;
+        };
+        Update: {
+          attempt_no?: number;
+          deadline_at?: string;
+          id?: string;
+          integrity?: Database["public"]["Enums"]["integrity_status"];
+          item_order?: string[];
+          max_score?: number | null;
+          option_orders?: NonNullable<Json>;
+          primary_session?: string;
+          score?: number | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["attempt_status"];
+          student_id?: string;
+          submitted_at?: string | null;
+          test_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attempts_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "attempts_test_id_fkey";
+            columns: ["test_id"];
+            isOneToOne: false;
+            referencedRelation: "tests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_log: {
         Row: {
           action: string;
@@ -410,7 +527,9 @@ export type Database = {
           proctoring: NonNullable<Json>;
           published_at: string | null;
           results_release: Database["public"]["Enums"]["results_release"];
+          results_released_at: string | null;
           retention_days: number;
+          reveal_answers: boolean;
           shuffle_items: boolean;
           shuffle_options: boolean;
           status: Database["public"]["Enums"]["test_status"];
@@ -431,7 +550,9 @@ export type Database = {
           proctoring?: NonNullable<Json>;
           published_at?: string | null;
           results_release?: Database["public"]["Enums"]["results_release"];
+          results_released_at?: string | null;
           retention_days?: number;
+          reveal_answers?: boolean;
           shuffle_items?: boolean;
           shuffle_options?: boolean;
           status?: Database["public"]["Enums"]["test_status"];
@@ -451,7 +572,9 @@ export type Database = {
           proctoring?: NonNullable<Json>;
           published_at?: string | null;
           results_release?: Database["public"]["Enums"]["results_release"];
+          results_released_at?: string | null;
           retention_days?: number;
+          reveal_answers?: boolean;
           shuffle_items?: boolean;
           shuffle_options?: boolean;
           status?: Database["public"]["Enums"]["test_status"];
@@ -499,6 +622,8 @@ export type Database = {
         Args: { p_status: Database["public"]["Enums"]["teacher_status"]; p_user_id: string };
         Returns: undefined;
       };
+      attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
+      attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
       can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
       check_question: {
         Args: {
@@ -508,6 +633,14 @@ export type Database = {
           p_type: Database["public"]["Enums"]["question_type"];
         };
         Returns: undefined;
+      };
+      check_response: {
+        Args: {
+          p_options: Json;
+          p_response: Json;
+          p_type: Database["public"]["Enums"]["question_type"];
+        };
+        Returns: boolean;
       };
       class_roster: {
         Args: { p_class_id: string };
@@ -544,17 +677,56 @@ export type Database = {
           type: Database["public"]["Enums"]["question_type"];
         }[];
       };
+      finalize_expired_attempts: { Args: Record<PropertyKey, never>; Returns: number };
+      finish_attempt: {
+        Args: { p_attempt_id: string; p_status: Database["public"]["Enums"]["attempt_status"] };
+        Returns: undefined;
+      };
+      fix_item_key: {
+        Args: {
+          p_case_sensitive?: boolean;
+          p_correct: Json;
+          p_item_id: string;
+          p_tolerance?: number;
+        };
+        Returns: number;
+      };
+      grade_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_approved_teacher: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_class_member: { Args: { p_class_id: string }; Returns: boolean };
       is_class_owner: { Args: { p_class_id: string }; Returns: boolean };
       is_class_teacher: { Args: { p_class_id: string }; Returns: boolean };
       join_class: { Args: { p_code: string }; Returns: Json };
+      mark_answer: {
+        Args: { p_attempt_id: string; p_item_id: string; p_points: number };
+        Returns: undefined;
+      };
+      my_result: { Args: { p_attempt_id: string }; Returns: Json };
       new_join_code: { Args: Record<PropertyKey, never>; Returns: string };
+      normalise_answer: { Args: { p_case_sensitive: boolean; p_text: string }; Returns: string };
       publish_test: { Args: { p_test_id: string }; Returns: undefined };
+      release_results: { Args: { p_test_id: string }; Returns: undefined };
       remove_co_teacher: { Args: { p_class_id: string; p_teacher_id: string }; Returns: undefined };
       request_teacher: { Args: { p_institution: string; p_note: string }; Returns: undefined };
+      results_visible: {
+        Args: {
+          p_attempt: Omit<
+            Database["public"]["Tables"]["attempts"]["Row"],
+            Database["public"]["Tables"]["attempts"]["ComputedFields"]
+          >;
+          p_test: Omit<
+            Database["public"]["Tables"]["tests"]["Row"],
+            Database["public"]["Tables"]["tests"]["ComputedFields"]
+          >;
+        };
+        Returns: boolean;
+      };
       rotate_join_code: { Args: { p_class_id: string }; Returns: string };
+      save_answer: {
+        Args: { p_attempt_id: string; p_item_id: string; p_response: Json };
+        Returns: string;
+      };
       save_question: {
         Args: {
           p_case_sensitive?: boolean;
@@ -569,6 +741,17 @@ export type Database = {
         };
         Returns: string;
       };
+      score_item: {
+        Args: {
+          p_case_sensitive: boolean;
+          p_correct: Json;
+          p_points: number;
+          p_response: Json;
+          p_tolerance: number;
+          p_type: Database["public"]["Enums"]["question_type"];
+        };
+        Returns: number;
+      };
       set_member: {
         Args: {
           p_class_id: string;
@@ -578,7 +761,26 @@ export type Database = {
         };
         Returns: undefined;
       };
+      start_attempt: { Args: { p_session: string; p_test_id: string }; Returns: Json };
+      submit_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
       test_class: { Args: { p_test_id: string }; Returns: string };
+      test_results: {
+        Args: { p_test_id: string };
+        Returns: {
+          attempt_id: string;
+          attempt_no: number;
+          email: string;
+          full_name: string;
+          integrity: Database["public"]["Enums"]["integrity_status"];
+          max_score: number;
+          score: number;
+          started_at: string;
+          status: Database["public"]["Enums"]["attempt_status"];
+          student_id: string;
+          submitted_at: string;
+          to_mark: number;
+        }[];
+      };
       unpublish_test: { Args: { p_test_id: string }; Returns: undefined };
       valid_proctoring: { Args: { p: Json }; Returns: boolean };
       write_audit: {
@@ -587,7 +789,9 @@ export type Database = {
       };
     };
     Enums: {
+      attempt_status: "in_progress" | "submitted" | "auto_submitted" | "terminated" | "voided";
       class_teacher_kind: "owner" | "co_teacher";
+      integrity_status: "clean" | "flagged" | "reviewed_ok" | "reviewed_violation";
       member_status: "active" | "removed";
       question_type: "single" | "multiple" | "true_false" | "short_text" | "numeric";
       results_release: "immediate" | "manual" | "after_close";
@@ -708,7 +912,9 @@ export const Constants = {
   },
   public: {
     Enums: {
+      attempt_status: ["in_progress", "submitted", "auto_submitted", "terminated", "voided"],
       class_teacher_kind: ["owner", "co_teacher"],
+      integrity_status: ["clean", "flagged", "reviewed_ok", "reviewed_violation"],
       member_status: ["active", "removed"],
       question_type: ["single", "multiple", "true_false", "short_text", "numeric"],
       results_release: ["immediate", "manual", "after_close"],

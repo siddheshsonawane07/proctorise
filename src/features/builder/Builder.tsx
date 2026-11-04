@@ -98,6 +98,7 @@ function Details({ test }: { test: TestRow }) {
         shuffle_items: f.get("shuffle_items") === "on",
         shuffle_options: f.get("shuffle_options") === "on",
         results_release: String(f.get("results_release")) as TestRow["results_release"],
+        reveal_answers: f.get("reveal_answers") === "on",
         retention_days: Number(f.get("retention_days")),
       },
       { onSuccess: () => setSaved(true) },
@@ -177,6 +178,10 @@ function Details({ test }: { test: TestRow }) {
         <label className="flex items-center gap-2">
           <input type="checkbox" name="shuffle_options" defaultChecked={test.shuffle_options} />
           Shuffle the order of options
+        </label>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" name="reveal_answers" defaultChecked={test.reveal_answers} />
+          With their results, show students the right answers
         </label>
         {update.isError && <Message kind="error">{messageFrom(update.error)}</Message>}
         {saved && <Message kind="ok">Saved.</Message>}
@@ -451,6 +456,12 @@ function PublishedTest({ test }: { test: TestRow }) {
           Open from {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)} ·{" "}
           {test.duration_min} minutes · {items.data?.length ?? "…"} questions
         </p>
+        <Link
+          to={`/app/tests/${test.id}/results`}
+          className="inline-block font-medium text-accent underline"
+        >
+          Results and marking
+        </Link>
         <p className="text-sm text-text-muted">
           To change it, take it back to a draft. That's only possible until a student starts it.
         </p>

@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const desktop = /desktop\.spec\.ts/;
 const phone = /phone\.spec\.ts/;
-const stack = /(auth|teacher)\.spec\.ts/;
+const stack = /(auth|teacher|attempt)\.spec\.ts/;
 
 export default defineConfig({
   testDir: "./e2e",

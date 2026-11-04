@@ -33,8 +33,20 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: "app/results/:attemptId",
+            lazy: async () => ({
+              Component: (await import("../features/attempt/MyResult")).MyResult,
+            }),
+          },
+          {
             element: <RequireTeacher />,
             children: [
+              {
+                path: "app/tests/:testId/results",
+                lazy: async () => ({
+                  Component: (await import("../features/results/Results")).Results,
+                }),
+              },
               {
                 path: "app/bank",
                 lazy: async () => ({ Component: (await import("../features/bank/Bank")).Bank }),
@@ -70,8 +82,10 @@ export const routes: RouteObject[] = [
             element: <DesktopOnly />,
             children: [
               {
-                path: "app/attempt/:attemptId",
-                lazy: async () => ({ Component: (await import("./routes/Attempt")).Attempt }),
+                path: "app/take/:testId",
+                lazy: async () => ({
+                  Component: (await import("../features/attempt/TakeTest")).TakeTest,
+                }),
               },
             ],
           },

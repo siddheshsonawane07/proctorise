@@ -20,6 +20,7 @@ import {
   type TestRow,
 } from "./api";
 import { useProfile } from "../auth/useProfile";
+import { useMyAttempts, type MyAttempt } from "../attempt/api";
 import { isTeacher } from "../auth/roles";
 
 const MULTIPLIERS = [1, 1.25, 1.5, 2];
@@ -61,6 +62,7 @@ function StudentClass({ cls }: { cls: ClassRow }) {
 }
 
 function TestGroup({ title, tests }: { title: string; tests: TestRow[] }) {
+  const attempts = useMyAttempts();
   if (tests.length === 0) return null;
   return (
     <Card title={title}>
@@ -72,10 +74,35 @@ function TestGroup({ title, tests }: { title: string; tests: TestRow[] }) {
               {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)} · {test.duration_min}{" "}
               minutes
             </p>
+            <TestAction
+              test={test}
+              attempts={(attempts.data ?? []).filter((a) => a.test_id === test.id)}
+            />
           </li>
         ))}
       </ul>
     </Card>
+  );
+}
+
+function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }) {
+  const open = attempts.find((a) => a.status === "in_progress");
+  const done = attempts.filter((a) => a.status !== "in_progress");
+  const canStart =
+    testWindow(test.opens_at, test.closes_at) === "open" && attempts.length < test.max_attempts;
+  return (
+    <div className="mt-1 flex flex-wrap gap-3 text-sm">
+      {(open || canStart) && (
+        <Link to={`/app/take/${test.id}`} className="font-medium text-accent underline">
+          {open ? "Continue" : done.length ? "Try again" : "Start"}
+        </Link>
+      )}
+      {done.map((a) => (
+        <Link key={a.id} to={`/app/results/${a.id}`} className="text-accent underline">
+          {done.length > 1 ? `Result of attempt ${a.attempt_no}` : "Your result"}
+        </Link>
+      ))}
+    </div>
   );
 }
 

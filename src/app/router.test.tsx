@@ -112,7 +112,7 @@ describe("signing in", () => {
 
 describe("the desktop-only gate", () => {
   it("blocks the test on a narrow screen", async () => {
-    renderAt("/app/attempt/123", profile());
+    renderAt("/app/take/123", profile());
     expect(
       await screen.findByRole("heading", { name: "Please use a laptop or desktop" }),
     ).toBeInTheDocument();
@@ -120,8 +120,10 @@ describe("the desktop-only gate", () => {
 
   it("opens the test on a desktop", async () => {
     mediaMatches.add(DESKTOP_QUERY);
-    renderAt("/app/attempt/123", profile());
-    expect(await screen.findByRole("heading", { name: "Test" })).toBeInTheDocument();
+    renderAt("/app/take/123", profile());
+    // The test page itself loads (it fetches the test); the gate's notice is not shown.
+    expect(await screen.findByText("Loading…")).toBeInTheDocument();
+    expect(screen.queryByText("Please use a laptop or desktop")).not.toBeInTheDocument();
   });
 });
 
