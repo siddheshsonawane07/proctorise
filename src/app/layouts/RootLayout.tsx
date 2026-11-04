@@ -20,6 +20,16 @@ export function RootLayout() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         <Outlet />
       </main>
+      <footer className="border-t border-border print:hidden">
+        <nav
+          aria-label="Footer"
+          className="mx-auto flex max-w-5xl flex-wrap gap-4 px-4 py-4 text-sm text-text-muted"
+        >
+          <Link to="/help/students">For students</Link>
+          <Link to="/help/teachers">For teachers</Link>
+          <Link to="/privacy">Privacy</Link>
+        </nav>
+      </footer>
     </div>
   );
 }

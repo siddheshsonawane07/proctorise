@@ -20,6 +20,7 @@ function profile(overrides: Partial<Profile> = {}): Profile {
     teacher_note: null,
     teacher_requested_at: null,
     adult_confirmed_at: "2026-11-04T00:00:00Z",
+    deletion_requested_at: null,
     created_at: "2026-11-04T00:00:00Z",
     updated_at: "2026-11-04T00:00:00Z",
     ...overrides,

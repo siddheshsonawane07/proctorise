@@ -539,6 +539,7 @@ export type Database = {
         Row: {
           adult_confirmed_at: string | null;
           created_at: string;
+          deletion_requested_at: string | null;
           full_name: string;
           id: string;
           institution: string | null;
@@ -552,6 +553,7 @@ export type Database = {
         Insert: {
           adult_confirmed_at?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           full_name?: string;
           id: string;
           institution?: string | null;
@@ -564,6 +566,7 @@ export type Database = {
         Update: {
           adult_confirmed_at?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           full_name?: string;
           id?: string;
           institution?: string | null;
@@ -846,6 +849,13 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accounts_to_delete: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          files: Json;
+          user_id: string;
+        }[];
+      };
       add_co_teacher: { Args: { p_class_id: string; p_email: string }; Returns: undefined };
       admin_list_people: {
         Args: { p_status?: Database["public"]["Enums"]["teacher_status"] };
@@ -865,6 +875,7 @@ export type Database = {
         Args: { p_status: Database["public"]["Enums"]["teacher_status"]; p_user_id: string };
         Returns: undefined;
       };
+      admin_usage: { Args: Record<PropertyKey, never>; Returns: Json };
       attempt_class: { Args: { p_attempt_id: string }; Returns: string };
       attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
       attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
@@ -872,6 +883,7 @@ export type Database = {
       can_read_topic: { Args: { p_topic: string }; Returns: boolean };
       can_use_pairing_channel: { Args: { p_topic: string }; Returns: boolean };
       can_write_topic: { Args: { p_topic: string }; Returns: boolean };
+      cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
       check_question: {
         Args: {
           p_correct: Json;
@@ -936,6 +948,12 @@ export type Database = {
       };
       event_class: { Args: { p_event_id: number }; Returns: string };
       evidence_slot_open: { Args: { p_path: string }; Returns: boolean };
+      expired_evidence: {
+        Args: { p_limit?: number };
+        Returns: {
+          path: string;
+        }[];
+      };
       extend_attempt: {
         Args: { p_attempt_id: string; p_minutes: number; p_reason: string };
         Returns: string;
@@ -954,6 +972,7 @@ export type Database = {
         };
         Returns: number;
       };
+      forget_evidence: { Args: { p_paths: string[] }; Returns: number };
       grade_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
       has_profile: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
@@ -985,6 +1004,7 @@ export type Database = {
         Returns: undefined;
       };
       mark_phone_ready: { Args: Record<PropertyKey, never>; Returns: undefined };
+      my_data: { Args: Record<PropertyKey, never>; Returns: Json };
       my_pairing: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1022,6 +1042,7 @@ export type Database = {
       };
       release_results: { Args: { p_test_id: string }; Returns: undefined };
       remove_co_teacher: { Args: { p_class_id: string; p_teacher_id: string }; Returns: undefined };
+      request_account_deletion: { Args: { p_confirm: string }; Returns: undefined };
       request_teacher: { Args: { p_institution: string; p_note: string }; Returns: undefined };
       reserve_evidence: {
         Args: { p_attempt_id: string; p_reason: string; p_source: string };

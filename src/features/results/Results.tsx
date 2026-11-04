@@ -15,6 +15,13 @@ import { ProctorEvents } from "./ProctorEvents";
 
 type Row = Database["public"]["Functions"]["test_results"]["Returns"][number];
 
+const INTEGRITY: Record<Row["integrity"], string> = {
+  clean: "No flags",
+  flagged: "Flagged, not judged",
+  reviewed_ok: "Judged fine",
+  reviewed_violation: "Judged a violation",
+};
+
 const STATUS: Record<Row["status"], string> = {
   in_progress: "Taking it now",
   submitted: "Submitted",
@@ -57,6 +64,7 @@ export function Results() {
         r.submitted_at ?? "",
         r.score === null ? "" : String(r.score),
         r.max_score === null ? "" : String(r.max_score),
+        INTEGRITY[r.integrity],
       ]);
     }
     const csv = lines.map((l) => l.map((v) => `"${v.replaceAll('"', '""')}"`).join(",")).join("\n");

@@ -23,6 +23,18 @@ export const routes: RouteObject[] = [
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "reset-password", element: <ResetPassword /> },
       {
+        path: "privacy",
+        lazy: async () => ({ Component: (await import("./pages/Privacy")).Privacy }),
+      },
+      {
+        path: "help/teachers",
+        lazy: async () => ({ Component: (await import("./pages/Help")).HelpTeachers }),
+      },
+      {
+        path: "help/students",
+        lazy: async () => ({ Component: (await import("./pages/Help")).HelpStudents }),
+      },
+      {
         element: <RequireAuth />,
         children: [
           { path: "app", element: <AppHome /> },
@@ -31,6 +43,10 @@ export const routes: RouteObject[] = [
             lazy: async () => ({
               Component: (await import("../features/classes/ClassPage")).ClassPage,
             }),
+          },
+          {
+            path: "app/my-data",
+            lazy: async () => ({ Component: (await import("../features/account/MyData")).MyData }),
           },
           {
             path: "app/identity",
@@ -92,6 +108,10 @@ export const routes: RouteObject[] = [
           {
             element: <RequireAdmin />,
             children: [
+              {
+                path: "app/admin/usage",
+                lazy: async () => ({ Component: (await import("../features/admin/Usage")).Usage }),
+              },
               {
                 path: "app/admin/teachers",
                 lazy: async () => ({

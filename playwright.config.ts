@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const desktop = /desktop\.spec\.ts/;
 const phone = /phone\.spec\.ts/;
-const stack = /(auth|teacher|attempt)\.spec\.ts/;
+const stack = /(auth|teacher|attempt|maintenance|a11y-app)\.spec\.ts/;
 const proctor = /proctor\.spec\.ts/;
 
 export default defineConfig({

@@ -30,9 +30,14 @@ export function AppHome() {
       <h1 className="text-2xl font-semibold">Hello, {firstName}</h1>
       {profile.role === "admin" && (
         <Card title="Admin">
-          <Link to="/app/admin/teachers" className="text-accent underline">
-            Teacher requests and teachers
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link to="/app/admin/teachers" className="text-accent underline">
+              Teacher requests and teachers
+            </Link>
+            <Link to="/app/admin/usage" className="text-accent underline">
+              Usage against the free plan
+            </Link>
+          </div>
         </Card>
       )}
       {teacher && <TeachingClasses />}
@@ -43,6 +48,11 @@ export function AppHome() {
         </p>
         <Link to="/app/identity" className="text-accent underline">
           Set up or replace your photo
+        </Link>
+      </Card>
+      <Card title="Your data">
+        <Link to="/app/my-data" className="text-accent underline">
+          Download your data, or delete your account
         </Link>
       </Card>
       {profile.role === "student" && <BecomeTeacher profile={profile} />}
