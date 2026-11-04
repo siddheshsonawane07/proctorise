@@ -1,5 +1,6 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
-import type { TablesInsert } from "../../lib/database.types";
+import type { Database, TablesInsert } from "../../lib/database.types";
 import type { Severity } from "./rules/engine";
 
 type Row = TablesInsert<"proctor_events">;
@@ -15,7 +16,10 @@ export class EventSink {
   private timer: ReturnType<typeof setInterval> | null = null;
   private sending = false;
 
-  constructor(private readonly intervalMs = 5_000) {}
+  constructor(
+    private readonly intervalMs = 5_000,
+    private readonly client: SupabaseClient<Database> = supabase,
+  ) {}
 
   start() {
     this.timer ??= setInterval(() => void this.flush(), this.intervalMs);
@@ -43,7 +47,7 @@ export class EventSink {
     try {
       if (this.rows.length) {
         const batch = this.rows.slice(0, 50);
-        const { error } = await supabase
+        const { error } = await this.client
           .from("proctor_events")
           .upsert(batch, { onConflict: "client_id", ignoreDuplicates: true });
         if (!error) this.rows = this.rows.slice(batch.length);
@@ -51,7 +55,7 @@ export class EventSink {
       // Updates only once every row they could refer to is stored.
       if (this.updates.length && this.rows.length === 0) {
         const batch = this.updates.slice(0, 100);
-        const { error } = await supabase.rpc("update_proctor_events", { p_updates: batch });
+        const { error } = await this.client.rpc("update_proctor_events", { p_updates: batch });
         if (!error) this.updates = this.updates.slice(batch.length);
       }
     } finally {

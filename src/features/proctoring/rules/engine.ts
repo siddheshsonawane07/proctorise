@@ -28,7 +28,14 @@ export type EventKind =
   | "camera_lost"
   | "copy_paste"
   | "context_menu"
-  | "shortcut";
+  | "shortcut"
+  | "phone_gone"
+  | "phone_hidden"
+  | "phone_moved"
+  | "phone_person"
+  | "phone_object"
+  | "phone_camera_lost"
+  | "phone_setup_unconfirmed";
 
 /** Conditions that last: the browser reports them turning on and off. */
 export type BrowserCondition =
@@ -109,7 +116,7 @@ const BROWSER: Record<BrowserCondition, { severity: Severity; minMs: number }> =
 };
 
 /** One lasting condition: when it began, whether its event is open, and when it was last seen. */
-class Condition {
+export class Condition {
   private since: number | null = null;
   private lastActive = 0;
   private openId: string | null = null;

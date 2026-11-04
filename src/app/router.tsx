@@ -103,7 +103,15 @@ export const routes: RouteObject[] = [
         children: [
           {
             path: "pair/:token",
-            lazy: async () => ({ Component: (await import("./routes/Pair")).Pair }),
+            lazy: async () => ({
+              Component: (await import("../features/pairing/PhonePage")).PhonePage,
+            }),
+          },
+          {
+            path: "pair",
+            lazy: async () => ({
+              Component: (await import("../features/pairing/PhonePage")).PhonePage,
+            }),
           },
         ],
       },

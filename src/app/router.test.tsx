@@ -130,8 +130,8 @@ describe("the desktop-only gate", () => {
 describe("the phone-only gate", () => {
   it("opens the phone page on a phone, with no account", async () => {
     mediaMatches.add(PHONE_QUERY);
-    renderAt("/pair/abc");
-    expect(await screen.findByRole("heading", { name: "Phone camera" })).toBeInTheDocument();
+    renderAt("/pair");
+    expect(await screen.findByRole("heading", { name: "Connect your phone" })).toBeInTheDocument();
   });
 
   it("asks a desktop to use a phone", async () => {

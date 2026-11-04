@@ -22,6 +22,14 @@ const LABEL: Record<string, string> = {
   copy_paste: "Tried to copy or paste",
   context_menu: "Right-clicked",
   shortcut: "Used a keyboard shortcut",
+  phone_gone: "Phone camera disconnected",
+  phone_hidden: "Phone page hidden (app switched or screen locked)",
+  phone_moved: "Phone camera moved",
+  phone_person: "Another person in the phone's view",
+  phone_object: "Phone or notes in the phone's view",
+  phone_camera_lost: "Phone camera stopped",
+  phone_replaced: "Phone replaced",
+  phone_setup_unconfirmed: "Phone view not confirmed at setup",
 };
 
 /** What the proctoring engine recorded on one attempt. The full review is phase 7's. */

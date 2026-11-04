@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test("the phone page opens on a phone", async ({ page }) => {
-  await page.goto("/pair/abc");
-  await expect(page.getByRole("heading", { name: "Phone camera" })).toBeVisible();
+  await page.goto("/pair");
+  await expect(page.getByRole("heading", { name: "Connect your phone" })).toBeVisible();
 });
 
 test("sign-in works on a phone", async ({ page }) => {

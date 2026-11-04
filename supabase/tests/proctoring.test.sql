@@ -78,7 +78,7 @@ select is((select severity::text from public.proctor_events where client_id = cu
 
 -- Snapshots.
 select set_config('t.path', public.reserve_evidence(current_setting('t.attempt')::uuid, 'camera', 'event'), true);
-select matches(current_setting('t.path'), '^' || current_setting('t.attempt') || '/[0-9a-f-]+\.jpg$',
+select matches(current_setting('t.path'), '^' || current_setting('t.attempt') || '/laptop-[0-9a-f-]+\.jpg$',
   'a reserved snapshot path sits under the attempt');
 select lives_ok($$ insert into storage.objects (bucket_id, name) values ('evidence', current_setting('t.path')) $$,
   'the student uploads into the reserved slot');

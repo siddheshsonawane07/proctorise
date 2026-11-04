@@ -16,7 +16,7 @@ create table public.proctor_events (
     'identity_mismatch', 'identity_passed', 'tab_hidden', 'window_blur', 'fullscreen_exit',
     'screen_share_stopped', 'second_display', 'camera_lost', 'copy_paste', 'context_menu',
     'shortcut', 'phone_gone', 'phone_hidden', 'phone_moved', 'phone_person', 'phone_object',
-    'phone_camera_lost', 'phone_replaced'
+    'phone_camera_lost', 'phone_replaced', 'phone_setup_unconfirmed'
   )),
   severity public.proctor_severity not null,
   started_at timestamptz not null,

@@ -282,6 +282,77 @@ export type Database = {
         };
         Relationships: [];
       };
+      device_pairings: {
+        Row: {
+          attempt_id: string | null;
+          claimed_at: string | null;
+          claimed_by: string | null;
+          code_hash: string;
+          created_at: string;
+          device_label: string | null;
+          expires_at: string;
+          id: string;
+          ready_at: string | null;
+          revoked_at: string | null;
+          student_id: string;
+          test_id: string;
+          token_hash: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempt_id?: string | null;
+          claimed_at?: string | null;
+          claimed_by?: string | null;
+          code_hash: string;
+          created_at?: string;
+          device_label?: string | null;
+          expires_at: string;
+          id?: string;
+          ready_at?: string | null;
+          revoked_at?: string | null;
+          student_id: string;
+          test_id: string;
+          token_hash: string;
+        };
+        Update: {
+          attempt_id?: string | null;
+          claimed_at?: string | null;
+          claimed_by?: string | null;
+          code_hash?: string;
+          created_at?: string;
+          device_label?: string | null;
+          expires_at?: string;
+          id?: string;
+          ready_at?: string | null;
+          revoked_at?: string | null;
+          student_id?: string;
+          test_id?: string;
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "device_pairings_attempt_id_fkey";
+            columns: ["attempt_id"];
+            isOneToOne: false;
+            referencedRelation: "attempts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "device_pairings_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "device_pairings_test_id_fkey";
+            columns: ["test_id"];
+            isOneToOne: false;
+            referencedRelation: "tests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       evidence: {
         Row: {
           attempt_id: string;
@@ -758,6 +829,7 @@ export type Database = {
       attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
       attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
       can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
+      can_use_pairing_channel: { Args: { p_topic: string }; Returns: boolean };
       check_question: {
         Args: {
           p_correct: Json;
@@ -774,6 +846,10 @@ export type Database = {
           p_type: Database["public"]["Enums"]["question_type"];
         };
         Returns: boolean;
+      };
+      claim_pairing: {
+        Args: { p_code?: string; p_device_label?: string; p_token: string };
+        Returns: Json;
       };
       class_roster: {
         Args: { p_class_id: string };
@@ -798,6 +874,7 @@ export type Database = {
       };
       confirm_adult: { Args: Record<PropertyKey, never>; Returns: undefined };
       create_class: { Args: { p_name: string }; Returns: string };
+      create_pairing: { Args: { p_test_id: string }; Returns: Json };
       draft_questions: {
         Args: { p_test_id: string };
         Returns: {
@@ -827,6 +904,7 @@ export type Database = {
         Returns: number;
       };
       grade_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
+      has_profile: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_approved_teacher: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_class_member: { Args: { p_class_id: string }; Returns: boolean };
@@ -837,10 +915,37 @@ export type Database = {
         Args: { p_attempt_id: string; p_item_id: string; p_points: number };
         Returns: undefined;
       };
+      mark_phone_ready: { Args: Record<PropertyKey, never>; Returns: undefined };
+      my_pairing: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          attempt_id: string | null;
+          claimed_at: string | null;
+          claimed_by: string | null;
+          code_hash: string;
+          created_at: string;
+          device_label: string | null;
+          expires_at: string;
+          id: string;
+          ready_at: string | null;
+          revoked_at: string | null;
+          student_id: string;
+          test_id: string;
+          token_hash: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "device_pairings";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       my_result: { Args: { p_attempt_id: string }; Returns: Json };
       new_join_code: { Args: Record<PropertyKey, never>; Returns: string };
       normalise_answer: { Args: { p_case_sensitive: boolean; p_text: string }; Returns: string };
       owns_open_attempt: { Args: { p_attempt_id: string }; Returns: boolean };
+      phone_owns_attempt: { Args: { p_attempt_id: string }; Returns: boolean };
+      phone_status: { Args: Record<PropertyKey, never>; Returns: Json };
       publish_test: { Args: { p_test_id: string }; Returns: undefined };
       record_attempt_consent: {
         Args: { p_attempt_id: string; p_version: string };

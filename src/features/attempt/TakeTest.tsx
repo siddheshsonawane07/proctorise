@@ -13,6 +13,7 @@ import { SystemCheck, type CheckedDevices } from "../proctoring/SystemCheck";
 import { IdentityGate, type IdentityResult } from "../proctoring/IdentityGate";
 import { ProctorSession, type SessionStatus } from "../proctoring/session";
 import { CONSENT_VERSION } from "../proctoring/identity";
+import { PhonePairing } from "../pairing/PhonePairing";
 import {
   recordConsent,
   saveAnswer,
@@ -99,7 +100,12 @@ export function TakeTest() {
 
       {needsChecks && willStart && (
         <>
-          <SystemCheck proctoring={settings} onChange={onDevices} handOver={handOver} />
+          <SystemCheck
+            testId={testId}
+            proctoring={settings}
+            onChange={onDevices}
+            handOver={handOver}
+          />
           <Card title="What is checked">
             <ul className="list-disc space-y-1 pl-5 text-sm text-text-muted">
               {settings.preset !== "light" && (
@@ -190,7 +196,9 @@ function TestScreen({
   // Measured at start and again after every save.
   const [offset, setOffset] = useState(() => Date.parse(payload.server_now) - Date.now());
   const remaining = Date.parse(payload.deadline_at) - (useClock(1000) + offset);
-  const proctoring = useProctorSession(payload, proctor, offset);
+  // Set below, once `finish` exists: a teacher's automatic rule may end the attempt (D7).
+  const autoSubmit = useRef<() => void>(() => {});
+  const proctoring = useProctorSession(payload, proctor, offset, () => autoSubmit.current());
 
   // One queue for the life of this attempt's screen.
   const [queue] = useState(
@@ -223,6 +231,10 @@ function TestScreen({
       onSuccess: () => navigate(`/app/results/${payload.attempt_id}`, { replace: true }),
     });
   }, [queue, stop, submit, payload.attempt_id, navigate]);
+
+  useEffect(() => {
+    autoSubmit.current = () => void finish();
+  }, [finish]);
 
   const timeUp = remaining <= 0;
   const finishedOnce = useRef(false);
@@ -288,6 +300,15 @@ function TestScreen({
         <p role="alert" className="rounded-md border border-warn p-3 text-sm">
           {status.warnings[0].text}
         </p>
+      )}
+      {status?.phone === "gone" && (
+        <section role="alert" className="space-y-3 rounded-md border border-warn p-4">
+          <p className="font-medium">
+            Your phone camera disconnected. Open the page on your phone again, or connect it anew.
+            Keep answering meanwhile.
+          </p>
+          <PhonePairing testId={payload.test_id} onReady={proctoring.switchPairing} />
+        </section>
       )}
       {status && !status.fullscreen && (
         <Cover
@@ -380,6 +401,11 @@ function TestScreen({
 function statusText(status: SessionStatus): string {
   return [
     status.camera ? "Camera on" : "Camera off",
+    status.phone === "connected"
+      ? "Phone connected"
+      : status.phone === "gone"
+        ? "Phone disconnected"
+        : null,
     status.screen === "shared"
       ? "Screen shared"
       : status.screen === "stopped"
@@ -403,6 +429,7 @@ function useProctorSession(
   payload: AttemptPayload,
   proctor: ProctorDevices | null,
   offset: number,
+  onAutoSubmit: () => void,
 ) {
   const [value, setValue] = useState<SessionStatus | null>(null);
   const [session] = useState(() =>
@@ -414,7 +441,9 @@ function useProctorSession(
           screen: proctor.screen,
           offsetMs: offset,
           reference: proctor.identity?.reference ?? null,
+          pairingId: proctor.pairingId,
           onStatus: setValue,
+          onAutoSubmit,
         })
       : null,
   );
@@ -441,9 +470,12 @@ function useProctorSession(
     if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
   }, [session]);
 
+  const switchPairing = useCallback((id: string) => session?.switchPairing(id), [session]);
+
   return {
     value,
     stop,
+    switchPairing,
     reshare: async () => {
       const s = await navigator.mediaDevices
         .getDisplayMedia({ video: { displaySurface: "monitor" } as MediaTrackConstraints })

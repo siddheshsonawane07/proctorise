@@ -13,12 +13,17 @@ import {
 import { embed, similarity, MATCH_THRESHOLD, type Embedding } from "./identity";
 import { STUDENT_MESSAGE } from "./messages";
 import type { Proctoring } from "../builder/proctoring";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import { supabase } from "../../lib/supabase";
+import { pairingChannel } from "../pairing/channel";
+import { PhonePresence } from "./rules/phone";
 
 export type SessionStatus = {
   engine: "loading" | "running" | "unavailable";
   camera: boolean;
   screen: "shared" | "stopped" | "not_required";
   fullscreen: boolean;
+  phone: "connected" | "gone" | "not_required";
   /** Open events the student should know about, newest first, in plain words. */
   warnings: { id: string; kind: EventKind; text: string }[];
 };
@@ -32,7 +37,11 @@ type Options = {
   /** Server time minus local time, in ms. */
   offsetMs: number;
   reference: Embedding | null;
+  /** The connected phone's pairing, when the test needs one. */
+  pairingId: string | null;
   onStatus: (status: SessionStatus) => void;
+  /** Called once if a rule the teacher turned on ends the attempt (D7: browser facts only). */
+  onAutoSubmit?: (reason: "phone_gone" | "screen_share_stopped") => void;
 };
 
 const IDENTITY_RECHECK_MS = 3 * 60_000;
@@ -52,6 +61,11 @@ export class ProctorSession {
   private readonly open = new Map<string, { kind: EventKind; severity: Severity }>();
   private status: SessionStatus;
   private stopped = false;
+  private readonly phonePresence = new PhonePresence();
+  private phoneChannel: RealtimeChannel | null = null;
+  private phonePresent = true;
+  private screenStoppedAt: number | null = null;
+  private autoSubmitted = false;
 
   constructor(private options: Options) {
     this.rules = new Rules(options.proctoring.preset);
@@ -67,6 +81,7 @@ export class ProctorSession {
       camera: !!options.camera,
       screen: options.screen ? "shared" : "not_required",
       fullscreen: !!document.fullscreenElement,
+      phone: options.pairingId ? "connected" : "not_required",
       warnings: [],
     };
   }
@@ -119,6 +134,10 @@ export class ProctorSession {
       }
     }
 
+    if (this.options.pairingId) this.watchPhone(this.options.pairingId);
+    const rulesTimer = setInterval(() => this.everySecond(), 1000);
+    this.cleanups.push(() => clearInterval(rulesTimer));
+
     if (proctoring.identity_check && this.options.reference) {
       const recheck = setInterval(() => void this.checkIdentity(), IDENTITY_RECHECK_MS);
       this.cleanups.push(() => clearInterval(recheck));
@@ -130,6 +149,8 @@ export class ProctorSession {
     if (this.stopped) return;
     this.stopped = true;
     this.apply(this.rules.end(this.now()));
+    this.apply(this.phonePresence.end(this.now()));
+    if (this.phoneChannel) void supabase.removeChannel(this.phoneChannel);
     this.detector.stop();
     for (const cleanup of this.cleanups) cleanup();
     for (const stream of [this.options.camera, this.options.screen]) {
@@ -147,6 +168,46 @@ export class ProctorSession {
       this.sink.add(this.row("identity_passed", "info", t, score));
     } else {
       this.apply(this.rules.instant("identity_mismatch", t, "high", { score, at: "start" }));
+    }
+  }
+
+  /** A new phone after the old one went: watch its channel instead. */
+  switchPairing(pairingId: string) {
+    if (this.phoneChannel) void supabase.removeChannel(this.phoneChannel);
+    this.watchPhone(pairingId);
+  }
+
+  private watchPhone(pairingId: string) {
+    this.phoneChannel = pairingChannel(supabase, pairingId, "laptop", {
+      onPresence: (present) => {
+        this.phonePresent = present;
+        this.apply(this.phonePresence.update(present, this.now()));
+        this.setStatus({ phone: present ? "connected" : "gone" });
+      },
+    });
+  }
+
+  /** Durations the rules need without a new signal: the phone being gone, screen sharing off. */
+  private everySecond() {
+    const t = this.now();
+    if (this.options.pairingId || this.phoneChannel) {
+      this.apply(this.phonePresence.update(this.phonePresent, t));
+    }
+    const p = this.options.proctoring;
+    if (this.autoSubmitted || !this.options.onAutoSubmit) return;
+    if (
+      p.auto_submit_phone_gone_min !== null &&
+      this.phonePresence.goneForMs(t) >= p.auto_submit_phone_gone_min * 60_000
+    ) {
+      this.autoSubmitted = true;
+      this.options.onAutoSubmit("phone_gone");
+    } else if (
+      p.auto_submit_screen_share_s !== null &&
+      this.screenStoppedAt !== null &&
+      t - this.screenStoppedAt >= p.auto_submit_screen_share_s * 1000
+    ) {
+      this.autoSubmitted = true;
+      this.options.onAutoSubmit("screen_share_stopped");
     }
   }
 
@@ -185,6 +246,7 @@ export class ProctorSession {
     if (kind === "camera_lost") this.setStatus({ camera: !on });
     if (kind === "screen_share_stopped" && this.options.screen) {
       this.setStatus({ screen: on ? "stopped" : "shared" });
+      this.screenStoppedAt = on ? (this.screenStoppedAt ?? this.now()) : null;
     }
     this.apply(this.rules.browser(kind, on, this.now()));
   }

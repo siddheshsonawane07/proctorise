@@ -9,10 +9,16 @@ import { useCamera } from "./useCamera";
 import { Preview } from "./Preview";
 import { useEnrolment } from "./enrolmentApi";
 import { preloadIdentity } from "./identity";
+import { PhonePairing } from "../pairing/PhonePairing";
 
 type Check = { label: string; state: "pass" | "warn" | "block" | "wait"; text: string };
 
-export type CheckedDevices = { camera: MediaStream | null; screen: MediaStream | null };
+export type CheckedDevices = {
+  camera: MediaStream | null;
+  screen: MediaStream | null;
+  /** The connected phone's pairing, when the test needs one. */
+  pairingId: string | null;
+};
 
 const MARK: Record<Check["state"], string> = { pass: "OK", warn: "Note", block: "Fix", wait: "…" };
 
@@ -27,10 +33,12 @@ function isChromium(): boolean {
  * in plain words. Calls onChange with the camera (and screen) once nothing blocks.
  */
 export function SystemCheck({
+  testId,
   proctoring,
   onChange,
   handOver,
 }: {
+  testId: string;
   proctoring: Proctoring;
   onChange: (devices: CheckedDevices | null) => void;
   /** True once the test has taken the streams: leaving the lobby then must not stop them. */
@@ -44,6 +52,7 @@ export function SystemCheck({
   const [faces, setFaces] = useState<number | null>(null);
   const [engine, setEngine] = useState<"loading" | "ok" | "slow" | "failed">("loading");
   const [oneScreen, setOneScreen] = useState(false);
+  const [pairingId, setPairingId] = useState<string | null>(null);
   const videoBox = useRef<HTMLDivElement>(null);
   const screenRef = useRef<MediaStream | null>(null);
   const handedOver = useRef(false);
@@ -214,6 +223,13 @@ export function SystemCheck({
           },
     );
   }
+  if (proctoring.phone_required) {
+    checks.push(
+      pairingId
+        ? { label: "Phone camera", state: "pass", text: "Connected and set up" }
+        : { label: "Phone camera", state: "block", text: "Connect your phone below." },
+    );
+  }
   if (proctoring.identity_check) {
     checks.push(
       enrolment.data
@@ -230,8 +246,8 @@ export function SystemCheck({
     checks.every((c) => c.state === "pass" || c.state === "warn") &&
     (!needsCamera(proctoring) || cameraOn !== null);
   useEffect(() => {
-    onChange(ready ? { camera: cameraOn, screen } : null);
-  }, [ready, cameraOn, screen, onChange]);
+    onChange(ready ? { camera: cameraOn, screen, pairingId } : null);
+  }, [ready, cameraOn, screen, pairingId, onChange]);
 
   return (
     <Card title="Checking your computer">
@@ -285,6 +301,12 @@ export function SystemCheck({
         <Button variant="plain" onClick={() => void shareScreen()}>
           Share my screen
         </Button>
+      )}
+      {proctoring.phone_required && (
+        <div className="border-t border-border pt-4">
+          <h3 className="mb-2 font-medium">Your phone as a side camera</h3>
+          <PhonePairing testId={testId} onReady={setPairingId} />
+        </div>
       )}
       {proctoring.identity_check && !enrolment.isPending && !enrolment.data && (
         <Link to="/app/identity" className="text-accent underline">

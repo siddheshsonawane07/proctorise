@@ -1,4 +1,6 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
+import type { Database } from "../../lib/database.types";
 
 /** A still from a video: 480 px wide JPEG, about 20–30 KB (ARCHITECTURE § 7). */
 export async function grabFrame(video: HTMLVideoElement): Promise<Blob | null> {
@@ -20,17 +22,18 @@ export async function uploadSnapshot(
   attemptId: string,
   video: HTMLVideoElement,
   source: "camera" | "screen",
-  reason: "thumbnail" | "event",
+  reason: "thumbnail" | "event" | "setup",
+  client: SupabaseClient<Database> = supabase,
 ): Promise<string | null> {
   const blob = await grabFrame(video);
   if (!blob) return null;
-  const { data: path, error } = await supabase.rpc("reserve_evidence", {
+  const { data: path, error } = await client.rpc("reserve_evidence", {
     p_attempt_id: attemptId,
     p_source: source,
     p_reason: reason,
   });
   if (error || !path) return null;
-  const upload = await supabase.storage
+  const upload = await client.storage
     .from("evidence")
     .upload(path, blob, { contentType: "image/jpeg", upsert: false });
   return upload.error ? null : path;
