@@ -22,7 +22,8 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > src/lib/database.types.ts && prettier --write src/lib/database.types.ts",
     "predev": "node scripts/copy-vendor-assets.mjs",
-    "prebuild": "node scripts/copy-vendor-assets.mjs"
+    "prebuild": "node scripts/copy-vendor-assets.mjs",
+    "db:reset": "supabase db reset"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.2.2",

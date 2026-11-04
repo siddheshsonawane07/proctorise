@@ -50,8 +50,8 @@ export function MyData() {
         {profile?.deletion_requested_at ? (
           <>
             <p>
-              Your account will be deleted within a day: your photo, your pictures, your attempts
-              and your sign-in.
+              Your account will be deleted within a day: your photo, your pictures and your sign-in.
+              Your teachers keep your scores, without your name.
             </p>
             <Button variant="plain" onClick={() => cancel.mutate()} disabled={cancel.isPending}>
               Keep my account
@@ -60,8 +60,8 @@ export function MyData() {
         ) : (
           <>
             <p className="text-text-muted">
-              This deletes your photo, every picture from your tests, your attempts and scores, and
-              your sign-in, within a day. Your teachers lose your results.
+              This deletes your photo, every picture from your tests, your profile and your sign-in,
+              within a day. Your teachers keep your scores and answers, shown as "Deleted student".
             </p>
             <Field
               label="Type DELETE to confirm"

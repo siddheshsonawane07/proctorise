@@ -76,7 +76,8 @@ export function Privacy() {
           <Link to="/app/my-data" className="text-accent underline">
             Your data
           </Link>
-          . Deleting removes your photo, your pictures, your attempts and your account within a day.
+          . Deleting removes your photo, your pictures, your profile and your sign-in within a day;
+          your teachers keep your scores and answers without your name.
         </li>
         <li>Proctorise is for people aged 18 or older.</li>
       </Section>
