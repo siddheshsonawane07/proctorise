@@ -76,6 +76,8 @@ export type Database = {
       attempts: {
         Row: {
           attempt_no: number;
+          consent_version: string | null;
+          consented_at: string | null;
           deadline_at: string;
           id: string;
           integrity: Database["public"]["Enums"]["integrity_status"];
@@ -93,6 +95,8 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           attempt_no: number;
+          consent_version?: string | null;
+          consented_at?: string | null;
           deadline_at: string;
           id?: string;
           integrity?: Database["public"]["Enums"]["integrity_status"];
@@ -109,6 +113,8 @@ export type Database = {
         };
         Update: {
           attempt_no?: number;
+          consent_version?: string | null;
+          consented_at?: string | null;
           deadline_at?: string;
           id?: string;
           integrity?: Database["public"]["Enums"]["integrity_status"];
@@ -276,6 +282,78 @@ export type Database = {
         };
         Relationships: [];
       };
+      evidence: {
+        Row: {
+          attempt_id: string;
+          created_at: string;
+          device: Database["public"]["Enums"]["proctor_device"];
+          path: string;
+          reason: string;
+          source: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempt_id: string;
+          created_at?: string;
+          device: Database["public"]["Enums"]["proctor_device"];
+          path: string;
+          reason: string;
+          source: string;
+        };
+        Update: {
+          attempt_id?: string;
+          created_at?: string;
+          device?: Database["public"]["Enums"]["proctor_device"];
+          path?: string;
+          reason?: string;
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "evidence_attempt_id_fkey";
+            columns: ["attempt_id"];
+            isOneToOne: false;
+            referencedRelation: "attempts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      identity_enrolments: {
+        Row: {
+          consent_version: string;
+          consented_at: string;
+          liveness_passed_at: string | null;
+          photo_path: string;
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          consent_version: string;
+          consented_at?: string;
+          liveness_passed_at?: string | null;
+          photo_path: string;
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          consent_version?: string;
+          consented_at?: string;
+          liveness_passed_at?: string | null;
+          photo_path?: string;
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "identity_enrolments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       join_failures: {
         Row: {
           at: string;
@@ -291,6 +369,60 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      proctor_events: {
+        Row: {
+          attempt_id: string;
+          client_id: string;
+          confidence: number | null;
+          created_at: string;
+          details: NonNullable<Json>;
+          device: Database["public"]["Enums"]["proctor_device"];
+          ended_at: string | null;
+          id: number;
+          kind: string;
+          severity: Database["public"]["Enums"]["proctor_severity"];
+          snapshot_path: string | null;
+          started_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempt_id: string;
+          client_id: string;
+          confidence?: number | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          device: Database["public"]["Enums"]["proctor_device"];
+          ended_at?: string | null;
+          id?: never;
+          kind: string;
+          severity: Database["public"]["Enums"]["proctor_severity"];
+          snapshot_path?: string | null;
+          started_at: string;
+        };
+        Update: {
+          attempt_id?: string;
+          client_id?: string;
+          confidence?: number | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          device?: Database["public"]["Enums"]["proctor_device"];
+          ended_at?: string | null;
+          id?: never;
+          kind?: string;
+          severity?: Database["public"]["Enums"]["proctor_severity"];
+          snapshot_path?: string | null;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "proctor_events_attempt_id_fkey";
+            columns: ["attempt_id"];
+            isOneToOne: false;
+            referencedRelation: "attempts";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       profiles: {
         Row: {
@@ -622,6 +754,7 @@ export type Database = {
         Args: { p_status: Database["public"]["Enums"]["teacher_status"]; p_user_id: string };
         Returns: undefined;
       };
+      attempt_class: { Args: { p_attempt_id: string }; Returns: string };
       attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
       attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
       can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
@@ -646,6 +779,7 @@ export type Database = {
         Args: { p_class_id: string };
         Returns: {
           email: string;
+          enrolled_at: string;
           full_name: string;
           joined_at: string;
           status: Database["public"]["Enums"]["member_status"];
@@ -677,6 +811,7 @@ export type Database = {
           type: Database["public"]["Enums"]["question_type"];
         }[];
       };
+      evidence_slot_open: { Args: { p_path: string }; Returns: boolean };
       finalize_expired_attempts: { Args: Record<PropertyKey, never>; Returns: number };
       finish_attempt: {
         Args: { p_attempt_id: string; p_status: Database["public"]["Enums"]["attempt_status"] };
@@ -705,10 +840,19 @@ export type Database = {
       my_result: { Args: { p_attempt_id: string }; Returns: Json };
       new_join_code: { Args: Record<PropertyKey, never>; Returns: string };
       normalise_answer: { Args: { p_case_sensitive: boolean; p_text: string }; Returns: string };
+      owns_open_attempt: { Args: { p_attempt_id: string }; Returns: boolean };
       publish_test: { Args: { p_test_id: string }; Returns: undefined };
+      record_attempt_consent: {
+        Args: { p_attempt_id: string; p_version: string };
+        Returns: undefined;
+      };
       release_results: { Args: { p_test_id: string }; Returns: undefined };
       remove_co_teacher: { Args: { p_class_id: string; p_teacher_id: string }; Returns: undefined };
       request_teacher: { Args: { p_institution: string; p_note: string }; Returns: undefined };
+      reserve_evidence: {
+        Args: { p_attempt_id: string; p_reason: string; p_source: string };
+        Returns: string;
+      };
       results_visible: {
         Args: {
           p_attempt: Omit<
@@ -726,6 +870,10 @@ export type Database = {
       save_answer: {
         Args: { p_attempt_id: string; p_item_id: string; p_response: Json };
         Returns: string;
+      };
+      save_enrolment: {
+        Args: { p_consent_version: string; p_liveness_passed: boolean };
+        Returns: undefined;
       };
       save_question: {
         Args: {
@@ -763,6 +911,7 @@ export type Database = {
       };
       start_attempt: { Args: { p_session: string; p_test_id: string }; Returns: Json };
       submit_attempt: { Args: { p_attempt_id: string }; Returns: undefined };
+      teaches_student: { Args: { p_student_id: string }; Returns: boolean };
       test_class: { Args: { p_test_id: string }; Returns: string };
       test_results: {
         Args: { p_test_id: string };
@@ -782,6 +931,7 @@ export type Database = {
         }[];
       };
       unpublish_test: { Args: { p_test_id: string }; Returns: undefined };
+      update_proctor_events: { Args: { p_updates: Json }; Returns: undefined };
       valid_proctoring: { Args: { p: Json }; Returns: boolean };
       write_audit: {
         Args: { p_action: string; p_details?: Json; p_target_id: string; p_target_type: string };
@@ -793,6 +943,8 @@ export type Database = {
       class_teacher_kind: "owner" | "co_teacher";
       integrity_status: "clean" | "flagged" | "reviewed_ok" | "reviewed_violation";
       member_status: "active" | "removed";
+      proctor_device: "laptop" | "phone";
+      proctor_severity: "info" | "warn" | "high";
       question_type: "single" | "multiple" | "true_false" | "short_text" | "numeric";
       results_release: "immediate" | "manual" | "after_close";
       teacher_status: "none" | "requested" | "approved" | "rejected" | "suspended";
@@ -916,6 +1068,8 @@ export const Constants = {
       class_teacher_kind: ["owner", "co_teacher"],
       integrity_status: ["clean", "flagged", "reviewed_ok", "reviewed_violation"],
       member_status: ["active", "removed"],
+      proctor_device: ["laptop", "phone"],
+      proctor_severity: ["info", "warn", "high"],
       question_type: ["single", "multiple", "true_false", "short_text", "numeric"],
       results_release: ["immediate", "manual", "after_close"],
       teacher_status: ["none", "requested", "approved", "rejected", "suspended"],

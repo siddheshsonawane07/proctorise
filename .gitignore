@@ -34,3 +34,6 @@ test-results
 
 # Written by gitleaks in CI
 results.sarif
+
+# Copied from node_modules by scripts/copy-vendor-assets.mjs
+public/vendor
