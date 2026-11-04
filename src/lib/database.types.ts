@@ -88,7 +88,7 @@ export type Database = {
           score: number | null;
           started_at: string;
           status: Database["public"]["Enums"]["attempt_status"];
-          student_id: string;
+          student_id: string | null;
           submitted_at: string | null;
           test_id: string;
         };
@@ -107,7 +107,7 @@ export type Database = {
           score?: number | null;
           started_at?: string;
           status?: Database["public"]["Enums"]["attempt_status"];
-          student_id: string;
+          student_id?: string | null;
           submitted_at?: string | null;
           test_id: string;
         };
@@ -125,7 +125,7 @@ export type Database = {
           score?: number | null;
           started_at?: string;
           status?: Database["public"]["Enums"]["attempt_status"];
-          student_id?: string;
+          student_id?: string | null;
           submitted_at?: string | null;
           test_id?: string;
         };
