@@ -39,7 +39,9 @@ function human(): Promise<Human> {
       segmentation: { enabled: false },
     });
     await instance.load();
-    await instance.warmup();
+    // No instance.warmup(): it fetches a data: URL, which the CSP's connect-src refuses, and then
+    // never resolves, so every identity check would hang in production. The first detection
+    // compiles the shaders instead (found 2026-11-04 under wrangler with the real _headers).
     return instance;
   });
   return loading;

@@ -12,14 +12,18 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: "http://localhost:4173",
+    // E2E_BASE_URL runs the suite against another server (e.g. wrangler pages dev, with the real
+    // _headers); without it, Playwright starts vite preview.
+    baseURL: process.env.E2E_BASE_URL ?? "http://localhost:4173",
     trace: "on-first-retry",
   },
-  webServer: {
-    command: "npm run preview",
-    url: "http://localhost:4173",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.E2E_BASE_URL
+    ? undefined
+    : {
+        command: "npm run preview",
+        url: "http://localhost:4173",
+        reuseExistingServer: !process.env.CI,
+      },
   projects: [
     { name: "chromium", testMatch: desktop, use: { ...devices["Desktop Chrome"] } },
     // Needs the local Supabase stack; skipped without it (see e2e/support/supabase.ts).
