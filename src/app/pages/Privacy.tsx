@@ -9,7 +9,7 @@ export function Privacy() {
   return (
     <article className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-3xl font-semibold">Privacy</h1>
-      <p className="text-text-muted">Last changed 4 November 2026.</p>
+      <p className="text-text-muted">Last changed 6 November 2026.</p>
 
       <Section title="What is captured during a proctored test">
         <li>
@@ -44,6 +44,13 @@ export function Privacy() {
           see when they do, and it is not recorded.
         </li>
         <li>Not what you type outside the test, or anything else on your computer.</li>
+        <li>
+          Nothing from the{" "}
+          <Link to="/demo" className="text-accent underline">
+            demo
+          </Link>
+          : its checks run in your browser, and no picture, sound or event leaves it.
+        </li>
       </Section>
 
       <Section title="Your photo">

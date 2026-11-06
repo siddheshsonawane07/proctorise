@@ -34,6 +34,16 @@ export const routes: RouteObject[] = [
         path: "help/students",
         lazy: async () => ({ Component: (await import("./pages/Help")).HelpStudents }),
       },
+      // The real checks on a visitor's own camera, sending nothing; desktop like a test.
+      {
+        element: <DesktopOnly />,
+        children: [
+          {
+            path: "demo",
+            lazy: async () => ({ Component: (await import("../features/demo/Demo")).Demo }),
+          },
+        ],
+      },
       {
         element: <RequireAuth />,
         children: [

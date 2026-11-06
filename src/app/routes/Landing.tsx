@@ -182,8 +182,8 @@ export function Landing() {
               Create an account
               <RiArrowRightLine aria-hidden className="ml-1 size-[18px]" />
             </Link>
-            <Link to="/help/teachers" className={buttonClass("plain", "h-11 px-5")}>
-              How it works for teachers
+            <Link to="/demo" className={buttonClass("plain", "h-11 px-5")}>
+              Try it on your camera
             </Link>
           </div>
         </div>
@@ -196,7 +196,11 @@ export function Landing() {
         </h2>
         <p className="mt-3 max-w-2xl text-body-regular text-text-muted">
           Each check notices one thing and keeps a picture of it. None of them fails a test on its
-          own: a teacher looks at every flag and decides.
+          own: a teacher looks at every flag and decides.{" "}
+          <Link to="/demo" className="text-accent underline">
+            Try them on your own camera
+          </Link>
+          ; nothing is sent or saved.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CHECKS.map((c) => (
