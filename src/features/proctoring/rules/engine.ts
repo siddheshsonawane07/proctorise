@@ -85,7 +85,9 @@ const STANDARD: Thresholds = {
   lookingAwayWindowMs: 30_000,
   yawDeg: 35,
   pitchDeg: 25,
-  objectScore: 0.6,
+  // 0.6 missed held phones on webcam-soft frames; 0.5 lost none to false alarms in the
+  // measurement (Research: Phone Detection 2026-11-06). The two-of-three vote still applies.
+  objectScore: 0.5,
   speechMs: 3_000,
 };
 
@@ -98,7 +100,7 @@ export const PRESET_THRESHOLDS: Record<Preset, Thresholds> = {
     faceMissingHighMs: 15_000,
     multipleFacesMs: 1_000,
     lookingAwayMs: 5_000,
-    objectScore: 0.5,
+    objectScore: 0.4,
     speechMs: 2_000,
   },
 };

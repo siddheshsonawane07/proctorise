@@ -5,6 +5,7 @@ import { Preview } from "../proctoring/Preview";
 import { useCamera } from "../proctoring/useCamera";
 import { EVENT_LABEL } from "../proctoring/labels";
 import { STUDENT_MESSAGE } from "../proctoring/messages";
+import { voice } from "../proctoring/voice";
 import { PRESET_THRESHOLDS, type EventKind } from "../proctoring/rules/engine";
 import { QuestionView, type ViewItem } from "../questions/QuestionView";
 import type { Json } from "../../lib/database.types";
@@ -36,7 +37,7 @@ const TRY: { kinds: EventKind[]; text: string }[] = [
     text: `Step out of view, or cover the camera, for ${LIMITS.faceMissingMs / 1000} seconds.`,
   },
   { kinds: ["multiple_faces"], text: "Ask someone to lean into view." },
-  { kinds: ["object_phone"], text: "Hold a phone up to the camera." },
+  { kinds: ["object_phone"], text: "Hold a phone up to the camera, screen or back first." },
   { kinds: ["object_book"], text: "Hold up a book." },
   { kinds: ["speech"], text: "Talk for a few seconds." },
   {
@@ -55,12 +56,20 @@ export function Demo() {
   const camera = useCamera(true);
   const [state, setState] = useState<DemoState | null>(null);
   const [answer, setAnswer] = useState<Json | undefined>(undefined);
+  const [speak, setSpeak] = useState(true);
+  const speakRef = useRef(speak);
   const session = useRef<DemoSession | null>(null);
   const stream = camera.state.status === "on" ? camera.state.stream : null;
 
   useEffect(() => {
+    speakRef.current = speak;
+    if (session.current) session.current.speak = speak;
+  }, [speak]);
+
+  useEffect(() => {
     if (!stream) return;
     const s = new DemoSession(stream, setState);
+    s.speak = speakRef.current;
     session.current = s;
     void s.start();
     return () => {
@@ -88,7 +97,14 @@ export function Demo() {
           {camera.state.status === "refused" && (
             <Message kind="error">{camera.state.message}</Message>
           )}
-          <Button disabled={camera.state.status === "asking"} onClick={() => void camera.ask()}>
+          <Button
+            disabled={camera.state.status === "asking"}
+            onClick={() => {
+              // Browsers play sound only after a click; this is that click.
+              voice.unlock();
+              void camera.ask();
+            }}
+          >
             {camera.state.status === "asking"
               ? "Waiting for permission…"
               : "Turn on camera and microphone"}
@@ -98,6 +114,8 @@ export function Demo() {
         <Running
           stream={stream}
           state={state}
+          speak={speak}
+          onSpeak={setSpeak}
           answer={answer}
           onAnswer={setAnswer}
           onClear={() => session.current?.clear()}
@@ -123,12 +141,16 @@ export function Demo() {
 function Running({
   stream,
   state,
+  speak,
+  onSpeak,
   answer,
   onAnswer,
   onClear,
 }: {
   stream: MediaStream;
   state: DemoState | null;
+  speak: boolean;
+  onSpeak: (on: boolean) => void;
   answer: Json | undefined;
   onAnswer: (value: Json) => void;
   onClear: () => void;
@@ -145,9 +167,15 @@ function Running({
 
   return (
     <div className="space-y-4">
-      <p role="status" className="text-body-medium text-text-muted">
-        Camera on · {engine}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p role="status" className="text-body-medium text-text-muted">
+          Camera on · {engine}
+        </p>
+        <label className="flex items-center gap-2 text-body-regular text-text">
+          <input type="checkbox" checked={speak} onChange={(e) => onSpeak(e.target.checked)} />
+          Read warnings aloud
+        </label>
+      </div>
       {warning && (
         <p
           role="alert"

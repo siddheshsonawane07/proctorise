@@ -18,6 +18,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
 import { pairingChannel } from "../pairing/channel";
 import { PhonePresence } from "./rules/phone";
+import { readObjects } from "./objects";
 
 export type SessionStatus = {
   engine: "loading" | "running" | "unavailable";
@@ -264,11 +265,7 @@ export class ProctorSession {
       pitch: result.pitch,
     });
     if (result.objects) {
-      const best = (label: string) =>
-        Math.max(0, ...result.objects!.filter((o) => o.label === label).map((o) => o.score));
-      actions.push(
-        ...this.rules.objects({ t: result.t, phone: best("cell phone"), book: best("book") }),
-      );
+      actions.push(...this.rules.objects({ t: result.t, ...readObjects(result.objects) }));
     }
     this.apply(actions);
   }

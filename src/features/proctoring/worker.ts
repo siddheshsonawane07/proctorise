@@ -11,6 +11,7 @@ import {
   type FaceLandmarkerResult,
 } from "@mediapipe/tasks-vision";
 import { headPose } from "./pose";
+import { DETECTED_LABELS } from "./objects";
 
 export type InitMessage = {
   type: "init";
@@ -76,7 +77,7 @@ async function init(message: InitMessage) {
       runningMode: "VIDEO",
       scoreThreshold: 0.3,
       maxResults: 5,
-      categoryAllowlist: ["cell phone", "book", "person", "laptop", "keyboard"],
+      categoryAllowlist: DETECTED_LABELS,
     });
   };
   try {

@@ -10,6 +10,7 @@ import { uploadSnapshot } from "../proctoring/evidence";
 import { PhoneRules } from "../proctoring/rules/phone";
 import type { Action } from "../proctoring/rules/engine";
 import { signature, similarityOf } from "../proctoring/signature";
+import { readObjects } from "../proctoring/objects";
 import { pairingChannel, send } from "./channel";
 
 type Stage =
@@ -276,8 +277,6 @@ function Camera({
         const objects = r.objects ?? [];
         const count = (label: string, min: number) =>
           objects.filter((o) => o.label === label && o.score >= min).length;
-        const best = (label: string) =>
-          Math.max(0, ...objects.filter((o) => o.label === label).map((o) => o.score));
         if (stageRef.current === "setup") {
           const person = count("person", 0.5) >= 1;
           const desk = count("laptop", 0.4) + count("keyboard", 0.4) >= 1;
@@ -295,8 +294,7 @@ function Camera({
             rules.objects({
               t: r.t,
               persons: count("person", 0.5),
-              phone: best("cell phone"),
-              book: best("book"),
+              ...readObjects(objects),
             }),
           );
           if (reference && video.current) {

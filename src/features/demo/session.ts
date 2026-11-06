@@ -2,6 +2,9 @@ import { Detector, type Detection } from "../proctoring/detector";
 import { watchIntegrity } from "../proctoring/integrity";
 import { watchSpeech } from "../proctoring/speech";
 import { Rules, type Action, type EventKind } from "../proctoring/rules/engine";
+import { readObjects } from "../proctoring/objects";
+import { STUDENT_MESSAGE } from "../proctoring/messages";
+import { voice } from "../proctoring/voice";
 import { applyActions, type DemoEvent } from "./events";
 
 /** What the checks see right now; null until the first reading. */
@@ -40,6 +43,8 @@ export class DemoSession {
   });
   private readonly cleanups: (() => void)[] = [];
   private stopped = false;
+  /** Read warnings aloud, as a test does unless the teacher turned it off. */
+  speak = true;
   private state: DemoState = {
     engine: "loading",
     signals: { faces: null, yaw: null, pitch: null, phone: null, book: null, speaking: false },
@@ -67,12 +72,14 @@ export class DemoSession {
     );
     if (this.stream.getAudioTracks().length) {
       this.cleanups.push(
-        watchSpeech(this.stream, (speaking) =>
+        // While the laptop reads a warning, its own voice is not the visitor talking.
+        watchSpeech(this.stream, (heard) => {
+          const speaking = heard && !voice.isTalking();
           this.set(
             { signals: { ...this.state.signals, speaking } },
             this.rules.speech({ t: Date.now(), speaking }),
-          ),
-        ),
+          );
+        }),
       );
     }
     try {
@@ -88,6 +95,7 @@ export class DemoSession {
     if (this.stopped) return;
     this.stopped = true;
     this.detector.stop();
+    voice.stop();
     for (const cleanup of this.cleanups) cleanup();
     this.video.srcObject = null;
   }
@@ -97,7 +105,6 @@ export class DemoSession {
     this.set({ events: [] });
   }
 
-  // The same reading of a detection as ProctorSession.onDetection.
   private onDetection(result: Detection) {
     const actions = this.rules.face({
       t: result.t,
@@ -107,10 +114,7 @@ export class DemoSession {
     });
     let { phone, book } = this.state.signals;
     if (result.objects) {
-      const best = (label: string) =>
-        Math.max(0, ...result.objects!.filter((o) => o.label === label).map((o) => o.score));
-      phone = best("cell phone");
-      book = best("book");
+      ({ phone, book } = readObjects(result.objects));
       actions.push(...this.rules.objects({ t: result.t, phone, book }));
     }
     const { faces, yaw, pitch } = result;
@@ -122,8 +126,12 @@ export class DemoSession {
     const next = { ...this.state, ...patch };
     if (actions.length) {
       next.events = applyActions(next.events, actions);
-      const opened = actions.flatMap((a) => (a.type === "open" ? [a.kind] : []));
-      next.seen = [...new Set([...next.seen, ...opened])];
+      const opened = actions.flatMap((a) => (a.type === "open" ? [a] : []));
+      next.seen = [...new Set([...next.seen, ...opened.map((a) => a.kind)])];
+      for (const a of opened) {
+        const text = STUDENT_MESSAGE[a.kind];
+        if (this.speak && text && a.severity !== "info") voice.warn(a.kind, text);
+      }
     }
     this.state = next;
     this.onChange(next);

@@ -6,7 +6,8 @@ import { Condition, type Action } from "./engine";
 
 export const PHONE = {
   personMs: 2_000,
-  objectScore: 0.6,
+  /** The laptop's standard limit (engine.ts). */
+  objectScore: 0.5,
   /** Below this correlation with the setup view, the phone is pointing somewhere else. */
   movedBelow: 0.6,
   movedMs: 10_000,
