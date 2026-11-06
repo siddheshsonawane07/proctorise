@@ -879,6 +879,7 @@ export type Database = {
       attempt_class: { Args: { p_attempt_id: string }; Returns: string };
       attempt_detail: { Args: { p_attempt_id: string }; Returns: Json };
       attempt_payload: { Args: { p_attempt_id: string }; Returns: Json };
+      call_maintenance: { Args: Record<PropertyKey, never>; Returns: number };
       can_edit_test: { Args: { p_test_id: string }; Returns: boolean };
       can_read_topic: { Args: { p_topic: string }; Returns: boolean };
       can_use_pairing_channel: { Args: { p_topic: string }; Returns: boolean };
@@ -1026,6 +1027,7 @@ export type Database = {
           warn_count: number;
         }[];
       };
+      maintenance_token: { Args: Record<PropertyKey, never>; Returns: string };
       mark_answer: {
         Args: { p_attempt_id: string; p_item_id: string; p_points: number };
         Returns: undefined;
