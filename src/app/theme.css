@@ -1,12 +1,69 @@
-@import "tailwindcss";
+/* BoardUI's theme, typography and globals (Tailwind is imported there), then ours on top. */
+@import "@fontsource-variable/inter/index.css";
+@import "../styles/globals.css";
 
 /*
- * Design tokens. Neutral greys with one teal accent; never purple or violet (CLAUDE.md rule 9).
+ * BoardUI's accent ramp is teal, our one accent. Purple and violet are mapped to cyan and indigo to blue, so
+ * no BoardUI token can show either (CLAUDE.md rule 9).
+ */
+@theme {
+  --color-accent-50: var(--color-teal-50);
+  --color-accent-100: var(--color-teal-100);
+  --color-accent-200: var(--color-teal-200);
+  --color-accent-300: var(--color-teal-300);
+  --color-accent-400: var(--color-teal-400);
+  --color-accent-500: var(--color-teal-600);
+  --color-accent-600: var(--color-teal-700);
+  --color-accent-700: var(--color-teal-800);
+  --color-accent-800: var(--color-teal-800);
+  --color-accent-900: var(--color-teal-900);
+  --color-accent-950: var(--color-teal-950);
+
+  --color-purple-50: oklch(98.4% 0.019 200.873);
+  --color-purple-100: oklch(95.6% 0.045 203.388);
+  --color-purple-200: oklch(91.7% 0.08 205.041);
+  --color-purple-300: oklch(86.5% 0.127 207.078);
+  --color-purple-400: oklch(78.9% 0.154 211.53);
+  --color-purple-500: oklch(71.5% 0.143 215.221);
+  --color-purple-600: oklch(60.9% 0.126 221.723);
+  --color-purple-700: oklch(52% 0.105 223.128);
+  --color-purple-800: oklch(45% 0.085 224.283);
+  --color-purple-900: oklch(39.8% 0.07 227.392);
+  --color-purple-950: oklch(30.2% 0.056 229.695);
+  --color-violet-50: var(--color-purple-50);
+  --color-violet-100: var(--color-purple-100);
+  --color-violet-200: var(--color-purple-200);
+  --color-violet-300: var(--color-purple-300);
+  --color-violet-400: var(--color-purple-400);
+  --color-violet-500: var(--color-purple-500);
+  --color-violet-600: var(--color-purple-600);
+  --color-violet-700: var(--color-purple-700);
+  --color-violet-800: var(--color-purple-800);
+  --color-violet-900: var(--color-purple-900);
+  --color-violet-950: var(--color-purple-950);
+  --color-indigo-50: var(--color-blue-50);
+  --color-indigo-100: var(--color-blue-100);
+  --color-indigo-200: var(--color-blue-200);
+  --color-indigo-300: var(--color-blue-300);
+  --color-indigo-400: var(--color-blue-400);
+  --color-indigo-500: var(--color-blue-500);
+  --color-indigo-600: var(--color-blue-600);
+  --color-indigo-700: var(--color-blue-700);
+  --color-indigo-800: var(--color-blue-800);
+  --color-indigo-900: var(--color-blue-900);
+  --color-indigo-950: var(--color-blue-950);
+}
+
+:root {
+  --font-inter: "Inter Variable";
+}
+
+/*
+ * The app's own tokens. Neutral greys with one teal accent.
  * Status colours pair with an icon or word on screen, never colour alone.
  */
 @theme {
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --color-surface: #ffffff;
   --color-surface-muted: #f4f5f6;

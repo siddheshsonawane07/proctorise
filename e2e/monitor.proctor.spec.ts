@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 import { asUser, createUser, hasStack, rpcAs, signIn, uniqueEmail } from "./support/supabase";
 
 // Phase 7's gate through the screens: a teacher watching, a student on Chromium's fake camera.

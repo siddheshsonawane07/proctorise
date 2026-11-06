@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 import { asUser, createUser, hasStack, rpcAs, signIn, uniqueEmail } from "./support/supabase";
 
 // Phase 5's pipeline, end to end: a fake camera (Chromium's test pattern, which has no face) →

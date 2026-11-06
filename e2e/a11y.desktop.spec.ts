@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 
 // WCAG 2.2 AA on the public pages (PHASE_8 § 8.3, step 10). Signed-in pages: a11y-app.spec.ts.
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];

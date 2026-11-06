@@ -1,5 +1,5 @@
 import { readdirSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 
 // The identity library loads and runs under the production CSP (which `vite preview` now serves
 // from public/_headers). Its warmup() fetched a data: URL the CSP refuses and then hung forever,

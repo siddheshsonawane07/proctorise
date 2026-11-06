@@ -1,4 +1,5 @@
-import { devices, expect, test } from "@playwright/test";
+import { devices } from "@playwright/test";
+import { expect, test } from "./support/test";
 import { asUser, createUser, hasStack, rpcAs, signIn, uniqueEmail } from "./support/supabase";
 
 // Phase 6 through the screens: a laptop and an emulated phone, both on Chromium's fake camera.
