@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router";
 import {
   RiArrowRightLine,
@@ -10,6 +11,103 @@ import {
   type RemixiconComponentType,
 } from "@remixicon/react";
 import { buttonClass } from "../ui/buttonClass";
+import { HeroScene } from "./landing/HeroScene";
+
+/*
+ * Everything drawn below the hero comes in one chunk after the page shows (landing/art.tsx), so the
+ * first-load budget pays only for the hero.
+ */
+const loadArt = () => import("./landing/art");
+type ArtName = keyof Awaited<ReturnType<typeof loadArt>>;
+const LazyArt = lazy(() =>
+  loadArt().then((m) => ({
+    default: function Drawn({ name }: { name: ArtName }) {
+      const Drawing = m[name];
+      return <Drawing />;
+    },
+  })),
+);
+
+/** A drawing that holds its space while its chunk loads. `ratio` is a Tailwind aspect class. */
+function Picture({ name, ratio }: { name: ArtName; ratio: string }) {
+  return (
+    <Suspense fallback={<div className={`${ratio} rounded-2xl bg-surface-muted`} />}>
+      <LazyArt name={name} />
+    </Suspense>
+  );
+}
+
+/** What each check notices, in the words of src/features/proctoring. */
+const CHECKS: { art: ArtName; title: string; text: string }[] = [
+  {
+    art: "ArtSecondPerson",
+    title: "Someone else in view",
+    text: "A second face in the webcam is flagged, with a picture of the moment.",
+  },
+  {
+    art: "ArtLookingAway",
+    title: "Looking away for long",
+    text: "A glance is fine. Looking away from the screen for several seconds is noted.",
+  },
+  {
+    art: "ArtPhoneInView",
+    title: "A phone or notes",
+    text: "The webcam spots a phone, or a book held up, and keeps a picture of it.",
+  },
+  {
+    art: "ArtTalking",
+    title: "Talking",
+    text: "The microphone only tells, in the browser, whether someone is talking. No sound is kept.",
+  },
+  {
+    art: "ArtLeftPage",
+    title: "Leaving the test",
+    text: "Switching tab or window, or leaving full screen, is noted to the second.",
+  },
+  {
+    art: "ArtShortcuts",
+    title: "Copy, paste and shortcuts",
+    text: "Copying, pasting, right-clicking and shortcuts are blocked, and each try is noted.",
+  },
+  {
+    art: "ArtSecondScreen",
+    title: "A second screen",
+    text: "Plugging in another monitor during the test is noted, in Chrome and Edge.",
+  },
+  {
+    art: "ArtPhoneSideView",
+    title: "The phone's side view",
+    text: "A paired phone watches the desk from the side, where the webcam can't see.",
+  },
+  {
+    art: "ArtIdentity",
+    title: "Is it really you",
+    text: "A photo taken once is compared with the face at the camera, in the browser.",
+  },
+];
+
+const FLOW: { art: ArtName; title: string; text: string }[] = [
+  {
+    art: "ArtFlowNoticed",
+    title: "Noticed",
+    text: "A check sees something, such as a phone in view.",
+  },
+  {
+    art: "ArtFlowPicture",
+    title: "A picture is kept",
+    text: "One still picture, with the time. Never a video.",
+  },
+  {
+    art: "ArtFlowReview",
+    title: "A teacher reviews",
+    text: "They look at the picture, then confirm or dismiss the flag.",
+  },
+  {
+    art: "ArtFlowReleased",
+    title: "Results released",
+    text: "Students see their marks when the teacher releases them.",
+  },
+];
 
 type Feature = { icon: RemixiconComponentType; title: string; text: string };
 
@@ -46,18 +144,21 @@ const FEATURES: Feature[] = [
   },
 ];
 
-const STEPS = [
+const STEPS: { who: string; title: string; text: string; art: ArtName }[] = [
   {
+    art: "ArtStepTeacher",
     who: "Teacher",
     title: "Make a class and a test",
     text: "Share the join code, write or import questions, and choose the checks.",
   },
   {
+    art: "ArtStepStudent",
     who: "Student",
     title: "Join and take the test",
     text: "A quick system check, a photo to confirm it's you, then the questions.",
   },
   {
+    art: "ArtStepReview",
     who: "Teacher",
     title: "Review and release",
     text: "Look at each flag with its picture, decide, and release the marks.",
@@ -86,7 +187,67 @@ export function Landing() {
             </Link>
           </div>
         </div>
-        <LivePreview />
+        <HeroScene />
+      </section>
+
+      <section aria-labelledby="checks">
+        <h2 id="checks" className="text-title-1-bold tracking-tight text-text">
+          How Proctorise catches cheating
+        </h2>
+        <p className="mt-3 max-w-2xl text-body-regular text-text-muted">
+          Each check notices one thing and keeps a picture of it. None of them fails a test on its
+          own: a teacher looks at every flag and decides.
+        </p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {CHECKS.map((c) => (
+            <div key={c.title} className="rounded-2xl border border-border bg-surface p-3">
+              <Picture name={c.art} ratio="aspect-[8/5]" />
+              <div className="px-2 pt-4 pb-2">
+                <h3 className="text-headline-semibold text-text">{c.title}</h3>
+                <p className="mt-1.5 text-body-regular text-text-muted">{c.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="flow">
+        <h2 id="flow" className="text-title-1-bold tracking-tight text-text">
+          From a flag to a decision
+        </h2>
+        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {FLOW.map((f, i) => (
+            <li key={f.title} className="rounded-2xl border border-border bg-surface-muted p-3">
+              <Picture name={f.art} ratio="aspect-[20/13]" />
+              <div className="px-2 pt-4 pb-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid size-6 place-items-center rounded-full bg-accent text-caption-1-semibold text-accent-text">
+                    {i + 1}
+                  </span>
+                  <h3 className="text-headline-semibold text-text">{f.title}</h3>
+                </div>
+                <p className="mt-1.5 text-body-regular text-text-muted">{f.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="live" className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr]">
+        <div>
+          <h2 id="live" className="text-title-1-bold tracking-tight text-text">
+            Every student on one screen
+          </h2>
+          <p className="mt-3 max-w-xl text-body-regular text-text-muted">
+            The live view shows each student's progress and flags as they happen. Warn one, give
+            extra time, or watch their camera live for up to two minutes. They see when you do, and
+            it isn't recorded.
+          </p>
+          <Link to="/help/teachers" className="mt-5 inline-block text-body-medium text-accent">
+            The guide for teachers
+          </Link>
+        </div>
+        <Picture name="LivePreview" ratio="aspect-[4/3]" />
       </section>
 
       <section aria-labelledby="features">
@@ -116,6 +277,9 @@ export function Landing() {
         <ol className="mt-8 grid gap-4 md:grid-cols-3">
           {STEPS.map((step, i) => (
             <li key={step.title} className="rounded-2xl border border-border bg-surface-muted p-5">
+              <div className="-mx-2 -mt-2 mb-5">
+                <Picture name={step.art} ratio="aspect-[12/7]" />
+              </div>
               <div className="flex items-center gap-3">
                 <span className="grid size-8 place-items-center rounded-full bg-accent text-body-semibold text-accent-text">
                   {i + 1}
@@ -136,69 +300,17 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border bg-surface-muted p-6 sm:p-8">
-        <h2 className="text-title-3-semibold text-text">What it can't do</h2>
-        <p className="mt-2 max-w-3xl text-body-regular text-text-muted">
-          A web page can't see a second computer out of view, block your computer's own shortcuts,
-          or stop someone helping from outside the camera's view. The phone camera covers some of
-          that. The rest is why a teacher reviews every flag.
-        </p>
+      <section className="grid items-center gap-8 rounded-2xl border border-border bg-surface-muted p-6 sm:p-8 md:grid-cols-[1.3fr_1fr]">
+        <div>
+          <h2 className="text-title-3-semibold text-text">What it can't do</h2>
+          <p className="mt-2 max-w-3xl text-body-regular text-text-muted">
+            A web page can't see a second computer out of view, block your computer's own shortcuts,
+            or stop someone helping from outside the camera's view. The phone camera covers some of
+            that. The rest is why a teacher reviews every flag.
+          </p>
+        </div>
+        <Picture name="ArtBlindSpots" ratio="aspect-[8/5]" />
       </section>
-    </div>
-  );
-}
-
-const PREVIEW = [
-  { name: "Aarav", status: "Writing", tone: "ok", progress: 70 },
-  { name: "Diya", status: "Looking away", tone: "warn", progress: 45 },
-  { name: "Kabir", status: "Writing", tone: "ok", progress: 85 },
-  { name: "Meera", status: "Second face", tone: "high", progress: 30 },
-  { name: "Rohan", status: "Handed in", tone: "done", progress: 100 },
-  { name: "Sana", status: "Writing", tone: "ok", progress: 60 },
-] as const;
-
-const TONE = {
-  ok: "bg-accent/10 text-accent",
-  warn: "bg-warn/10 text-warn",
-  high: "bg-high/10 text-high",
-  done: "bg-surface-muted text-text-muted",
-} as const;
-
-/** A picture of the teacher's live view, made of plain elements; decorative, so hidden from readers. */
-function LivePreview() {
-  return (
-    <div
-      aria-hidden
-      className="rounded-3xl border border-border bg-surface-muted p-3 shadow-xl shadow-black/5"
-    >
-      <div className="rounded-2xl border border-border bg-surface p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-headline-semibold text-text">Science 1 · Unit test</p>
-            <p className="text-caption-1-regular text-text-muted">6 students · 24 minutes left</p>
-          </div>
-          <span className="flex items-center gap-1.5 rounded-full bg-high/10 px-2.5 py-1 text-caption-1-semibold text-high">
-            <span className="size-1.5 animate-pulse rounded-full bg-high" />
-            Live
-          </span>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-          {PREVIEW.map((s) => (
-            <div key={s.name} className="rounded-xl border border-border p-2.5">
-              <div className="aspect-video rounded-lg bg-linear-to-br from-surface-muted to-border/60" />
-              <p className="mt-2 text-caption-1-semibold text-text">{s.name}</p>
-              <span
-                className={`mt-1 inline-block rounded-md px-1.5 py-0.5 text-caption-1-medium ${TONE[s.tone]}`}
-              >
-                {s.status}
-              </span>
-              <div className="mt-2 h-1 rounded-full bg-surface-muted">
-                <div className="h-1 rounded-full bg-accent" style={{ width: `${s.progress}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

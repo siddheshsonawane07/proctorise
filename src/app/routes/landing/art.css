@@ -1,0 +1,913 @@
+/*
+ * The landing page's illustrations (parts.tsx, HeroScene.tsx, art.tsx). A stylesheet, not <style> in
+ * the SVG, because the CSP's style-src 'self' blocks inline style elements.
+ *
+ * Fill classes (a-*) set only fill, stroke classes (s-*) only stroke. Each animated class has a resting
+ * state, the moment its check is flagged, which is what shows with reduced motion.
+ */
+
+.art {
+  --art-wall: #eef1f3;
+  --art-wall2: #dde2e6;
+  --art-window: #f8fafb;
+  --art-panel: #ffffff;
+  --art-line: #d4d9de;
+  --art-ink: #23272c;
+  --art-muted: #5f6770;
+  --art-on: #ffffff;
+  --art-screen: #ffffff;
+  --art-screen-dark: #2c3a45;
+  --art-device: #2b3036;
+  --art-device2: #444b53;
+  --art-desk: #e3d3bf;
+  --art-keycap: #5b636c;
+  --art-trousers: #39424c;
+  --art-ok: #13897f;
+  --art-ok-soft: #e3f3f1;
+  --art-warn: #e09a26;
+  --art-high: #d6453b;
+  --art-skin1: #f3cfb0;
+  --art-skin1s: #e2b08c;
+  --art-skin2: #d29a70;
+  --art-skin2s: #b98059;
+  --art-skin3: #8f5d3e;
+  --art-skin3s: #774b30;
+  --art-hair1: #2b2420;
+  --art-hair2: #6a4529;
+  --art-hair3: #1d1a18;
+  --art-shirt1: #2f8f86;
+  --art-shirt2: #e0a53f;
+  --art-shirt3: #4f6f8f;
+  --art-shadow: rgb(15 23 30 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .art {
+    --art-wall: #1d2226;
+    --art-wall2: #2f363c;
+    --art-window: #283036;
+    --art-panel: #23292e;
+    --art-line: #3a4248;
+    --art-ink: #e8ebee;
+    --art-muted: #a4acb4;
+    --art-on: #0b1416;
+    --art-screen: #1a1f23;
+    --art-screen-dark: #10151a;
+    --art-device: #0e1114;
+    --art-device2: #2d343a;
+    --art-desk: #5b4a3a;
+    --art-keycap: #3d454c;
+    --art-trousers: #2a3138;
+    --art-ok: #2bb3a6;
+    --art-ok-soft: #17332f;
+    --art-warn: #e8b453;
+    --art-high: #f2867e;
+    --art-shadow: rgb(0 0 0 / 0.35);
+  }
+}
+
+/* Text first, so a colour class on the same element wins. */
+.art .a-t {
+  font: 600 11px/1 var(--font-sans);
+  fill: var(--art-ink);
+}
+.art .a-t-sm {
+  font: 600 10.5px/1 var(--font-sans);
+  fill: var(--art-ink);
+}
+.art .a-t-xs {
+  font: 500 9.5px/1 var(--font-sans);
+  fill: var(--art-ink);
+}
+.art .a-t-lg {
+  font: 700 24px/1 var(--font-sans);
+  fill: var(--art-ink);
+}
+
+.art .a-wall {
+  fill: var(--art-wall);
+}
+.art .a-wall2 {
+  fill: var(--art-wall2);
+}
+.art .a-window {
+  fill: var(--art-window);
+}
+.art .a-panel {
+  fill: var(--art-panel);
+}
+.art .a-line {
+  fill: var(--art-line);
+}
+.art .a-ink {
+  fill: var(--art-ink);
+}
+/* Eyes and mouths stay dark in both themes. */
+.art .a-face {
+  fill: #23272c;
+}
+.art .a-muted {
+  fill: var(--art-muted);
+}
+.art .a-on {
+  fill: var(--art-on);
+}
+.art .a-white {
+  fill: #ffffff;
+}
+.art .a-screen {
+  fill: var(--art-screen);
+}
+.art .a-screen-dark {
+  fill: var(--art-screen-dark);
+}
+.art .a-device {
+  fill: var(--art-device);
+}
+.art .a-device2 {
+  fill: var(--art-device2);
+}
+.art .a-desk {
+  fill: var(--art-desk);
+}
+.art .a-keycap {
+  fill: var(--art-keycap);
+}
+.art .a-ok {
+  fill: var(--art-ok);
+}
+.art .a-ok-soft {
+  fill: var(--art-ok-soft);
+}
+.art .a-warn {
+  fill: var(--art-warn);
+}
+.art .a-high {
+  fill: var(--art-high);
+}
+.art .a-skin1 {
+  fill: var(--art-skin1);
+}
+.art .a-skin1s {
+  fill: var(--art-skin1s);
+}
+.art .a-skin2 {
+  fill: var(--art-skin2);
+}
+.art .a-skin2s {
+  fill: var(--art-skin2s);
+}
+.art .a-skin3 {
+  fill: var(--art-skin3);
+}
+.art .a-skin3s {
+  fill: var(--art-skin3s);
+}
+.art .a-hair1 {
+  fill: var(--art-hair1);
+}
+.art .a-hair2 {
+  fill: var(--art-hair2);
+}
+.art .a-hair3 {
+  fill: var(--art-hair3);
+}
+.art .a-shirt1 {
+  fill: var(--art-shirt1);
+}
+.art .a-shirt2 {
+  fill: var(--art-shirt2);
+}
+.art .a-shirt3 {
+  fill: var(--art-shirt3);
+}
+
+.art .s-panel {
+  stroke: var(--art-panel);
+}
+.art .s-ink {
+  stroke: var(--art-ink);
+}
+.art .s-face {
+  stroke: #23272c;
+}
+.art .s-line {
+  stroke: var(--art-line);
+}
+.art .s-muted {
+  stroke: var(--art-muted);
+}
+.art .s-on {
+  stroke: var(--art-on);
+}
+.art .s-ok {
+  stroke: var(--art-ok);
+}
+.art .s-warn {
+  stroke: var(--art-warn);
+}
+.art .s-high {
+  stroke: var(--art-high);
+}
+.art .s-wall2 {
+  stroke: var(--art-wall2);
+}
+.art .s-device {
+  stroke: var(--art-device);
+}
+.art .s-device2 {
+  stroke: var(--art-device2);
+}
+.art .s-desk {
+  stroke: var(--art-desk);
+}
+.art .s-trousers {
+  stroke: var(--art-trousers);
+}
+.art .s-shirt1 {
+  stroke: var(--art-shirt1);
+}
+.art .s-shirt3 {
+  stroke: var(--art-shirt3);
+}
+
+.art .chip-shadow {
+  filter: drop-shadow(0 2px 5px var(--art-shadow));
+}
+.art .look-left {
+  transform: translateX(-5px);
+}
+
+/* ---------- Motion ---------- */
+
+.art [class*="il-"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: 6s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+/* Appears once the check has noticed something, and goes again before the loop restarts. */
+.art .il-late {
+  animation-name: il-late;
+}
+@keyframes il-late {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  48%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+.art .il-end {
+  animation-name: il-end;
+}
+@keyframes il-end {
+  0%,
+  72% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  78%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+.art .il-pop {
+  animation-name: il-pop;
+}
+@keyframes il-pop {
+  0%,
+  44% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  55%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+.art .il-blink {
+  animation: il-blink 1.4s ease-in-out infinite alternate;
+}
+@keyframes il-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* Another person */
+.art .il-peek {
+  animation-name: il-peek;
+}
+@keyframes il-peek {
+  0%,
+  22% {
+    transform: translateX(110px);
+  }
+  36%,
+  86% {
+    transform: none;
+  }
+  98%,
+  100% {
+    transform: translateX(110px);
+  }
+}
+
+/* Looking away: the face turns, the timer fills, then the flag. */
+.art .il-glance {
+  transform: translateX(-9px);
+  animation-name: il-glance;
+}
+@keyframes il-glance {
+  0%,
+  22% {
+    transform: none;
+  }
+  30%,
+  88% {
+    transform: translateX(-9px);
+  }
+  96%,
+  100% {
+    transform: none;
+  }
+}
+.art .il-timer {
+  animation-name: il-timer;
+}
+@keyframes il-timer {
+  0%,
+  30% {
+    stroke-dashoffset: 100;
+  }
+  74%,
+  94% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* A phone comes up from below the desk. */
+.art .il-lift {
+  animation-name: il-lift;
+}
+@keyframes il-lift {
+  0%,
+  18% {
+    transform: translateY(96px);
+  }
+  32%,
+  86% {
+    transform: none;
+  }
+  98%,
+  100% {
+    transform: translateY(96px);
+  }
+}
+
+/* Talking */
+.art .il-talk {
+  animation: il-talk 0.42s ease-in-out infinite alternate;
+}
+@keyframes il-talk {
+  from {
+    transform: scaleY(0.35);
+  }
+  to {
+    transform: scaleY(1.15);
+  }
+}
+.art .il-wave {
+  animation: il-wave 1.2s ease-out infinite;
+}
+.art .il-wave2 {
+  animation-delay: 0.2s;
+}
+.art .il-wave3 {
+  animation-delay: 0.4s;
+}
+@keyframes il-wave {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.art .il-bar {
+  transform-origin: center bottom;
+  animation: il-bar 0.5s ease-in-out infinite alternate;
+}
+.art .il-bar1 {
+  animation-delay: 0.15s;
+}
+.art .il-bar2 {
+  animation-delay: 0.3s;
+}
+@keyframes il-bar {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Leaving the test page: the cursor opens another tab, and back. */
+.art .il-cursor {
+  transform: translate(200px, 38px);
+  animation-name: il-cursor;
+}
+@keyframes il-cursor {
+  0%,
+  14% {
+    transform: translate(236px, 150px);
+  }
+  32% {
+    transform: translate(200px, 38px);
+  }
+  35% {
+    transform: translate(200px, 38px) scale(0.85);
+  }
+  38%,
+  62% {
+    transform: translate(200px, 38px);
+  }
+  74% {
+    transform: translate(112px, 38px);
+  }
+  77% {
+    transform: translate(112px, 38px) scale(0.85);
+  }
+  80% {
+    transform: translate(112px, 38px);
+  }
+  100% {
+    transform: translate(236px, 150px);
+  }
+}
+.art .il-tab-a,
+.art .il-page-a {
+  opacity: 0;
+  animation-name: il-on-test;
+}
+.art .il-tab-b,
+.art .il-page-b {
+  opacity: 1;
+  animation-name: il-off-test;
+}
+@keyframes il-on-test {
+  0%,
+  36% {
+    opacity: 1;
+  }
+  37%,
+  78% {
+    opacity: 0;
+  }
+  79%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes il-off-test {
+  0%,
+  36% {
+    opacity: 0;
+  }
+  37%,
+  78% {
+    opacity: 1;
+  }
+  79%,
+  100% {
+    opacity: 0;
+  }
+}
+.art .il-flag-mid {
+  animation-name: il-flag-mid;
+}
+@keyframes il-flag-mid {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  43%,
+  76% {
+    opacity: 1;
+    transform: none;
+  }
+  82%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* Copy and paste: the keys go down, the copy is stopped. */
+.art .il-press {
+  transform: translateY(1.5px);
+  animation-name: il-press;
+}
+.art .il-press2,
+.art .il-press2 .il-keyglow {
+  animation-delay: 0.15s;
+}
+@keyframes il-press {
+  0%,
+  30% {
+    transform: none;
+  }
+  34%,
+  62% {
+    transform: translateY(1.5px);
+  }
+  66%,
+  100% {
+    transform: none;
+  }
+}
+.art .il-keyglow {
+  opacity: 0.6;
+  animation-name: il-keyglow;
+}
+@keyframes il-keyglow {
+  0%,
+  30% {
+    opacity: 0;
+  }
+  34%,
+  62% {
+    opacity: 0.6;
+  }
+  66%,
+  100% {
+    opacity: 0;
+  }
+}
+.art .il-copy {
+  animation-name: il-copy;
+}
+@keyframes il-copy {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  42% {
+    opacity: 1;
+    transform: translateX(8px);
+  }
+  48%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* A second screen slides in and is plugged in. */
+.art .il-slide {
+  animation-name: il-slide;
+}
+@keyframes il-slide {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateX(140px);
+  }
+  32%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateX(140px);
+  }
+}
+.art .il-cable {
+  animation-name: il-cable;
+}
+@keyframes il-cable {
+  0%,
+  30% {
+    stroke-dashoffset: 100;
+  }
+  44%,
+  88% {
+    stroke-dashoffset: 0;
+  }
+  98%,
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* The phone's side view */
+.art .il-cone-phone {
+  animation: il-cone 2.4s ease-in-out infinite alternate;
+}
+@keyframes il-cone {
+  from {
+    opacity: 0.12;
+  }
+  to {
+    opacity: 0.28;
+  }
+}
+
+/* Identity */
+.art .il-scan {
+  transform: translateY(64px);
+  animation: il-scan 2.6s linear infinite;
+}
+@keyframes il-scan {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(128px);
+  }
+}
+.art .il-dash {
+  animation: il-dash 1s linear infinite;
+}
+@keyframes il-dash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+/* From a flag to a decision */
+.art .il-flash {
+  opacity: 0;
+  animation-name: il-flash;
+}
+@keyframes il-flash {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  24% {
+    opacity: 0.9;
+  }
+  36%,
+  100% {
+    opacity: 0;
+  }
+}
+.art .il-cursor-review {
+  transform: translate(124px, 90px);
+  animation-name: il-cursor-review;
+}
+@keyframes il-cursor-review {
+  0%,
+  26% {
+    transform: translate(176px, 124px);
+  }
+  48% {
+    transform: translate(124px, 90px);
+  }
+  51% {
+    transform: translate(124px, 90px) scale(0.85);
+  }
+  54%,
+  88% {
+    transform: translate(124px, 90px);
+  }
+  100% {
+    transform: translate(176px, 124px);
+  }
+}
+.art .il-confirm {
+  opacity: 0.22;
+  animation-name: il-confirm;
+}
+@keyframes il-confirm {
+  0%,
+  51% {
+    opacity: 0;
+  }
+  54%,
+  88% {
+    opacity: 0.22;
+  }
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* How it works: ticks in turn, then the button. */
+.art .il-seq {
+  animation-name: il-seq;
+}
+.art .il-seq1 {
+  animation-delay: 0.7s;
+}
+.art .il-seq2 {
+  animation-delay: 1.4s;
+}
+@keyframes il-seq {
+  0%,
+  8% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  14%,
+  84% {
+    opacity: 1;
+    transform: none;
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+.art .il-start {
+  animation-name: il-start;
+}
+@keyframes il-start {
+  0%,
+  50% {
+    opacity: 0.4;
+    transform: none;
+  }
+  58% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  62%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
+  100% {
+    opacity: 0.4;
+    transform: none;
+  }
+}
+.art .il-ghost {
+  animation: il-ghost 2.6s ease-in-out infinite alternate;
+}
+@keyframes il-ghost {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+
+/* The hero: face tracking, and events arriving one by one. */
+.art .il-dots {
+  animation: il-blink 1.6s ease-in-out infinite alternate;
+}
+.art .il-scan-hero {
+  transform: translateY(54px);
+  animation: il-scan-hero 3s linear infinite;
+}
+@keyframes il-scan-hero {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(110px);
+  }
+}
+.art .il-feed {
+  animation-duration: 10s;
+}
+.art .il-feed0 {
+  animation-name: il-feed0;
+}
+.art .il-feed1 {
+  animation-name: il-feed1;
+}
+.art .il-feed2 {
+  animation-name: il-feed2;
+}
+.art .il-feed3 {
+  animation-name: il-feed3;
+}
+@keyframes il-feed0 {
+  0%,
+  6% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  12%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes il-feed1 {
+  0%,
+  24% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes il-feed2 {
+  0%,
+  42% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  48%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes il-feed3 {
+  0%,
+  60% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  66%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art * {
+    animation: none !important;
+  }
+}
