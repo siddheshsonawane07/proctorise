@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 import { createUser, hasStack, uniqueEmail } from "./support/supabase";
 import { CSV_TEMPLATE } from "../src/features/bank/question";
 

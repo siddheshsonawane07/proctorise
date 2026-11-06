@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -31,6 +32,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   return {
     plugins: [react(), tailwindcss()],
+    // BoardUI components import from "@/…".
+    resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
     preview: { headers: productionHeaders(env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL) },
     test: {
       environment: "jsdom",

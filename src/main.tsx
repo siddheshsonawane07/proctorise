@@ -4,7 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
 import { router } from "./app/router";
 import { SessionProvider } from "./features/auth/SessionProvider";
+import { followSystemColorScheme } from "./app/colorScheme";
 import "./app/theme.css";
+
+followSystemColorScheme();
 
 const queryClient = new QueryClient();
 

@@ -31,3 +31,19 @@ if (total > BUDGET_KB) {
   console.error(`Over budget by ${(total - BUDGET_KB).toFixed(1)} KB.`);
   process.exit(1);
 }
+
+// No purple or violet (CLAUDE.md rule 9): fails on any saturated oklch colour with a hue between
+// blue (about 265) and pink (about 340) in the built CSS. Greys (chroma under 0.03) pass.
+import { readdirSync } from "node:fs";
+const purples = [];
+for (const file of readdirSync(join(dist, "assets")).filter((f) => f.endsWith(".css"))) {
+  const css = readFileSync(join(dist, "assets", file), "utf8");
+  for (const [colour, , chroma, hue] of css.matchAll(/oklch\(([\d.]+%?) ([\d.]+) ([\d.]+)\)/g)) {
+    if (Number(chroma) >= 0.03 && Number(hue) >= 270 && Number(hue) <= 335) purples.push(colour);
+  }
+}
+if (purples.length > 0) {
+  console.error(`Purple or violet in the built CSS: ${[...new Set(purples)].join(", ")}`);
+  process.exit(1);
+}
+console.log("No purple or violet in the built CSS.");

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 import { createUser, hasStack, rpcAs, signIn, uniqueEmail } from "./support/supabase";
 
 // WCAG 2.2 AA on signed-in pages, against the local stack.
