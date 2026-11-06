@@ -32,7 +32,7 @@ export function SignIn() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
       <h1 className="text-2xl font-semibold">Sign in</h1>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <Field label="Email" name="email" type="email" autoComplete="email" required />

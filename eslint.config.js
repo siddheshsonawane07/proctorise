@@ -24,6 +24,11 @@ export default defineConfig([
       "react-refresh/only-export-components": ["error", { allowConstantExport: true }],
     },
   },
+  // BoardUI's components are vendored source that exports style maps beside components.
+  {
+    files: ["src/components/**/*.tsx"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
   {
     files: ["scripts/**/*.mjs", "eslint.config.js"],
     extends: [js.configs.recommended],

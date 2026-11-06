@@ -14,7 +14,7 @@ export function ResetPassword() {
   if (state.status === "loading") return <Loading />;
   if (!state.session) {
     return (
-      <div className="mx-auto max-w-sm">
+      <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
         <h1 className="text-2xl font-semibold">This link has expired</h1>
         <p className="mt-3 text-text-muted">
           <Link to="/forgot-password" className="text-accent underline">
@@ -35,7 +35,7 @@ export function ResetPassword() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
       <h1 className="text-2xl font-semibold">Set a new password</h1>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <Field

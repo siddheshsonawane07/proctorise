@@ -12,5 +12,5 @@ test("sign-in works on a phone", async ({ page }) => {
 
 test("the landing page works on a phone", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Get started" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Create an account" })).toBeVisible();
 });
