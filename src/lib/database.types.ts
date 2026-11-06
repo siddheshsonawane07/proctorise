@@ -905,6 +905,16 @@ export type Database = {
         Args: { p_code?: string; p_device_label?: string; p_token: string };
         Returns: Json;
       };
+      class_marks: {
+        Args: { p_class_id: string };
+        Returns: {
+          attempt_status: Database["public"]["Enums"]["attempt_status"];
+          max_score: number;
+          score: number;
+          student_id: string;
+          test_id: string;
+        }[];
+      };
       class_roster: {
         Args: { p_class_id: string };
         Returns: {
@@ -915,6 +925,23 @@ export type Database = {
           status: Database["public"]["Enums"]["member_status"];
           student_id: string;
           time_multiplier: number;
+        }[];
+      };
+      class_student_report: {
+        Args: { p_class_id: string; p_student_id: string };
+        Returns: {
+          attempt_id: string;
+          attempt_status: Database["public"]["Enums"]["attempt_status"];
+          closes_at: string;
+          high_flags: number;
+          integrity: Database["public"]["Enums"]["integrity_status"];
+          max_score: number;
+          score: number;
+          submitted_at: string;
+          test_id: string;
+          test_status: Database["public"]["Enums"]["test_status"];
+          title: string;
+          warn_flags: number;
         }[];
       };
       class_teacher_list: {
@@ -1119,6 +1146,15 @@ export type Database = {
           p_time_multiplier: number;
         };
         Returns: undefined;
+      };
+      set_members: {
+        Args: {
+          p_class_id: string;
+          p_status: Database["public"]["Enums"]["member_status"];
+          p_student_ids: string[];
+          p_time_multiplier: number;
+        };
+        Returns: number;
       };
       start_attempt: { Args: { p_session: string; p_test_id: string }; Returns: Json };
       submit_attempt: { Args: { p_attempt_id: string }; Returns: undefined };

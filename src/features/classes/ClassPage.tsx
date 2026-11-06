@@ -13,8 +13,6 @@ import {
   useCreateTest,
   useRemoveCoTeacher,
   useRotateCode,
-  useRoster,
-  useSetMember,
   useUpdateClass,
   type ClassRow,
   type TestRow,
@@ -22,8 +20,7 @@ import {
 import { useProfile } from "../auth/useProfile";
 import { useMyAttempts, type MyAttempt } from "../attempt/api";
 import { isTeacher } from "../auth/roles";
-
-const MULTIPLIERS = [1, 1.25, 1.5, 2];
+import { Roster } from "./Roster";
 
 export function ClassPage() {
   const { classId = "" } = useParams();
@@ -118,12 +115,19 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
   ];
   return (
     <div>
-      <h1 className="text-2xl font-semibold">{cls.name}</h1>
+      <h1 className="text-title-1-bold tracking-tight text-text">{cls.name}</h1>
       <p className="mt-1 text-text-muted">
-        Join code: <strong className="font-mono text-text">{cls.join_code}</strong>
+        Join code:{" "}
+        <strong className="rounded-md bg-surface-muted px-2 py-0.5 font-mono tracking-wider text-text">
+          {cls.join_code}
+        </strong>
         {!cls.join_open && " (joining is closed)"}
       </p>
-      <div role="tablist" aria-label="Class" className="mt-4 flex flex-wrap gap-2">
+      <div
+        role="tablist"
+        aria-label="Class"
+        className="mt-5 flex flex-wrap gap-1 border-b border-border"
+      >
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -131,8 +135,10 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
             type="button"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              tab === t.id ? "bg-accent text-accent-text" : "border border-border"
+            className={`-mb-px border-b-2 px-3 py-2 text-body-medium ${
+              tab === t.id
+                ? "border-accent text-accent"
+                : "border-transparent text-text-muted hover:text-text"
             }`}
           >
             {t.label}
@@ -188,96 +194,6 @@ function TeacherTests({ classId }: { classId: string }) {
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function Roster({ classId }: { classId: string }) {
-  const roster = useRoster(classId, true);
-  const setMember = useSetMember(classId);
-
-  function downloadCsv() {
-    const rows = [["Name", "Email", "Status", "Extra time", "Joined"]];
-    for (const r of roster.data ?? []) {
-      rows.push([r.full_name, r.email, r.status, `${r.time_multiplier}x`, r.joined_at]);
-    }
-    const csv = rows
-      .map((row) => row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","))
-      .join("\n");
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    link.download = "students.csv";
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
-
-  if (roster.isPending) return <Loading />;
-  if (roster.isError) return <Message kind="error">{messageFrom(roster.error)}</Message>;
-  if (roster.data.length === 0) {
-    return <p className="text-text-muted">No students yet. Share the join code with your class.</p>;
-  }
-  return (
-    <div className="space-y-4">
-      <Button variant="plain" onClick={downloadCsv}>
-        Download as CSV
-      </Button>
-      {setMember.isError && <Message kind="error">{messageFrom(setMember.error)}</Message>}
-      <table className="w-full text-left text-sm">
-        <thead className="text-text-muted">
-          <tr>
-            <th className="py-2 font-medium">Name</th>
-            <th className="py-2 font-medium">Email</th>
-            <th className="py-2 font-medium">Extra time</th>
-            <th className="py-2 font-medium" />
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {roster.data.map((r) => (
-            <tr key={r.student_id} className={r.status === "removed" ? "text-text-muted" : ""}>
-              <td className="py-2">{r.full_name || "—"}</td>
-              <td className="py-2">{r.email}</td>
-              <td className="py-2">
-                <label>
-                  <span className="sr-only">Extra time for {r.full_name}</span>
-                  <select
-                    value={Number(r.time_multiplier)}
-                    disabled={r.status === "removed" || setMember.isPending}
-                    onChange={(e) =>
-                      setMember.mutate({
-                        studentId: r.student_id,
-                        status: r.status,
-                        timeMultiplier: Number(e.target.value),
-                      })
-                    }
-                    className="rounded border border-border bg-surface px-2 py-1"
-                  >
-                    {MULTIPLIERS.map((m) => (
-                      <option key={m} value={m}>
-                        {m === 1 ? "None" : `${m}× time`}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </td>
-              <td className="py-2 text-right">
-                <Button
-                  variant="plain"
-                  disabled={setMember.isPending}
-                  onClick={() =>
-                    setMember.mutate({
-                      studentId: r.student_id,
-                      status: r.status === "active" ? "removed" : "active",
-                      timeMultiplier: Number(r.time_multiplier),
-                    })
-                  }
-                >
-                  {r.status === "active" ? "Remove" : "Add back"}
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }

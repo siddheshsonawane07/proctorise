@@ -69,11 +69,7 @@ export function Landing() {
     <div className="space-y-24 pb-8">
       <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1 text-caption-1-medium text-text-muted">
-            <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-            Free for schools and teachers
-          </p>
-          <h1 className="mt-5 text-display-3-bold tracking-tight text-text sm:text-display-2-bold">
+          <h1 className="text-display-3-bold tracking-tight text-text sm:text-display-2-bold">
             Online tests, checked fairly.
           </h1>
           <p className="mt-5 max-w-xl text-title-3-regular text-text-muted">

@@ -1,8 +1,8 @@
 import type {
   ButtonHTMLAttributes,
+  ComponentPropsWithRef,
   InputHTMLAttributes,
   ReactNode,
-  TextareaHTMLAttributes,
 } from "react";
 import { RiCheckboxCircleFill, RiErrorWarningFill } from "@remixicon/react";
 import { Button as BoardButton } from "@/components/base/buttons/button";
@@ -37,11 +37,11 @@ export function Field({
 export function TextArea({
   label,
   ...input
-}: { label: string } & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: { label: string } & ComponentPropsWithRef<"textarea">) {
   return (
     <label className="block">
       <span className="text-body-medium text-text-primary">{label}</span>
-      <textarea {...input} rows={3} className={fieldClass} />
+      <textarea rows={3} {...input} className={fieldClass} />
     </label>
   );
 }

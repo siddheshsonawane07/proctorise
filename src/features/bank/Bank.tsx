@@ -6,8 +6,11 @@ import { Button, Card, Loading, Message } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import { unwrap } from "../classes/api";
 import { QuestionEditor } from "./QuestionEditor";
-import { CSV_TEMPLATE, parseCsv, rowToQuestion, TYPE_LABEL } from "./question";
-import { useBank, useSaveQuestion, type BankQuestion } from "./api";
+import { CSV_TEMPLATE, TYPE_LABEL } from "./question";
+import { readQuestionsCsv, type ImportRow } from "./prompt";
+import { ImportPreview } from "./ImportPreview";
+import { PromptBuilder } from "./PromptBuilder";
+import { useBank, type BankQuestion } from "./api";
 
 export function Bank() {
   const bank = useBank();
@@ -22,7 +25,7 @@ export function Bank() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Question bank</h1>
+        <h1 className="text-title-1-bold tracking-tight text-text">Question bank</h1>
         <Button onClick={() => setEditing("new")}>New question</Button>
       </div>
       <p className="text-text-muted">
@@ -36,14 +39,14 @@ export function Bank() {
           onDone={() => setEditing(null)}
         />
       )}
-      <CsvImport />
+      <AddQuestions />
       {bank.isPending && <Loading />}
       {bank.isError && <Message kind="error">{messageFrom(bank.error)}</Message>}
       {bank.data?.length === 0 && <p className="text-text-muted">No questions yet.</p>}
       {remove.isError && <Message kind="error">{messageFrom(remove.error)}</Message>}
       <ul className="space-y-3">
         {bank.data?.map((q) => (
-          <li key={q.id} className="rounded-lg border border-border p-4">
+          <li key={q.id} className="rounded-2xl border border-border bg-surface p-4 shadow-xs">
             <p className="text-sm text-text-muted">
               {TYPE_LABEL[q.type]} · {Number(q.points)}{" "}
               {Number(q.points) === 1 ? "point" : "points"}
@@ -71,10 +74,45 @@ export function Bank() {
   );
 }
 
+function AddQuestions() {
+  const [mode, setMode] = useState<"ai" | "file">("ai");
+  return (
+    <section aria-labelledby="add-questions" className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="add-questions" className="text-title-3-semibold text-text">
+          Add questions in bulk
+        </h2>
+        <div className="flex rounded-xl bg-surface-muted p-1" role="group" aria-label="How to add">
+          {(
+            [
+              ["ai", "Ask your AI"],
+              ["file", "Import a spreadsheet"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={mode === value}
+              onClick={() => setMode(value)}
+              className={`rounded-lg px-3 py-1.5 text-body-medium ${
+                mode === value
+                  ? "bg-surface text-text shadow-xs"
+                  : "text-text-muted hover:text-text"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {mode === "ai" ? <PromptBuilder /> : <CsvImport />}
+    </section>
+  );
+}
+
 function CsvImport() {
-  const save = useSaveQuestion();
-  const [report, setReport] = useState<{ added: number; errors: string[] } | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [rows, setRows] = useState<ImportRow[] | null>(null);
+  const [name, setName] = useState("");
 
   function downloadTemplate() {
     const link = document.createElement("a");
@@ -88,58 +126,26 @@ function CsvImport() {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    setBusy(true);
-    const rows = parseCsv(await file.text());
-    const body = rows[0]?.[0]?.trim().toLowerCase() === "type" ? rows.slice(1) : rows;
-    const errors: string[] = [];
-    let added = 0;
-    for (const [i, row] of body.entries()) {
-      const parsed = rowToQuestion(row);
-      const line = i + (body === rows ? 1 : 2);
-      if (typeof parsed === "string") {
-        errors.push(`Row ${line}: ${parsed}`);
-        continue;
-      }
-      try {
-        await save.mutateAsync({ id: null, input: parsed });
-        added++;
-      } catch (error) {
-        errors.push(`Row ${line}: ${messageFrom(error)}`);
-      }
-    }
-    setReport({ added, errors });
-    setBusy(false);
+    setName(file.name);
+    setRows(readQuestionsCsv(await file.text()));
   }
 
   return (
     <Card title="Import from a spreadsheet">
-      <p className="text-sm text-text-muted">
-        Save a sheet as CSV with the columns in the template, then choose the file.
+      <p className="text-body-regular text-text-muted">
+        Save a sheet as CSV with the columns in the template, then choose the file. You will see
+        every question before anything is saved.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="plain" onClick={downloadTemplate}>
           Download the template
         </Button>
-        <label className="text-sm">
+        <label className="text-body-regular">
           <span className="sr-only">CSV file</span>
-          <input type="file" accept=".csv,text/csv" onChange={onFile} disabled={busy} />
+          <input type="file" accept=".csv,text/csv" onChange={onFile} />
         </label>
       </div>
-      {busy && <Loading />}
-      {report && (
-        <Message kind={report.errors.length ? "error" : "ok"}>
-          Added {report.added} {report.added === 1 ? "question" : "questions"}.
-          {report.errors.length > 0 && (
-            <span className="mt-2 block">
-              {report.errors.map((e) => (
-                <span key={e} className="block">
-                  {e}
-                </span>
-              ))}
-            </span>
-          )}
-        </Message>
-      )}
+      {rows && <ImportPreview key={name + rows.length} rows={rows} extraTags={[]} />}
     </Card>
   );
 }

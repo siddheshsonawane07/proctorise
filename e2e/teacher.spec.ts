@@ -37,13 +37,17 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   expect(code).toMatch(/^[A-Z2-9]{8}$/);
 
   // Six questions of five types, from the CSV template.
+  // Nothing saves until the teacher has seen every row (Phase-9-Critic #6).
   await teacher.goto("/app/bank");
+  await teacher.getByRole("button", { name: "Import a spreadsheet" }).click();
   await teacher.getByLabel("CSV file").setInputFiles({
     name: "questions.csv",
     mimeType: "text/csv",
     buffer: Buffer.from(CSV_TEMPLATE),
   });
-  await expect(teacher.getByText("Added 6 questions.")).toBeVisible();
+  await expect(teacher.getByText("6 ready.")).toBeVisible();
+  await teacher.getByRole("button", { name: "Save 6 questions" }).click();
+  await expect(teacher.getByText("Saved 6 questions to your bank.")).toBeVisible();
 
   // A test with three of them, open now.
   await teacher.goto("/app");
@@ -83,4 +87,39 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   // And cannot open the builder.
   await student.goto(teacher.url());
   await expect(student.getByRole("heading", { name: "You don't have access" })).toBeVisible();
+});
+
+// Phase 9.4: the prompt carries the import's header; an AI's reply, chatter and all, previews row by
+// row; the saved questions carry the board, class, subject and chapter the teacher chose.
+test("a teacher turns an AI's reply into questions", async ({ page }) => {
+  const email = uniqueEmail("ai-teacher");
+  await createUser({ email, password: PASSWORD, fullName: "Asha Teacher", teacher: true });
+  await signInAs(page, email);
+  await page.goto("/app/bank");
+
+  await page.getByLabel("Subject").selectOption({ label: "Science and Technology Part 1" });
+  await page.getByLabel("Chapter or topic").fill("Refraction of Light");
+  await expect(page.getByLabel("The prompt")).toHaveValue(
+    /chapter "Refraction of Light"[\s\S]*type,prompt,options,correct,points,tags,tolerance/,
+  );
+
+  const reply = [
+    "Sure! Here are your questions:",
+    "```csv",
+    "type,prompt,options,correct,points,tags,tolerance",
+    'single,"Light bends when it passes from air into?","vacuum|glass",B,1,easy|refraction,',
+    'true_false,"The speed of light is the same in all media.",,false,1,easy|speed,',
+    'single,"Broken row","only one",A,1,,',
+    "```",
+  ].join("\n");
+  await page.getByLabel("The AI's answer, with the CSV").fill(reply);
+  await page.getByRole("button", { name: "Check the questions" }).click();
+  await expect(page.getByText(/2 ready, 1 need fixing/)).toBeVisible();
+  await page.getByRole("button", { name: "Save 2 questions" }).click();
+  await expect(page.getByText("Saved 2 questions to your bank.")).toBeVisible();
+
+  await page.reload();
+  await expect(
+    page.getByText(/msbshse, class-10, science-1, refraction-of-light, easy, refraction/),
+  ).toBeVisible();
 });

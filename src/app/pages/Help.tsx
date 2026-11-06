@@ -57,7 +57,9 @@ export function HelpStudents() {
       </Step>
       <Step n={4} title="During the test">
         Your answers save as you go, and wait on your computer if the connection drops. Stay in full
-        screen and on the test page. If a warning appears, it says what was noticed and what to do.
+        screen and on the test page. If a warning appears, it says what was noticed and what to do,
+        and unless your teacher turned sound off, it is also read aloud with a short chime. Keep
+        your sound on. The rules are read aloud when you start, too.
       </Step>
       <Step n={5} title="If something breaks">
         Reload the page: your answers and the time left come back. If your phone disconnects, open

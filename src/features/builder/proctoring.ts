@@ -15,6 +15,8 @@ export type Proctoring = {
   auto_submit_screen_share_s: number | null;
   /** End the attempt when the phone has been gone this long. Off when null (D7). */
   auto_submit_phone_gone_min: number | null;
+  /** Speak a warning when a flag opens. Absent in tests saved before 9.6, which means on. */
+  spoken_warnings?: boolean;
 };
 
 export const PRESETS: Record<Preset, { label: string; text: string }> = {
@@ -38,7 +40,10 @@ export const SNAPSHOT_INTERVALS = [30, 60, 120, 300];
 export function isValidProctoring(value: unknown): value is Proctoring {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const p = value as Record<string, unknown>;
-  const keys = Object.keys(p).sort().join(",");
+  const keys = Object.keys(p)
+    .filter((k) => k !== "spoken_warnings")
+    .sort()
+    .join(",");
   const expected = [
     "auto_submit_phone_gone_min",
     "auto_submit_screen_share_s",
@@ -56,6 +61,7 @@ export function isValidProctoring(value: unknown): value is Proctoring {
     typeof p.identity_check === "boolean" &&
     typeof p.phone_required === "boolean" &&
     typeof p.screen_share_required === "boolean" &&
+    (p.spoken_warnings === undefined || typeof p.spoken_warnings === "boolean") &&
     within(p.snapshot_interval_s, 30, 300) &&
     (p.auto_submit_screen_share_s === null || within(p.auto_submit_screen_share_s, 10, 600)) &&
     (p.auto_submit_phone_gone_min === null || within(p.auto_submit_phone_gone_min, 1, 30))
@@ -65,4 +71,9 @@ export function isValidProctoring(value: unknown): value is Proctoring {
 /** The camera is needed for camera checks and for the identity check; light alone needs neither. */
 export function needsCamera(p: Proctoring): boolean {
   return p.preset !== "light" || p.identity_check;
+}
+
+/** Spoken warnings are on unless the teacher turned them off. */
+export function speaksWarnings(p: Proctoring): boolean {
+  return p.spoken_warnings !== false;
 }

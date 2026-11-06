@@ -83,26 +83,42 @@ export function LiveGrid() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link to={`/app/tests/${testId}/edit`} className="text-sm text-accent underline">
-            Back to the test
+          <Link to={`/app/tests/${testId}/edit`} className="text-body-medium text-accent">
+            ← Back to the test
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold">Live: {test.data?.title}</h1>
-          <p className="text-sm text-text-muted">
+          <h1 className="mt-1 flex items-center gap-3 text-title-1-bold tracking-tight text-text">
+            Live: {test.data?.title}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-high/10 px-2.5 py-1 text-caption-1-semibold text-high">
+              <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-high" />
+              Live
+            </span>
+          </h1>
+          <p className="text-body-regular text-text-muted">
             {live} taking it now · {rows.length} started
             {live > MAX_LIVE_STUDENTS * 0.8 && ` · near the free plan's ${MAX_LIVE_STUDENTS}`}
           </p>
         </div>
-        <Link to={`/app/tests/${testId}/review`} className="text-accent underline">
+        <Link
+          to={`/app/tests/${testId}/review`}
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-body-medium text-text no-underline shadow-xs hover:bg-surface-muted"
+        >
           Review flags
         </Link>
       </div>
       {!connected && (
-        <p role="status" className="rounded-md border border-warn p-3 text-sm">
+        <p
+          role="status"
+          className="rounded-xl border border-warn/40 bg-warn/10 p-3 text-body-medium text-warn"
+        >
           Live updates paused, reconnecting. The list still refreshes every 15 seconds.
         </p>
       )}
-      {rows.length === 0 && <p className="text-text-muted">No one has started yet.</p>}
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {rows.length === 0 && (
+        <p className="rounded-2xl border border-dashed border-border p-8 text-center text-text-muted">
+          No one has started yet.
+        </p>
+      )}
+      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((r) => (
           <Tile
             key={r.attempt_id}
@@ -131,20 +147,55 @@ function Tile({
 }) {
   const fresh = summary && now - summary.at < 30_000;
   const attention = Math.min(row.unreviewed, row.high_count) > 0;
+  const writing = row.status === "in_progress";
+  const badge = attention
+    ? { text: "Needs a look", cls: "bg-high/10 text-high" }
+    : writing
+      ? { text: "Writing", cls: "bg-accent/10 text-accent" }
+      : { text: STATUS[row.status], cls: "bg-surface-muted text-text-muted" };
+  const name = row.full_name || "Student";
   return (
     <li
-      className={`space-y-2 rounded-lg border p-4 ${attention ? "border-high" : "border-border"}`}
+      className={`space-y-3 rounded-2xl border bg-surface p-4 shadow-xs transition-shadow hover:shadow-md ${
+        attention ? "border-high/60 ring-1 ring-high/30" : "border-border"
+      }`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-medium">{row.full_name || "Student"}</p>
-        <p className="font-mono text-sm">
-          {row.status === "in_progress"
-            ? formatRemaining(Date.parse(row.deadline_at) - now)
-            : STATUS[row.status]}
-        </p>
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden
+          className="grid size-10 shrink-0 place-items-center rounded-full bg-accent/10 text-body-semibold text-accent"
+        >
+          {name
+            .split(" ")
+            .map((w) => w[0])
+            .slice(0, 2)
+            .join("")
+            .toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-body-semibold text-text">{name}</p>
+          <span
+            className={`mt-0.5 inline-block rounded-md px-1.5 py-0.5 text-caption-1-medium ${badge.cls}`}
+          >
+            {badge.text}
+          </span>
+        </div>
+        {writing && (
+          <p className="rounded-full bg-surface-muted px-2.5 py-1 font-mono text-caption-1-semibold tabular-nums text-text">
+            {formatRemaining(Date.parse(row.deadline_at) - now)}
+          </p>
+        )}
       </div>
+      {writing && fresh && summary.total > 0 && (
+        <div aria-hidden className="h-1.5 rounded-full bg-surface-muted">
+          <div
+            className="h-1.5 rounded-full bg-accent transition-all"
+            style={{ width: `${(summary.answered / summary.total) * 100}%` }}
+          />
+        </div>
+      )}
       {row.status === "in_progress" && (
-        <p className="text-sm text-text-muted">
+        <p className="text-caption-1-regular text-text-muted">
           {fresh
             ? [
                 `${summary.answered} of ${summary.total} answered`,
@@ -161,8 +212,8 @@ function Tile({
             : "No recent signal from this computer"}
         </p>
       )}
-      <p className="text-sm">
-        <span className={row.high_count ? "text-high" : "text-text-muted"}>
+      <p className="text-body-regular">
+        <span className={row.high_count ? "font-semibold text-high" : "text-text-muted"}>
           {row.high_count} high
         </span>
         {" · "}
@@ -174,7 +225,7 @@ function Tile({
         )}
       </p>
       {row.last_kind && (
-        <p className="text-sm text-text-muted">
+        <p className="text-caption-1-regular text-text-muted">
           Latest: {EVENT_LABEL[row.last_kind] ?? row.last_kind}
         </p>
       )}

@@ -21,7 +21,13 @@ import {
   useUpdateTest,
   type DraftQuestion,
 } from "./api";
-import { PRESETS, SNAPSHOT_INTERVALS, type Preset, type Proctoring } from "./proctoring";
+import {
+  PRESETS,
+  SNAPSHOT_INTERVALS,
+  speaksWarnings,
+  type Preset,
+  type Proctoring,
+} from "./proctoring";
 
 export function Builder() {
   const { testId = "" } = useParams();
@@ -382,6 +388,14 @@ function ProctoringSettings({ test }: { test: TestRow }) {
           checked={p.screen_share_required}
           onChange={(v) => set({ screen_share_required: v })}
           label="Sharing the whole screen"
+        />
+      </fieldset>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Sound</legend>
+        <Toggle
+          checked={speaksWarnings(p)}
+          onChange={(v) => set({ spoken_warnings: v })}
+          label="Read the rules aloud at the start, and speak a short warning when something is flagged"
         />
       </fieldset>
       <label className="block">

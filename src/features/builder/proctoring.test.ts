@@ -19,6 +19,10 @@ describe("isValidProctoring (mirrors valid_proctoring in the database)", () => {
     expect(isValidProctoring({ ...DEFAULT, preset: "lax" })).toBe(false));
   it("refuses a snapshot interval out of range", () =>
     expect(isValidProctoring({ ...DEFAULT, snapshot_interval_s: 5 })).toBe(false));
+  it("accepts settings with or without spoken warnings", () => {
+    expect(isValidProctoring({ ...DEFAULT, spoken_warnings: false })).toBe(true);
+    expect(isValidProctoring({ ...DEFAULT, spoken_warnings: "yes" })).toBe(false);
+  });
   it("accepts an automatic action in range", () =>
     expect(isValidProctoring({ ...DEFAULT, auto_submit_phone_gone_min: 2 })).toBe(true));
 });

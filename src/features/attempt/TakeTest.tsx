@@ -7,7 +7,8 @@ import { messageFrom } from "../../lib/errors";
 import type { Json } from "../../lib/database.types";
 import { formatRemaining, formatWhen } from "../../lib/time";
 import { useTest } from "../builder/api";
-import type { Proctoring } from "../builder/proctoring";
+import { needsCamera, speaksWarnings, type Proctoring } from "../builder/proctoring";
+import { startInstructions, voice } from "../proctoring/voice";
 import { QuestionView } from "../questions/QuestionView";
 import { SystemCheck, type CheckedDevices } from "../proctoring/SystemCheck";
 import { IdentityGate, type IdentityResult } from "../proctoring/IdentityGate";
@@ -64,6 +65,8 @@ export function TakeTest() {
   const willStart = !!open || (windowOpen && left > 0);
 
   function begin() {
+    // Speech is allowed only after a tap, so it is unlocked here (Phase-9-Critic #8).
+    if (speaksWarnings(settings)) voice.unlock();
     if (needsChecks) {
       // Full screen must be asked for inside the click itself.
       void document.documentElement.requestFullscreen?.().catch(() => {});
@@ -72,6 +75,9 @@ export function TakeTest() {
     start.mutate(testId, {
       onSuccess: async (p) => {
         if (needsChecks) await recordConsent(p.attempt_id, CONSENT_VERSION).catch(() => {});
+        if (speaksWarnings(p.proctoring)) {
+          voice.say(startInstructions(t.duration_min, needsCamera(p.proctoring)));
+        }
         setPayload(p);
       },
     });
@@ -310,14 +316,16 @@ function TestScreen({
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface py-3">
-        <h1 className="text-lg font-semibold">{payload.title}</h1>
-        <p role="status" aria-live="polite" className="text-sm text-text-muted">
+      <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface/95 px-4 py-3 shadow-xs backdrop-blur">
+        <h1 className="text-headline-semibold text-text">{payload.title}</h1>
+        <p role="status" aria-live="polite" className="text-caption-1-regular text-text-muted">
           {SAVE_TEXT[save.kind]}
           {status && ` · ${statusText(status)}`}
         </p>
         <p
-          className={`font-mono text-lg ${remaining < 60_000 ? "text-high" : ""}`}
+          className={`rounded-full px-3 py-1 font-mono text-headline-semibold tabular-nums ${
+            remaining < 60_000 ? "bg-high/10 text-high" : "bg-surface-muted text-text"
+          }`}
           aria-label={`Time left: ${formatRemaining(remaining)}`}
         >
           {formatRemaining(remaining)}
@@ -346,7 +354,10 @@ function TestScreen({
         </div>
       )}
       {status?.warnings[0] && (
-        <p role="alert" className="rounded-md border border-warn p-3 text-sm">
+        <p
+          role="alert"
+          className="rounded-xl border border-warn/40 bg-warn/10 p-3 text-body-medium text-warn"
+        >
           {status.warnings[0].text}
         </p>
       )}
@@ -376,71 +387,103 @@ function TestScreen({
         />
       )}
 
-      <nav aria-label="Questions" className="flex flex-wrap gap-2">
-        {items.map((it, i) => (
-          <button
-            key={it.id}
-            type="button"
-            onClick={() => go(i)}
-            aria-current={i === index ? "step" : undefined}
-            aria-label={`Question ${i + 1}${isBlank(answers[it.id]) ? ", not answered" : ", answered"}${
-              flagged.has(it.id) ? ", marked for review" : ""
-            }`}
-            className={`h-9 w-9 rounded-md border text-sm ${
-              i === index
-                ? "border-accent bg-accent text-accent-text"
-                : isBlank(answers[it.id])
-                  ? "border-border"
-                  : "border-accent text-accent"
-            } ${flagged.has(it.id) ? "ring-2 ring-warn" : ""}`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </nav>
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_18rem]">
+        <div className="space-y-4">
+          <section className="rounded-2xl border border-border bg-surface p-6 shadow-xs">
+            <QuestionView
+              item={item}
+              number={index + 1}
+              value={answers[item.id]}
+              onChange={(value) => answer(item.id, value)}
+            />
+            <label className="mt-4 flex items-center gap-2 text-sm text-text-muted">
+              <input
+                type="checkbox"
+                checked={flagged.has(item.id)}
+                onChange={() => toggleFlag(item.id)}
+              />
+              Mark to come back to
+            </label>
+          </section>
 
-      <section className="rounded-lg border border-border p-5">
-        <QuestionView
-          item={item}
-          number={index + 1}
-          value={answers[item.id]}
-          onChange={(value) => answer(item.id, value)}
-        />
-        <label className="mt-4 flex items-center gap-2 text-sm text-text-muted">
-          <input
-            type="checkbox"
-            checked={flagged.has(item.id)}
-            onChange={() => toggleFlag(item.id)}
-          />
-          Mark to come back to
-        </label>
-      </section>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="plain" disabled={index === 0} onClick={() => go(index - 1)}>
-          Previous
-        </Button>
-        {index < items.length - 1 && <Button onClick={() => go(index + 1)}>Next</Button>}
-        <span className="flex-1" />
-        {confirming ? (
-          <>
-            <span className="text-sm">
-              {unanswered > 0
-                ? `${unanswered} ${unanswered === 1 ? "question is" : "questions are"} not answered. Submit anyway?`
-                : "Submit your answers? You can't change them afterwards."}
-            </span>
-            <Button onClick={() => void finish()} disabled={submit.isPending}>
-              Yes, submit
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="plain" disabled={index === 0} onClick={() => go(index - 1)}>
+              Previous
             </Button>
-            <Button variant="plain" onClick={() => setConfirming(false)}>
-              Keep going
-            </Button>
-          </>
-        ) : (
-          <Button variant="plain" onClick={() => setConfirming(true)}>
-            Submit the test
-          </Button>
-        )}
+            {index < items.length - 1 && <Button onClick={() => go(index + 1)}>Next</Button>}
+            <span className="flex-1" />
+            {confirming ? (
+              <>
+                <span className="text-sm">
+                  {unanswered > 0
+                    ? `${unanswered} ${unanswered === 1 ? "question is" : "questions are"} not answered. Submit anyway?`
+                    : "Submit your answers? You can't change them afterwards."}
+                </span>
+                <Button onClick={() => void finish()} disabled={submit.isPending}>
+                  Yes, submit
+                </Button>
+                <Button variant="plain" onClick={() => setConfirming(false)}>
+                  Keep going
+                </Button>
+              </>
+            ) : (
+              <Button variant="plain" onClick={() => setConfirming(true)}>
+                Submit the test
+              </Button>
+            )}
+          </div>
+        </div>
+        <aside className="space-y-4 rounded-2xl border border-border bg-surface p-4 shadow-xs lg:sticky lg:top-24">
+          <div>
+            <p className="text-caption-1-semibold text-text-muted">
+              {items.filter((it) => !isBlank(answers[it.id])).length} of {items.length} answered
+            </p>
+            <div className="mt-2 h-1.5 rounded-full bg-surface-muted">
+              <div
+                className="h-1.5 rounded-full bg-accent transition-all"
+                style={{
+                  width: `${(items.filter((it) => !isBlank(answers[it.id])).length / items.length) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+          <nav aria-label="Questions" className="grid grid-cols-5 gap-2">
+            {items.map((it, i) => (
+              <button
+                key={it.id}
+                type="button"
+                onClick={() => go(i)}
+                aria-current={i === index ? "step" : undefined}
+                aria-label={`Question ${i + 1}${isBlank(answers[it.id]) ? ", not answered" : ", answered"}${
+                  flagged.has(it.id) ? ", marked for review" : ""
+                }`}
+                className={`h-10 rounded-lg border text-body-medium transition-colors ${
+                  i === index
+                    ? "border-accent bg-accent text-accent-text"
+                    : isBlank(answers[it.id])
+                      ? "border-border hover:bg-surface-muted"
+                      : "border-accent/40 bg-accent/10 text-accent"
+                } ${flagged.has(it.id) ? "ring-2 ring-warn ring-offset-1" : ""}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </nav>
+          <ul className="space-y-1 text-caption-1-regular text-text-muted">
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="size-3 rounded border border-accent/40 bg-accent/10" />
+              Answered
+            </li>
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="size-3 rounded border border-border" />
+              Not answered
+            </li>
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="size-3 rounded border border-border ring-2 ring-warn" />
+              Marked to come back to
+            </li>
+          </ul>
+        </aside>
       </div>
       {submit.isError && <Message kind="error">{messageFrom(submit.error)}</Message>}
     </div>

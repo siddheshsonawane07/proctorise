@@ -3,6 +3,7 @@ import { EventSink } from "./sink";
 import { uploadSnapshot } from "./evidence";
 import { watchIntegrity } from "./integrity";
 import { watchSpeech } from "./speech";
+import { voice } from "./voice";
 import {
   Rules,
   type Action,
@@ -12,7 +13,7 @@ import {
 } from "./rules/engine";
 import { embed, similarity, MATCH_THRESHOLD, type Embedding } from "./identity";
 import { STUDENT_MESSAGE } from "./messages";
-import type { Proctoring } from "../builder/proctoring";
+import { speaksWarnings, type Proctoring } from "../builder/proctoring";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
 import { pairingChannel } from "../pairing/channel";
@@ -120,8 +121,11 @@ export class ProctorSession {
     if (camera && proctoring.preset !== "light") {
       if (camera.getAudioTracks().length) {
         this.cleanups.push(
+          // While the laptop speaks a warning, its own voice is not the student talking.
           watchSpeech(camera, (speaking) =>
-            this.apply(this.rules.speech({ t: this.now(), speaking })),
+            this.apply(
+              this.rules.speech({ t: this.now(), speaking: speaking && !voice.isTalking() }),
+            ),
           ),
         );
       }
@@ -152,6 +156,7 @@ export class ProctorSession {
     this.apply(this.phonePresence.end(this.now()));
     if (this.phoneChannel) void supabase.removeChannel(this.phoneChannel);
     this.detector.stop();
+    voice.stop();
     for (const cleanup of this.cleanups) cleanup();
     for (const stream of [this.options.camera, this.options.screen]) {
       stream?.getTracks().forEach((track) => track.stop());
@@ -312,10 +317,12 @@ export class ProctorSession {
         if (action.severity !== "info") {
           void this.snapshot(action.id);
           const text = STUDENT_MESSAGE[action.kind];
-          if (text)
+          if (text) {
             this.setStatus({
               warnings: [{ id: action.id, kind: action.kind, text }, ...this.status.warnings],
             });
+            if (speaksWarnings(this.options.proctoring)) voice.warn(action.kind, text);
+          }
         }
       } else if (action.type === "escalate") {
         this.sink.update({ client_id: action.id, severity: action.severity });

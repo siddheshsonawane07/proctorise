@@ -182,3 +182,42 @@ export function useCreateTest(classId: string) {
     return data;
   });
 }
+
+/** Several students at once; null keeps each one's own status or extra time (set_members). */
+export function useSetMembers(classId: string) {
+  return useClassMutation(
+    classId,
+    async (args: {
+      studentIds: string[];
+      status: MemberStatus | null;
+      timeMultiplier: number | null;
+    }) =>
+      unwrap(
+        await supabase.rpc("set_members", {
+          p_class_id: classId,
+          p_student_ids: args.studentIds,
+          // The function keeps each student's own value for a null.
+          p_status: args.status as MemberStatus,
+          p_time_multiplier: args.timeMultiplier as number,
+        }),
+      ),
+  );
+}
+
+export function useStudentReport(classId: string, studentId: string | null) {
+  return useQuery({
+    queryKey: ["class", classId, "student", studentId],
+    enabled: studentId !== null,
+    queryFn: async () =>
+      unwrap(
+        await supabase.rpc("class_student_report", {
+          p_class_id: classId,
+          p_student_id: studentId as string,
+        }),
+      ),
+  });
+}
+
+export async function fetchClassMarks(classId: string) {
+  return unwrap(await supabase.rpc("class_marks", { p_class_id: classId }));
+}

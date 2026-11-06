@@ -27,7 +27,7 @@ export function AppHome() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Hello, {firstName}</h1>
+      <h1 className="text-title-1-bold tracking-tight text-text">Hello, {firstName}</h1>
       {profile.role === "admin" && (
         <Card title="Admin">
           <div className="flex flex-wrap gap-4">
