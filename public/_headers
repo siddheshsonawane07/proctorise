@@ -1,7 +1,7 @@
-# Read by Cloudflare Pages and Netlify. Supabase is allowed by wildcard until phase 2 knows the
-# project URLs; tighten it to the two projects then.
+# Read by Cloudflare Pages. Supabase is allowed only for the production project; a new project
+# (staging, or a replacement) must be added here or the app cannot reach it.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self' blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob: https://gbpylpgsnodbbsowjgpz.supabase.co; media-src 'self' blob:; connect-src 'self' https://gbpylpgsnodbbsowjgpz.supabase.co wss://gbpylpgsnodbbsowjgpz.supabase.co; worker-src 'self' blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(self), microphone=(self), display-capture=(self), fullscreen=(self), window-management=(self), geolocation=(), payment=(), usb=()
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
