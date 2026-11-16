@@ -25,6 +25,7 @@ import { useJoinedClasses, useTeachingClasses } from "../../features/classes/api
 import { classBand } from "../../features/classes/colour";
 import { cx } from "@/utils/cx";
 import { buttonClass } from "../ui/buttonClass";
+import { LoadingBar } from "../ui/LoadingBar";
 import { Toaster } from "../ui/Toaster";
 
 /**
@@ -34,6 +35,7 @@ import { Toaster } from "../ui/Toaster";
 export function RootLayout() {
   return (
     <>
+      <LoadingBar />
       <Shell />
       <Toaster />
     </>

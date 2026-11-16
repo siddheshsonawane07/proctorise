@@ -7,6 +7,7 @@ import type {
 import { RiCheckboxCircleFill, RiErrorWarningFill } from "@remixicon/react";
 import { Button as BoardButton } from "@/components/base/buttons/button";
 import { cx } from "@/utils/cx";
+import { useWaiting } from "./busy";
 
 /*
  * The app's shared form parts, in BoardUI's look. Fields copy BoardUI's input styling onto plain
@@ -97,13 +98,14 @@ export function Card({ title, children }: { title: string; children: ReactNode }
   );
 }
 
+/**
+ * Something is loading. The line across the top of the window shows it (LoadingBar); here are
+ * only the words, for a screen reader.
+ */
 export function Loading() {
+  useWaiting();
   return (
-    <p role="status" className="flex items-center gap-2 text-text-muted">
-      <span
-        aria-hidden
-        className="size-4 animate-spin rounded-full border-2 border-border border-t-accent"
-      />
+    <p role="status" className="sr-only">
       Loading…
     </p>
   );

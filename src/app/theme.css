@@ -134,3 +134,38 @@ body {
     animation: none;
   }
 }
+
+/*
+ * The loading line: a third of the width, sliding left to right. It waits a moment before it
+ * shows, so a load that is over at once never flashes.
+ */
+@keyframes loading-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@keyframes loading-show {
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-bar {
+  opacity: 0;
+  animation: loading-show 1ms linear 150ms forwards;
+}
+
+.loading-bar > div {
+  animation: loading-slide 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar > div {
+    width: 100%;
+    animation: none;
+  }
+}
