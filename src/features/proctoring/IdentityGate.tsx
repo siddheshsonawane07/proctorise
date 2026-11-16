@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { Button, Card, Loading, Message } from "../../app/ui/form";
 import { useSession } from "../auth/session";
-import { embed, imageFrom, MATCH_THRESHOLD, similarity, type Embedding } from "./identity";
+import { bestMatch, embed, imageFrom, MATCH_THRESHOLD, type Embedding } from "./identity";
 import { Liveness } from "./Liveness";
 import { Preview } from "./Preview";
 
@@ -38,9 +38,10 @@ export function IdentityGate({
       const photo = await supabase.storage.from("enrolment").download(`${userId}/reference.jpg`);
       if (photo.error) throw photo.error;
       const ref = await embed(await imageFrom(photo.data));
-      const live = await embed(video);
-      if (Array.isArray(ref)) reference = ref;
-      if (Array.isArray(ref) && Array.isArray(live)) score = await similarity(ref, live);
+      if (Array.isArray(ref)) {
+        reference = ref;
+        score = await bestMatch(ref, video);
+      }
     } catch {
       // Treated as a failed try; the teacher sees the result either way.
     }

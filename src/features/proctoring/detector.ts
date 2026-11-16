@@ -4,10 +4,21 @@ import type { FrameMessage, InitMessage, WorkerResult } from "./worker";
 export const ASSETS = {
   wasmBase: "/vendor/mediapipe/1.2.2",
   faceModel: "/models/mediapipe/v1/face_landmarker.task",
-  objectModel: "/models/mediapipe/v1/efficientdet_lite0.tflite",
+  // float16, not int8: the GPU delegate returns nothing at all from the int8 file (v2/SOURCES.txt).
+  objectModel: "/models/mediapipe/v2/efficientdet_lite0.tflite",
 };
 
 export type Detection = Extract<WorkerResult, { type: "result" }>;
+
+/**
+ * The views the object detector takes in turn, as parts of the frame (x, y, width, height); null
+ * is the whole frame. The two zoomed views overlap in the middle and cover the desk and hands.
+ */
+const VIEWS: (readonly [number, number, number, number] | null)[] = [
+  [0, 0.3, 0.6, 0.7],
+  [0.4, 0.3, 0.6, 0.7],
+  null,
+];
 
 type Options = {
   withFace: boolean;
@@ -15,6 +26,13 @@ type Options = {
   fps: number;
   /** Run the object detector on every Nth frame. */
   objectsEvery: number;
+  /**
+   * Look for objects three ways in turn (the whole frame, then the lower left and lower right
+   * zoomed in) and report the best of the three every third frame. A phone in a hand is a few
+   * pixels of the whole frame; zoomed in it scored 0.34 to 0.52 where the whole frame scored 0 to
+   * 0.17 (Research: Detection Models 2026-11-17). Replaces `objectsEvery`.
+   */
+  tiles?: boolean;
   /** The time to stamp signals with: server-aligned milliseconds. */
   now: () => number;
   onResult: (result: Detection) => void;
@@ -33,6 +51,9 @@ export class Detector {
   private intervalMs: number;
   private stopped = false;
   private busy = false;
+  /** With `tiles`: the best score for each label over the views of this round. */
+  private round = new Map<string, number>();
+  private view = 0;
   readonly ready: Promise<{ delegate: "GPU" | "CPU"; loadMs: number }>;
   private resolveReady!: (value: { delegate: "GPU" | "CPU"; loadMs: number }) => void;
   private rejectReady!: (error: Error) => void;
@@ -92,17 +113,39 @@ export class Detector {
         resizeHeight: Math.round((640 * video.videoHeight) / video.videoWidth),
       });
       this.frameCount++;
+      this.view = this.options.tiles ? this.frameCount % VIEWS.length : 0;
+      const zoom = VIEWS[this.view];
       const message: FrameMessage = {
         type: "frame",
         bitmap,
         t: this.options.now(),
-        objects: this.frameCount % this.options.objectsEvery === 0,
+        objects: this.options.tiles || this.frameCount % this.options.objectsEvery === 0,
       };
-      this.worker.postMessage(message, [bitmap]);
+      if (zoom) {
+        const [x, y, w, h] = zoom.map((part, i) =>
+          Math.round(part * (i % 2 === 0 ? video.videoWidth : video.videoHeight)),
+        ) as [number, number, number, number];
+        message.zoom = await createImageBitmap(video, x, y, w, h, {
+          resizeWidth: 512,
+          resizeHeight: Math.round((512 * h) / w),
+        });
+      }
+      this.worker.postMessage(message, message.zoom ? [bitmap, message.zoom] : [bitmap]);
     } catch {
       this.busy = false;
       this.schedule(this.intervalMs);
     }
+  }
+
+  /** Keeps each label's best score across a round of views; hands the round over on its last. */
+  private merged(result: Detection): Detection {
+    for (const o of result.objects ?? []) {
+      this.round.set(o.label, Math.max(o.score, this.round.get(o.label) ?? 0));
+    }
+    if (this.view !== VIEWS.length - 1) return { ...result, objects: null };
+    const objects = [...this.round].map(([label, score]) => ({ label, score }));
+    this.round.clear();
+    return { ...result, objects };
   }
 
   private onMessage(message: WorkerResult) {
@@ -114,7 +157,7 @@ export class Detector {
       // Keep the worker under about a third of the time (the CPU budget, PHASE_5 § Verification).
       const minInterval = Math.min(1000, Math.max(1000 / this.options.fps, this.frameMs * 3));
       this.intervalMs = minInterval;
-      this.options.onResult(message);
+      this.options.onResult(this.options.tiles ? this.merged(message) : message);
       this.schedule(Math.max(0, this.intervalMs - message.ms));
     }
   }

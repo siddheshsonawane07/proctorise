@@ -21,7 +21,14 @@ export type InitMessage = {
   /** The phone needs no face model (phase 6). */
   withFace: boolean;
 };
-export type FrameMessage = { type: "frame"; bitmap: ImageBitmap; t: number; objects: boolean };
+export type FrameMessage = {
+  type: "frame";
+  bitmap: ImageBitmap;
+  t: number;
+  objects: boolean;
+  /** A closer view of part of the frame for the object detector, which sees small things badly. */
+  zoom?: ImageBitmap;
+};
 
 export type WorkerResult =
   | { type: "ready"; delegate: "GPU" | "CPU"; loadMs: number }
@@ -33,6 +40,9 @@ export type WorkerResult =
       yaw: number | null;
       pitch: number | null;
       blink: number | null;
+      /** Where the eyes point, sideways and up-down, from -1 to 1; 0 is straight out of the face. */
+      gazeX: number | null;
+      gazeY: number | null;
       objects: { label: string; score: number }[] | null;
       ms: number;
     };
@@ -91,12 +101,26 @@ async function init(message: InitMessage) {
 
 function readFace(result: FaceLandmarkerResult) {
   const faces = result.faceLandmarks.length;
-  if (faces !== 1) return { faces, yaw: null, pitch: null, blink: null };
+  if (faces !== 1) {
+    return { faces, yaw: null, pitch: null, blink: null, gazeX: null, gazeY: null };
+  }
   const matrix = result.facialTransformationMatrixes?.[0]?.data;
   const pose = matrix ? headPose(Array.from(matrix)) : { yaw: null, pitch: null };
   const shapes = result.faceBlendshapes?.[0]?.categories ?? [];
   const score = (name: string) => shapes.find((c) => c.categoryName === name)?.score ?? 0;
-  return { faces, ...pose, blink: Math.min(score("eyeBlinkLeft"), score("eyeBlinkRight")) };
+  // Left and right are the student's own: the left eye looking out and the right eye looking in
+  // both point to the student's left.
+  const left = (score("eyeLookOutLeft") + score("eyeLookInRight")) / 2;
+  const right = (score("eyeLookInLeft") + score("eyeLookOutRight")) / 2;
+  const up = (score("eyeLookUpLeft") + score("eyeLookUpRight")) / 2;
+  const down = (score("eyeLookDownLeft") + score("eyeLookDownRight")) / 2;
+  return {
+    faces,
+    ...pose,
+    blink: Math.min(score("eyeBlinkLeft"), score("eyeBlinkRight")),
+    gazeX: right - left,
+    gazeY: up - down,
+  };
 }
 
 function frame(message: FrameMessage) {
@@ -108,10 +132,12 @@ function frame(message: FrameMessage) {
     const f = face ? readFace(face.detectForVideo(message.bitmap, timestamp)) : null;
     const o =
       message.objects && objects
-        ? objects.detectForVideo(message.bitmap, timestamp).detections.flatMap((d) => {
-            const top = d.categories[0];
-            return top ? [{ label: top.categoryName, score: top.score }] : [];
-          })
+        ? objects
+            .detectForVideo(message.zoom ?? message.bitmap, timestamp)
+            .detections.flatMap((d) => {
+              const top = d.categories[0];
+              return top ? [{ label: top.categoryName, score: top.score }] : [];
+            })
         : null;
     post({
       type: "result",
@@ -120,11 +146,14 @@ function frame(message: FrameMessage) {
       yaw: f?.yaw ?? null,
       pitch: f?.pitch ?? null,
       blink: f?.blink ?? null,
+      gazeX: f?.gazeX ?? null,
+      gazeY: f?.gazeY ?? null,
       objects: o,
       ms: performance.now() - started,
     });
   } finally {
     message.bitmap.close();
+    message.zoom?.close();
   }
 }
 

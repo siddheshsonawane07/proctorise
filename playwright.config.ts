@@ -1,9 +1,13 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
 
 const desktop = /desktop\.spec\.ts/;
 const phone = /phone\.spec\.ts/;
 const stack = /(auth|teacher|attempt|maintenance|manage|a11y-app)\.spec\.ts/;
 const proctor = /proctor\.spec\.ts/;
+const camera = /camera\.spec\.ts/;
+// A real photograph as the camera: someone at a laptop with a phone in their hand.
+const PHONE_PHOTO = fileURLToPath(new URL("./e2e/fixtures/phone-in-hand.mjpeg", import.meta.url));
 
 export default defineConfig({
   testDir: "./e2e",
@@ -36,6 +40,21 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         launchOptions: {
           args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
+    },
+    // The same, with a photograph in place of Chromium's test pattern. No stack needed.
+    {
+      name: "camera",
+      testMatch: camera,
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: [
+            "--use-fake-device-for-media-stream",
+            "--use-fake-ui-for-media-stream",
+            `--use-file-for-fake-video-capture=${PHONE_PHOTO}`,
+          ],
         },
       },
     },

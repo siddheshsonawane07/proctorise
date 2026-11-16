@@ -4,8 +4,8 @@
  *
  * The fairness rules live here (Phase-5-Critic #3, #4): nothing fires on one frame; every rule has
  * a minimum duration or an n-of-m vote; a condition must stay clear for CLEAR_MS before an event
- * closes, so a flicker of detection neither starts nor ends one. Thresholds are per preset, from
- * PHASE_5 § 5.4, until the spike's measurements replace them.
+ * closes, so a flicker of detection neither starts nor ends one. Looking away is measured from
+ * where the student normally looks (Resting), not from the camera.
  */
 import type { Preset } from "../../builder/proctoring";
 
@@ -46,7 +46,14 @@ export type BrowserCondition =
   | "second_display"
   | "camera_lost";
 
-export type FaceSignal = { t: number; faces: number; yaw: number | null; pitch: number | null };
+export type FaceSignal = {
+  t: number;
+  faces: number;
+  yaw: number | null;
+  pitch: number | null;
+  /** Where the eyes point sideways, -1 to 1; absent from a detector that doesn't measure it. */
+  gazeX?: number | null;
+};
 export type ObjectSignal = { t: number; phone: number; book: number };
 export type SpeechSignal = { t: number; speaking: boolean };
 
@@ -70,21 +77,32 @@ type Thresholds = {
   multipleFacesMs: number;
   lookingAwayMs: number;
   lookingAwayWindowMs: number;
+  /** How far the head may turn or tilt from where this student normally holds it. */
   yawDeg: number;
   pitchDeg: number;
+  /** How far the eyes may point sideways from their usual place, on the -1 to 1 scale. */
+  gaze: number;
   objectScore: number;
   speechMs: number;
 };
 
+/*
+ * Shortened on 2026-11-17: the user found the checks too slow to be believed (nothing for 5 to 8
+ * seconds, where the old app spoke within 3). Still never one frame: at five frames a second, the
+ * shortest limit here is five frames in a row. Not yet walked against real students; the gate walk
+ * (Todos: Phase 5 Gate Walk) is what turns these from judgement into measurement.
+ */
 const STANDARD: Thresholds = {
   camera: true,
-  faceMissingMs: 5_000,
-  faceMissingHighMs: 30_000,
-  multipleFacesMs: 2_000,
-  lookingAwayMs: 8_000,
-  lookingAwayWindowMs: 30_000,
-  yawDeg: 35,
-  pitchDeg: 25,
+  faceMissingMs: 3_000,
+  faceMissingHighMs: 20_000,
+  multipleFacesMs: 1_500,
+  lookingAwayMs: 4_000,
+  lookingAwayWindowMs: 12_000,
+  yawDeg: 28,
+  // Wider than the turn: a glance down at the keyboard is part of typing an answer.
+  pitchDeg: 30,
+  gaze: 0.6,
   // 0.6 missed held phones on webcam-soft frames; 0.5 lost none to false alarms in the
   // measurement (Research: Phone Detection 2026-11-06). The two-of-three vote still applies.
   objectScore: 0.5,
@@ -96,10 +114,13 @@ export const PRESET_THRESHOLDS: Record<Preset, Thresholds> = {
   standard: STANDARD,
   strict: {
     ...STANDARD,
-    faceMissingMs: 3_000,
-    faceMissingHighMs: 15_000,
+    faceMissingMs: 2_000,
+    faceMissingHighMs: 12_000,
     multipleFacesMs: 1_000,
-    lookingAwayMs: 5_000,
+    lookingAwayMs: 3_000,
+    yawDeg: 24,
+    pitchDeg: 25,
+    gaze: 0.5,
     objectScore: 0.4,
     speechMs: 2_000,
   },
@@ -116,6 +137,49 @@ const BROWSER: Record<BrowserCondition, { severity: Severity; minMs: number }> =
   second_display: { severity: "high", minMs: 0 },
   camera_lost: { severity: "high", minMs: 3_000 },
 };
+
+/** Samples with one face before the resting place is known: about two seconds. */
+const SETTLE_SAMPLES = 8;
+/** The resting place is never taken to be further than this from facing the camera. */
+const REST_LIMIT_DEG = 30;
+/** How fast the resting place follows the student: about ten seconds to catch up. */
+const FOLLOW = 0.02;
+
+const median = (values: number[]) => [...values].sort((a, b) => a - b)[values.length >> 1]!;
+const clamp = (value: number, limit: number) => Math.max(-limit, Math.min(limit, value));
+
+/**
+ * Where this student's head and eyes rest when they look at their own screen. A camera above, below
+ * or beside the screen sees that as a turn, so "looking away" is measured from here and not from
+ * the camera. Learned from the first samples, then follows slow changes of posture, but only while
+ * the student is not looking away, so a long look elsewhere never becomes the new normal.
+ */
+export class Resting {
+  private first: { yaw: number; pitch: number; gazeX: number }[] = [];
+  yaw = 0;
+  pitch = 0;
+  gazeX = 0;
+  ready = false;
+
+  /** The sample's distance from rest, or null while rest is still being learned. */
+  offset(yaw: number, pitch: number, gazeX: number) {
+    if (!this.ready) {
+      this.first.push({ yaw, pitch, gazeX });
+      if (this.first.length < SETTLE_SAMPLES) return null;
+      this.yaw = clamp(median(this.first.map((s) => s.yaw)), REST_LIMIT_DEG);
+      this.pitch = clamp(median(this.first.map((s) => s.pitch)), REST_LIMIT_DEG);
+      this.gazeX = clamp(median(this.first.map((s) => s.gazeX)), 0.3);
+      this.ready = true;
+    }
+    return { yaw: yaw - this.yaw, pitch: pitch - this.pitch, gazeX: gazeX - this.gazeX };
+  }
+
+  follow(yaw: number, pitch: number, gazeX: number) {
+    this.yaw = clamp(this.yaw + FOLLOW * (yaw - this.yaw), REST_LIMIT_DEG);
+    this.pitch = clamp(this.pitch + FOLLOW * (pitch - this.pitch), REST_LIMIT_DEG);
+    this.gazeX = clamp(this.gazeX + FOLLOW * (gazeX - this.gazeX), 0.3);
+  }
+}
 
 /** One lasting condition: when it began, whether its event is open, and when it was last seen. */
 export class Condition {
@@ -187,6 +251,9 @@ export class Rules {
   private readonly book: Condition;
   private readonly speaking: Condition;
   private readonly browserConditions: Record<BrowserCondition, Condition>;
+  private readonly resting = new Resting();
+  /** The last frame's turn and tilt from rest, in degrees; null with no single face or no rest yet. */
+  turn: { yaw: number; pitch: number } | null = null;
   private awaySamples: { t: number; away: boolean }[] = [];
   private objectVotes: ObjectSignal[] = [];
 
@@ -218,11 +285,20 @@ export class Rules {
 
   face(s: FaceSignal): Action[] {
     if (!this.th.camera) return [];
-    const away =
-      s.faces === 1 &&
-      s.yaw !== null &&
-      s.pitch !== null &&
-      (Math.abs(s.yaw) > this.th.yawDeg || Math.abs(s.pitch) > this.th.pitchDeg);
+    let away = false;
+    this.turn = null;
+    if (s.faces === 1 && s.yaw !== null && s.pitch !== null) {
+      const gazeX = s.gazeX ?? 0;
+      const off = this.resting.offset(s.yaw, s.pitch, gazeX);
+      if (off) {
+        this.turn = { yaw: off.yaw, pitch: off.pitch };
+        away =
+          Math.abs(off.yaw) > this.th.yawDeg ||
+          Math.abs(off.pitch) > this.th.pitchDeg ||
+          Math.abs(off.gazeX) > this.th.gaze;
+        if (!away) this.resting.follow(s.yaw, s.pitch, gazeX);
+      }
+    }
     return [
       ...this.faceMissing.update(s.faces === 0, s.t),
       ...this.multipleFaces.update(s.faces >= 2, s.t, null, { faces: s.faces }),

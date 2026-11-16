@@ -1,0 +1,9 @@
+Downloaded 2026-11-17. Pinned to model version 1; self-hosted per ADR 002.
+
+efficientdet_lite0.tflite (float16)
+  https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite
+  sha256 4b59100025bea1235a84c1038879a6cccc9f6c49f5e41144e91e74d99e780993
+
+Replaces v1's int8 file. On the GPU delegate, which the worker tries first, the int8 file returns
+no detections at all (measured 2026-11-17 on an Apple M5 and on SwiftShader), so no phone or book
+was ever flagged for anyone whose browser gave the worker a GPU. float16 runs on both delegates.

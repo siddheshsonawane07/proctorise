@@ -65,6 +65,29 @@ export async function similarity(a: Embedding, b: Embedding): Promise<number> {
   return (await human()).match.similarity(a, b);
 }
 
+/**
+ * The best match over a few looks, a moment apart. One frame is unfair to someone reading the
+ * screen or typing: head down or half turned, the same face scores lower. Returns null when no
+ * look showed exactly one face.
+ */
+export async function bestMatch(
+  reference: Embedding,
+  video: HTMLVideoElement,
+  looks = 3,
+  gapMs = 700,
+): Promise<number | null> {
+  let best: number | null = null;
+  for (let i = 0; i < looks; i++) {
+    if (i > 0) await new Promise((resolve) => setTimeout(resolve, gapMs));
+    const live = await embed(video).catch(() => null);
+    if (!Array.isArray(live)) continue;
+    const score = await similarity(reference, live);
+    best = Math.max(best ?? 0, score);
+    if (best >= MATCH_THRESHOLD) break;
+  }
+  return best;
+}
+
 /** Loads an image from a blob, for the reference photo. */
 export function imageFrom(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {

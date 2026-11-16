@@ -1,0 +1,5 @@
+phone-in-hand.mjpeg
+  Two identical 1280x720 JPEG frames, for Chromium's --use-file-for-fake-video-capture.
+  From "Man with smartphone and laptop (Unsplash).jpg" by Alejandro Escamilla, CC0 (public domain
+  dedication), https://commons.wikimedia.org/wiki/File:Man_with_smartphone_and_laptop_(Unsplash).jpg
+  Fetched 2026-11-16 at 1280 px wide, letterboxed onto a 1280x720 grey frame.

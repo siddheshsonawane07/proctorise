@@ -36,8 +36,9 @@ export class DemoSession {
   private readonly video = document.createElement("video");
   private readonly detector = new Detector({
     withFace: true,
-    fps: 3,
+    fps: 5,
     objectsEvery: 3,
+    tiles: true,
     now: () => Date.now(),
     onResult: (result) => this.onDetection(result),
   });
@@ -111,14 +112,19 @@ export class DemoSession {
       faces: result.faces,
       yaw: result.yaw,
       pitch: result.pitch,
+      gazeX: result.gazeX,
     });
     let { phone, book } = this.state.signals;
     if (result.objects) {
       ({ phone, book } = readObjects(result.objects));
       actions.push(...this.rules.objects({ t: result.t, phone, book }));
     }
-    const { faces, yaw, pitch } = result;
-    this.set({ signals: { ...this.state.signals, faces, yaw, pitch, phone, book } }, actions);
+    // The meters show what the rule measures: the turn from where the visitor normally looks.
+    const { yaw = null, pitch = null } = this.rules.turn ?? {};
+    this.set(
+      { signals: { ...this.state.signals, faces: result.faces, yaw, pitch, phone, book } },
+      actions,
+    );
   }
 
   private set(patch: Partial<DemoState>, actions: Action[] = []) {

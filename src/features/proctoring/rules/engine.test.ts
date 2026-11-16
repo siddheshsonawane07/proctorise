@@ -31,7 +31,7 @@ describe("face_missing", () => {
     expect(actions).toEqual([]);
   });
 
-  it("opens after 5 s with no face, dated from when the face went", () => {
+  it("opens after 3 s with no face, dated from when the face went", () => {
     const r = rules();
     const actions = run(r, [...faces(0, 1000, ONE_FACE), ...faces(1250, 6500, NO_FACE)]);
     expect(actions).toEqual([
@@ -47,7 +47,7 @@ describe("face_missing", () => {
     ]);
   });
 
-  it("becomes high after 30 s, and closes once the face is back for a second", () => {
+  it("becomes high after 20 s, and closes once the face is back for a second", () => {
     const r = rules();
     const actions = run(r, [...faces(0, 31_000, NO_FACE), ...faces(31_250, 33_000, ONE_FACE)]);
     expect(actions.map((a) => a.type)).toEqual(["open", "escalate", "close"]);
@@ -65,38 +65,84 @@ describe("face_missing", () => {
 });
 
 describe("multiple_faces", () => {
-  it("is high after two faces for 2 s", () => {
+  it("is high after two faces for 1.5 s", () => {
     const actions = run(rules(), faces(0, 2_000, { faces: 2, yaw: 0, pitch: 0 }));
     expect(actions).toMatchObject([{ type: "open", kind: "multiple_faces", severity: "high" }]);
   });
 
-  it("ignores a second face for under 2 s", () => {
+  it("ignores a second face for under 1.5 s", () => {
     const actions = run(rules(), [
-      ...faces(0, 1_500, { faces: 2, yaw: 0, pitch: 0 }),
-      ...faces(1_750, 6_000, ONE_FACE),
+      ...faces(0, 1_250, { faces: 2, yaw: 0, pitch: 0 }),
+      ...faces(1_500, 6_000, ONE_FACE),
     ]);
     expect(actions).toEqual([]);
   });
 });
 
 describe("looking_away", () => {
-  it("adds up looking away across a 30 s window", () => {
-    const r = rules();
-    const away = { faces: 1, yaw: 50, pitch: 0 };
-    const actions = run(r, [
-      ...faces(0, 4_000, away),
-      ...faces(4_250, 8_000, ONE_FACE),
-      ...faces(8_250, 13_000, away),
+  const turned = (yaw: number) => ({ faces: 1, yaw, pitch: 0 });
+
+  it("measures from where the student rests, not from the camera", () => {
+    // A camera well to one side of the screen: reading the screen is a steady 25° turn to it.
+    const reading = run(rules(), faces(0, 30_000, turned(25)));
+    expect(reading).toEqual([]);
+
+    // From there, a further turn is what counts.
+    const actions = run(rules(), [
+      ...faces(0, 3_000, turned(25)),
+      ...faces(3_250, 9_000, turned(60)),
+    ]);
+    expect(actions).toMatchObject([{ type: "open", kind: "looking_away", severity: "warn" }]);
+  });
+
+  it("adds up looking away across the window", () => {
+    const actions = run(rules(), [
+      ...faces(0, 3_000, ONE_FACE),
+      ...faces(3_250, 5_500, turned(45)),
+      ...faces(5_750, 8_000, ONE_FACE),
+      ...faces(8_250, 11_000, turned(45)),
     ]);
     expect(actions).toMatchObject([{ type: "open", kind: "looking_away" }]);
   });
 
   it("does not count a glance", () => {
     const actions = run(rules(), [
-      ...faces(0, 2_000, { faces: 1, yaw: 50, pitch: 0 }),
-      ...faces(2_250, 20_000, ONE_FACE),
+      ...faces(0, 3_000, ONE_FACE),
+      ...faces(3_250, 5_000, turned(45)),
+      ...faces(5_250, 20_000, ONE_FACE),
     ]);
     expect(actions).toEqual([]);
+  });
+
+  it("counts eyes held far to one side with the head still", () => {
+    const actions = run(rules(), [
+      ...faces(0, 3_000, { ...ONE_FACE, gazeX: 0.05 }),
+      ...faces(3_250, 9_000, { ...ONE_FACE, gazeX: 0.8 }),
+    ]);
+    expect(actions).toMatchObject([{ type: "open", kind: "looking_away" }]);
+  });
+
+  it("never takes a long look away as the new normal", () => {
+    const actions = run(rules(), [
+      ...faces(0, 3_000, ONE_FACE),
+      ...faces(3_250, 90_000, turned(45)),
+    ]);
+    expect(actions.map((a) => a.type)).toEqual(["open"]);
+  });
+
+  it("does not learn its resting place from a head turned right away", () => {
+    // Starting the test turned 70° from the camera is still looking away.
+    const actions = run(rules(), faces(0, 9_000, turned(70)));
+    expect(actions).toMatchObject([{ type: "open", kind: "looking_away" }]);
+  });
+
+  it("follows a slow change of posture", () => {
+    // Twelve degrees further round, a degree every two seconds: never a look away.
+    const frames: FaceSignal[] = [];
+    for (let t = 0; t <= 60_000; t += 250) {
+      frames.push({ t, faces: 1, yaw: Math.min(12, t / 2_000) + 10, pitch: 0 });
+    }
+    expect(run(rules(), frames)).toEqual([]);
   });
 });
 

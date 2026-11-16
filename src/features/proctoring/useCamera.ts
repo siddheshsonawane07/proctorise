@@ -20,7 +20,9 @@ export function useCamera(audio: boolean) {
     setState({ status: "asking" });
     try {
       const s = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+        // Enough pixels for the zoomed-in object views; a camera that can't simply gives less.
+        // Stored stills stay 480 wide (evidence.ts), so this costs no storage.
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
         audio,
       });
       stream.current = s;

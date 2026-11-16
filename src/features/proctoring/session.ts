@@ -11,7 +11,7 @@ import {
   type EventKind,
   type Severity,
 } from "./rules/engine";
-import { embed, similarity, MATCH_THRESHOLD, type Embedding } from "./identity";
+import { bestMatch, MATCH_THRESHOLD, type Embedding } from "./identity";
 import { STUDENT_MESSAGE } from "./messages";
 import { speaksWarnings, type Proctoring } from "../builder/proctoring";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -73,8 +73,9 @@ export class ProctorSession {
     this.rules = new Rules(options.proctoring.preset);
     this.detector = new Detector({
       withFace: true,
-      fps: options.proctoring.preset === "strict" ? 4 : 3,
+      fps: options.proctoring.preset === "strict" ? 6 : 5,
       objectsEvery: 3,
+      tiles: true,
       now: () => this.now(),
       onResult: (result) => this.onDetection(result),
     });
@@ -263,6 +264,7 @@ export class ProctorSession {
       faces: result.faces,
       yaw: result.yaw,
       pitch: result.pitch,
+      gazeX: result.gazeX,
     });
     if (result.objects) {
       actions.push(...this.rules.objects({ t: result.t, ...readObjects(result.objects) }));
@@ -273,9 +275,8 @@ export class ProctorSession {
   private async checkIdentity() {
     const reference = this.options.reference;
     if (!reference || this.stopped) return;
-    const live = await embed(this.cameraVideo).catch(() => null);
-    if (!Array.isArray(live)) return; // No single face now: face_missing / multiple_faces cover it.
-    const score = await similarity(reference, live);
+    const score = await bestMatch(reference, this.cameraVideo);
+    if (score === null || this.stopped) return; // No single face: face_missing covers it.
     if (score < MATCH_THRESHOLD) {
       this.apply(
         this.rules.instant("identity_mismatch", this.now(), "warn", { score, at: "recheck" }),

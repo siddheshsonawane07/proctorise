@@ -261,7 +261,8 @@ function SignalList({ signals }: { signals: Signals }) {
       </dl>
       <p className="mt-3 text-caption-1-regular text-text-muted">
         The line on each bar is where a check starts counting, on the standard setting. Nothing is
-        flagged on one reading: each check needs it to last.
+        flagged on one reading: each check needs it to last. Head turn and tilt are measured from
+        where you were looking in the first two seconds, so look at this page as you start.
       </p>
     </section>
   );
