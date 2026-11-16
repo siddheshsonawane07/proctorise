@@ -2,6 +2,7 @@ import { useState, type ChangeEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
+import { RiAddLine } from "@remixicon/react";
 import { Button, Card, Loading, Message } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import { unwrap } from "../classes/api";
@@ -17,6 +18,7 @@ export function Bank() {
   const [editing, setEditing] = useState<BankQuestion | "new" | null>(null);
   const queryClient = useQueryClient();
   const remove = useMutation({
+    meta: { ok: "Question deleted." },
     mutationFn: async (id: string) =>
       unwrap(await supabase.from("questions").delete().eq("id", id)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["bank"] }),
@@ -26,49 +28,53 @@ export function Bank() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-title-1-bold tracking-tight text-text">Question bank</h1>
-        <Button onClick={() => setEditing("new")}>New question</Button>
+        <Button onClick={() => setEditing("new")}>
+          <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
+          New question
+        </Button>
       </div>
       <p className="text-text-muted">
         Your questions, for any of your tests. Changing one here never changes a test that is
         already published.
       </p>
-      {editing && (
-        <QuestionEditor
-          key={editing === "new" ? "new" : editing.id}
-          question={editing === "new" ? null : editing}
-          onDone={() => setEditing(null)}
-        />
+      {editing === "new" && (
+        <QuestionEditor question={null} another onDone={() => setEditing(null)} />
       )}
       <AddQuestions />
       {bank.isPending && <Loading />}
       {bank.isError && <Message kind="error">{messageFrom(bank.error)}</Message>}
       {bank.data?.length === 0 && <p className="text-text-muted">No questions yet.</p>}
-      {remove.isError && <Message kind="error">{messageFrom(remove.error)}</Message>}
       <ul className="space-y-3">
-        {bank.data?.map((q) => (
-          <li key={q.id} className="rounded-2xl border border-border bg-surface p-4 shadow-xs">
-            <p className="text-sm text-text-muted">
-              {TYPE_LABEL[q.type]} · {Number(q.points)}{" "}
-              {Number(q.points) === 1 ? "point" : "points"}
-              {q.tags.length > 0 && ` · ${q.tags.join(", ")}`}
-            </p>
-            <div className="mt-2">
-              <Markdown>{q.prompt}</Markdown>
-            </div>
-            <div className="mt-3 flex gap-2">
-              <Button variant="plain" onClick={() => setEditing(q)}>
-                Edit
-              </Button>
-              <Button
-                variant="plain"
-                disabled={remove.isPending}
-                onClick={() => remove.mutate(q.id)}
-              >
-                Delete
-              </Button>
-            </div>
-          </li>
-        ))}
+        {bank.data?.map((q) =>
+          editing !== "new" && editing?.id === q.id ? (
+            <li key={q.id}>
+              <QuestionEditor question={q} onDone={() => setEditing(null)} />
+            </li>
+          ) : (
+            <li key={q.id} className="rounded-2xl border border-border bg-surface p-4 shadow-xs">
+              <p className="text-body-regular text-text-muted">
+                {TYPE_LABEL[q.type]}, {Number(q.points)}{" "}
+                {Number(q.points) === 1 ? "point" : "points"}
+                {q.tags.length > 0 && `. Tags: ${q.tags.join(", ")}`}
+              </p>
+              <div className="mt-2">
+                <Markdown>{q.prompt}</Markdown>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <Button variant="plain" onClick={() => setEditing(q)}>
+                  Edit
+                </Button>
+                <Button
+                  variant="plain"
+                  disabled={remove.isPending}
+                  onClick={() => remove.mutate(q.id)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </li>
+          ),
+        )}
       </ul>
     </div>
   );

@@ -43,7 +43,6 @@ function ClassItem({ cls }: { cls: ClassSummary }) {
   const transfer = useTransferClass();
   const remove = useDeleteClass();
   const [handing, setHanding] = useState(false);
-  const error = transfer.error ?? remove.error;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,7 +65,6 @@ function ClassItem({ cls }: { cls: ClassSummary }) {
           {new Date(cls.created_at).toLocaleDateString()}
         </p>
       </div>
-      {error && <Message kind="error">{messageFrom(error)}</Message>}
       {handing ? (
         <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-2">
           <div className="min-w-56 flex-1">

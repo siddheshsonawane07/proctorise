@@ -101,7 +101,7 @@ describe("signing in", () => {
 
   it("lets a student join a class", async () => {
     renderAt("/app", profile());
-    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Join class" })).toBeInTheDocument();
   });
 
   it("keeps a student out of the admin page", async () => {
@@ -119,19 +119,19 @@ describe("one role at a time", () => {
   it("shows a teacher the teaching side only, until they switch", async () => {
     renderAt("/app", teacher);
     expect(await screen.findByText("Classes you teach will appear here.")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Join a class")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Join class" })).not.toBeInTheDocument();
 
     const menu = screen.getByRole("complementary");
     act(() => within(menu).getByRole("button", { name: "Student" }).click());
-    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
-    expect(screen.queryByLabelText("New class")).not.toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Join class" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Create class" })).not.toBeInTheDocument();
     expect(within(menu).queryByRole("link", { name: "Question bank" })).not.toBeInTheDocument();
     expect(within(menu).getByRole("link", { name: "Your photo" })).toBeInTheDocument();
   });
 
   it("gives a student no switch", async () => {
     renderAt("/app", profile());
-    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Join class" })).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Use Proctorise as" })).not.toBeInTheDocument();
   });
 
@@ -143,8 +143,8 @@ describe("one role at a time", () => {
     }
     expect(within(menu).queryByRole("link", { name: "Question bank" })).not.toBeInTheDocument();
     expect(within(menu).queryByRole("link", { name: "Your photo" })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Join a class")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("New class")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Join class" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Create class" })).not.toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Use Proctorise as" })).not.toBeInTheDocument();
   });
 

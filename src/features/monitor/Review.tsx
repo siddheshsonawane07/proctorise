@@ -39,7 +39,6 @@ export function Review() {
           A flag is something the software noticed, not proof. Look at each one before you decide.
         </p>
       </div>
-      {setIntegrity.isError && <Message kind="error">{messageFrom(setIntegrity.error)}</Message>}
       {flagged.length === 0 && <p className="text-text-muted">No attempt has any flags.</p>}
       {flagged.map((r) => (
         <Card key={r.attempt_id} title={r.full_name || "Student"}>

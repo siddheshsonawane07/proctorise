@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
 import { supabase } from "../../lib/supabase";
 import { messageFrom, safeNext } from "../../lib/errors";
-import { Button, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Field, Loading } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
 import { GoogleButton } from "./GoogleButton";
 
@@ -11,7 +12,6 @@ export function SignIn() {
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   if (state.status === "loading") return <Loading />;
@@ -21,13 +21,12 @@ export function SignIn() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setBusy(true);
-    setError(null);
     const { error } = await supabase.auth.signInWithPassword({
       email: String(form.get("email")),
       password: String(form.get("password")),
     });
     setBusy(false);
-    if (error) setError(messageFrom(error));
+    if (error) toast.error(messageFrom(error));
     else navigate(next, { replace: true });
   }
 
@@ -43,7 +42,6 @@ export function SignIn() {
           autoComplete="current-password"
           required
         />
-        {error && <Message kind="error">{error}</Message>}
         <Button type="submit" disabled={busy} className="w-full">
           {busy ? "Signing in…" : "Sign in"}
         </Button>

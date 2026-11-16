@@ -28,7 +28,7 @@ test("sign up, confirm by email, ask to teach, get approved by the admin", async
   await expect(student.getByRole("heading", { name: "Check your email" })).toBeVisible();
 
   await student.goto(await latestEmailLink(studentEmail));
-  await expect(student.getByRole("heading", { name: "Hello, Asha" })).toBeVisible();
+  await expect(student.getByRole("heading", { name: "Classes" })).toBeVisible();
 
   await student.getByLabel("School or institution").fill("City School");
   await student.getByRole("button", { name: "Ask for teacher access" }).click();
@@ -79,14 +79,14 @@ test("signing out in one tab signs out the other", async ({ browser }) => {
   await first.getByLabel("Email").fill(email);
   await first.getByLabel("Password").fill(PASSWORD);
   await first.getByRole("button", { name: "Sign in" }).click();
-  await expect(first.getByRole("heading", { name: "Hello, Tara" })).toBeVisible();
+  await expect(first.getByRole("heading", { name: "Classes" })).toBeVisible();
 
   const second = await context.newPage();
   await second.goto("/app");
-  await expect(second.getByRole("heading", { name: "Hello, Tara" })).toBeVisible();
+  await expect(second.getByRole("heading", { name: "Classes" })).toBeVisible();
 
   await first.getByRole("button", { name: "Sign out" }).click();
   await expect(second.getByRole("heading", { name: "Sign in" })).toBeVisible();
   await second.goBack();
-  await expect(second.getByRole("heading", { name: "Hello, Tara" })).toBeHidden();
+  await expect(second.getByRole("heading", { name: "Classes" })).toBeHidden();
 });

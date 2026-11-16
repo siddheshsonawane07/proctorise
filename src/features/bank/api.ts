@@ -35,9 +35,11 @@ export function useBank() {
   });
 }
 
-export function useSaveQuestion() {
+/** `meta`: what the corner notification says, or `quiet` when the caller reports for itself. */
+export function useSaveQuestion(meta: { ok?: string; quiet?: boolean } = {}) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta,
     mutationFn: async ({ id, input }: { id: string | null; input: QuestionInput }) =>
       unwrap(
         await supabase.rpc("save_question", {

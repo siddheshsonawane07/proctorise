@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
-import { Button, Field, Message } from "../../app/ui/form";
+import { Button, Field } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 
 export function ForgotPassword() {
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -13,7 +13,7 @@ export function ForgotPassword() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
-    if (error) setError(messageFrom(error));
+    if (error) toast.error(messageFrom(error));
     else setDone(true);
   }
 
@@ -27,7 +27,6 @@ export function ForgotPassword() {
       ) : (
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <Field label="Email" name="email" type="email" autoComplete="email" required />
-          {error && <Message kind="error">{error}</Message>}
           <Button type="submit" className="w-full">
             Send the link
           </Button>

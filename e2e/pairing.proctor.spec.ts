@@ -77,7 +77,7 @@ test("pair a phone by code; one phone only; hidden and gone are recorded", async
   await laptop.getByLabel("Email").fill(studentEmail);
   await laptop.getByLabel("Password").fill(PASSWORD);
   await laptop.getByRole("button", { name: "Sign in" }).click();
-  await expect(laptop.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(laptop.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
   await laptop.goto(`/app/take/${testId}`);
   await laptop.getByRole("button", { name: "Connect my phone" }).click();
   const pairCode = (await laptop.locator("strong.font-mono").textContent())!.trim();

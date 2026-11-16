@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Button, Message } from "../../app/ui/form";
+import { Button } from "../../app/ui/form";
 
 /** Asked once of anyone who signed up without the 18+ box, e.g. with Google (ADR 005). */
 export function ConfirmAdult() {
@@ -37,7 +36,6 @@ export function ConfirmAdult() {
       <p className="mt-3 text-text-muted">
         Tests here use your camera, so for now Proctorise is only for people aged 18 or older.
       </p>
-      {confirm.isError && <Message kind="error">{messageFrom(confirm.error)}</Message>}
       <div className="mt-6 flex gap-3">
         <Button onClick={() => confirm.mutate()} disabled={confirm.isPending}>
           I am 18 or older

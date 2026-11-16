@@ -24,6 +24,13 @@ export function unwrap<T>(result: { data: T | null; error: unknown }): T {
   return result.data as T;
 }
 
+/** What a class card says about a test, without opening the class. */
+export type CardTest = Pick<
+  TestRow,
+  "id" | "title" | "status" | "opens_at" | "closes_at" | "duration_min" | "max_attempts"
+>;
+const CARD_TEST = "id, title, status, opens_at, closes_at, duration_min, max_attempts";
+
 export function useTeachingClasses(enabled: boolean) {
   const userId = useUserId();
   return useQuery({
@@ -33,10 +40,20 @@ export function useTeachingClasses(enabled: boolean) {
       unwrap(
         await supabase
           .from("class_teachers")
-          .select("kind, classes(*)")
+          .select(`kind, classes(*, tests(${CARD_TEST}), class_members(status))`)
           .eq("teacher_id", userId!)
           .order("added_at", { ascending: false }),
-      ).flatMap((row) => (row.classes ? [{ ...row.classes, kind: row.kind }] : [])),
+      ).flatMap((row) => {
+        if (!row.classes) return [];
+        const { class_members, ...cls } = row.classes;
+        return [
+          {
+            ...cls,
+            kind: row.kind,
+            students: class_members.filter((m) => m.status === "active").length,
+          },
+        ];
+      }),
   });
 }
 
@@ -49,7 +66,7 @@ export function useJoinedClasses() {
       unwrap(
         await supabase
           .from("class_members")
-          .select("time_multiplier, classes(id, name)")
+          .select(`classes(id, name, description, tests(${CARD_TEST}))`)
           .eq("student_id", userId!)
           .eq("status", "active")
           .order("joined_at", { ascending: false }),
@@ -103,19 +120,36 @@ export function useClassTeachers(classId: string, enabled: boolean) {
   });
 }
 
-/** A mutation that refreshes one class (or every class list) when it succeeds. */
-function useClassMutation<A, R>(classId: string | null, fn: (args: A) => Promise<R>) {
+/**
+ * A mutation that refreshes one class (or every class list) when it succeeds. `ok` is what the
+ * corner notification says then; without it, the caller says it or nothing needs saying.
+ */
+function useClassMutation<A, R>(classId: string | null, fn: (args: A) => Promise<R>, ok?: string) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: ok ? { ok } : {},
     mutationFn: fn,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: classId ? ["class", classId] : ["classes"] }),
+    // The lists too: the menu and the cards show a class's name, students and tests.
+    onSuccess: async () => {
+      if (classId) await queryClient.invalidateQueries({ queryKey: ["class", classId] });
+      await queryClient.invalidateQueries({ queryKey: ["classes"] });
+    },
   });
 }
 
 export function useCreateClass() {
-  return useClassMutation(null, async (name: string) =>
-    unwrap(await supabase.rpc("create_class", { p_name: name })),
+  return useClassMutation(
+    null,
+    async (args: { name: string; description: string }) => {
+      const id = unwrap(await supabase.rpc("create_class", { p_name: args.name }));
+      if (args.description) {
+        unwrap(
+          await supabase.from("classes").update({ description: args.description }).eq("id", id),
+        );
+      }
+      return id;
+    },
+    "Class created.",
   );
 }
 
@@ -143,8 +177,10 @@ export function useUpdateClass(classId: string) {
 }
 
 export function useRotateCode(classId: string) {
-  return useClassMutation(classId, async () =>
-    unwrap(await supabase.rpc("rotate_join_code", { p_class_id: classId })),
+  return useClassMutation(
+    classId,
+    async () => unwrap(await supabase.rpc("rotate_join_code", { p_class_id: classId })),
+    "New class code made. The old one no longer works.",
   );
 }
 
@@ -160,20 +196,27 @@ export function useSetMember(classId: string) {
           p_time_multiplier: args.timeMultiplier,
         }),
       ),
+    "Saved.",
   );
 }
 
 export function useAddCoTeacher(classId: string) {
-  return useClassMutation(classId, async (email: string) =>
-    unwrap(await supabase.rpc("add_co_teacher", { p_class_id: classId, p_email: email })),
+  return useClassMutation(
+    classId,
+    async (email: string) =>
+      unwrap(await supabase.rpc("add_co_teacher", { p_class_id: classId, p_email: email })),
+    "Co-teacher added.",
   );
 }
 
 export function useRemoveCoTeacher(classId: string) {
-  return useClassMutation(classId, async (teacherId: string) =>
-    unwrap(
-      await supabase.rpc("remove_co_teacher", { p_class_id: classId, p_teacher_id: teacherId }),
-    ),
+  return useClassMutation(
+    classId,
+    async (teacherId: string) =>
+      unwrap(
+        await supabase.rpc("remove_co_teacher", { p_class_id: classId, p_teacher_id: teacherId }),
+      ),
+    "Co-teacher removed.",
   );
 }
 
@@ -182,53 +225,66 @@ export function useRemoveCoTeacher(classId: string) {
  * everything rather than name each list. The refresh is not waited for: the page that asked is
  * about to lose its class, and would unmount before it could move the person on.
  */
-function useSweepingMutation<A>(fn: (args: A) => Promise<unknown>) {
+function useSweepingMutation<A>(fn: (args: A) => Promise<unknown>, ok: string) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { ok },
     mutationFn: fn,
     onSuccess: () => void queryClient.invalidateQueries(),
   });
 }
 
 export function useLeaveClass() {
-  return useSweepingMutation(async (classId: string) =>
-    unwrap(await supabase.rpc("leave_class", { p_class_id: classId })),
+  return useSweepingMutation(
+    async (classId: string) => unwrap(await supabase.rpc("leave_class", { p_class_id: classId })),
+    "You left the class.",
   );
 }
 
 /** A co-teacher takes themselves off a class. */
 export function useStopTeaching() {
-  return useSweepingMutation(async (args: { classId: string; teacherId: string }) =>
-    unwrap(
-      await supabase.rpc("remove_co_teacher", {
-        p_class_id: args.classId,
-        p_teacher_id: args.teacherId,
-      }),
-    ),
+  return useSweepingMutation(
+    async (args: { classId: string; teacherId: string }) =>
+      unwrap(
+        await supabase.rpc("remove_co_teacher", {
+          p_class_id: args.classId,
+          p_teacher_id: args.teacherId,
+        }),
+      ),
+    "You no longer teach that class.",
   );
 }
 
 export function useTransferClass() {
-  return useSweepingMutation(async (args: { classId: string; email: string }) =>
-    unwrap(await supabase.rpc("transfer_class", { p_class_id: args.classId, p_email: args.email })),
+  return useSweepingMutation(
+    async (args: { classId: string; email: string }) =>
+      unwrap(
+        await supabase.rpc("transfer_class", { p_class_id: args.classId, p_email: args.email }),
+      ),
+    "Handed over.",
   );
 }
 
 export function useDeleteClass() {
-  return useSweepingMutation(async (classId: string) =>
-    unwrap(await supabase.rpc("delete_class", { p_class_id: classId })),
+  return useSweepingMutation(
+    async (classId: string) => unwrap(await supabase.rpc("delete_class", { p_class_id: classId })),
+    "Class deleted.",
   );
 }
 
 export function useDeleteTest(classId: string) {
-  return useClassMutation(classId, async (testId: string) =>
-    unwrap(await supabase.rpc("delete_test", { p_test_id: testId })),
+  return useClassMutation(
+    classId,
+    async (testId: string) => unwrap(await supabase.rpc("delete_test", { p_test_id: testId })),
+    "Test deleted.",
   );
 }
 
 export function useDuplicateTest(classId: string) {
-  return useClassMutation(classId, async (testId: string) =>
-    unwrap(await supabase.rpc("duplicate_test", { p_test_id: testId })),
+  return useClassMutation(
+    classId,
+    async (testId: string) => unwrap(await supabase.rpc("duplicate_test", { p_test_id: testId })),
+    "Copy made. It is a draft.",
   );
 }
 
@@ -262,6 +318,7 @@ export function useSetMembers(classId: string) {
           p_time_multiplier: args.timeMultiplier as number,
         }),
       ),
+    "Saved.",
   );
 }
 

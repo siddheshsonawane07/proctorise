@@ -10,13 +10,15 @@ export function HelpTeachers() {
         admin approves it.
       </Step>
       <Step n={2} title="Make a class">
-        On your home page, create a class. Share its join code with your students. Turn joining off
-        once everyone is in. Under the class's <em>Settings</em> you can rename it, hand it to
-        another teacher, archive it or delete it.
+        On <em>Classes</em>, choose <em>Create class</em>. Share its class code with your students.
+        Turn joining off once everyone is in. <em>People</em> lists its teachers and students. Under
+        the class's <em>Settings</em> you can rename it, hand it to another teacher, archive it or
+        delete it.
       </Step>
       <Step n={3} title="Write questions">
-        Open <em>Your question bank</em>. Write questions one by one, or import a spreadsheet saved
-        as CSV (download the template there, or try the sample questions).
+        Write them inside a test with <em>Write a question</em>; each one is also kept in your{" "}
+        <em>Question bank</em>, to use again. To add many at once, open the bank and import a
+        spreadsheet saved as CSV (download the template there, or try the sample questions).
       </Step>
       <Step n={4} title="Build and publish a test">
         In the class, make a new test: its window, time allowed, questions, and how closely to
@@ -49,9 +51,9 @@ export function HelpStudents() {
     <article className="mx-auto max-w-2xl space-y-5">
       <h1 className="text-3xl font-semibold">For students</h1>
       <Step n={1} title="Before the test day">
-        Join your class with the code from your teacher. If your test checks it's you, take your
-        photo under <em>Your photo for tests</em>. You can leave a class from its page; your teacher
-        keeps the results of tests you've taken.
+        On <em>Classes</em>, choose <em>Join class</em> and type the code from your teacher. If your
+        test checks it's you, take your photo under <em>Your photo</em>. You can leave a class from
+        its page; your teacher keeps the results of tests you've taken.
       </Step>
       <Step n={2} title="What you need">
         A laptop or desktop with a webcam, Chrome or Edge, a quiet room where you are alone, good

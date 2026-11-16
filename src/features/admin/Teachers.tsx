@@ -75,6 +75,7 @@ function PersonRow({ person }: { person: Person }) {
   const queryClient = useQueryClient();
   const [asking, setAsking] = useState<Status | null>(null);
   const change = useMutation({
+    meta: { ok: "Saved." },
     mutationFn: async (to: Status) => {
       const { error } = await supabase.rpc("admin_set_teacher_status", {
         p_user_id: person.id,
@@ -94,7 +95,6 @@ function PersonRow({ person }: { person: Person }) {
       </p>
       {person.institution && <p className="text-sm text-text-muted">{person.institution}</p>}
       {person.teacher_note && <p className="mt-1 text-sm">{person.teacher_note}</p>}
-      {change.isError && <Message kind="error">{messageFrom(change.error)}</Message>}
       {pending ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-sm">{pending.verb.replace("{name}", name)}</span>

@@ -75,7 +75,7 @@ test("a proctored attempt records a missing face, with a snapshot, and a blocked
   await page.getByLabel("Email").fill(studentEmail);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
 
   await page.goto(`/app/take/${testId}`);
   await expect(page.getByText("Camera and microphone on")).toBeVisible({ timeout: 20_000 });

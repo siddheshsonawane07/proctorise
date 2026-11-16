@@ -1,13 +1,13 @@
 import type { FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Button, Card, Field, Message, TextArea } from "../../app/ui/form";
+import { Button, Card, Field, TextArea } from "../../app/ui/form";
 import type { Profile } from "../auth/useProfile";
 
 export function BecomeTeacher({ profile }: { profile: Profile }) {
   const queryClient = useQueryClient();
   const request = useMutation({
+    meta: { ok: "Request sent to the admin." },
     mutationFn: async (input: { institution: string; note: string }) => {
       const { error } = await supabase.rpc("request_teacher", {
         p_institution: input.institution,
@@ -53,7 +53,6 @@ export function BecomeTeacher({ profile }: { profile: Profile }) {
       <form onSubmit={onSubmit} className="space-y-3">
         <Field label="School or institution" name="institution" required maxLength={200} />
         <TextArea label="Anything the admin should know (optional)" name="note" maxLength={1000} />
-        {request.isError && <Message kind="error">{messageFrom(request.error)}</Message>}
         <Button type="submit" disabled={request.isPending}>
           Ask for teacher access
         </Button>

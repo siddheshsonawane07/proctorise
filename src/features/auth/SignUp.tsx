@@ -2,14 +2,14 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
-import { Button, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Field, Loading } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
 import { GoogleButton } from "./GoogleButton";
 
 export function SignUp() {
   const state = useSession();
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -21,7 +21,6 @@ export function SignUp() {
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email"));
     setBusy(true);
-    setError(null);
     const { data, error } = await supabase.auth.signUp({
       email,
       password: String(form.get("password")),
@@ -32,7 +31,7 @@ export function SignUp() {
       },
     });
     setBusy(false);
-    if (error) setError(messageFrom(error));
+    if (error) toast.error(messageFrom(error));
     else if (data.session) navigate("/app", { replace: true });
     else setSentTo(email);
   }
@@ -71,7 +70,6 @@ export function SignUp() {
           <input type="checkbox" name="adult" required className="mt-1" />
           <span>I am 18 or older.</span>
         </label>
-        {error && <Message kind="error">{error}</Message>}
         <Button type="submit" disabled={busy} className="w-full">
           {busy ? "Creating…" : "Create account"}
         </Button>

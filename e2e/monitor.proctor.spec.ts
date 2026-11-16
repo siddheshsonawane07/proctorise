@@ -78,7 +78,7 @@ test("the teacher sees a flag in seconds, adds time, warns, views the camera, en
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password").fill(PASSWORD);
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
     return page;
   };
 

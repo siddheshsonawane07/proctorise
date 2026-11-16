@@ -40,6 +40,7 @@ export function Results() {
     queryFn: async () => unwrap(await supabase.rpc("test_results", { p_test_id: testId })),
   });
   const release = useMutation({
+    meta: { ok: "Results released to the students." },
     mutationFn: async () => unwrap(await supabase.rpc("release_results", { p_test_id: testId })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["test", testId] }),
   });
@@ -90,7 +91,6 @@ export function Results() {
               Students can't see their scores until you release them.
               {toMark > 0 && ` ${toMark} ${toMark === 1 ? "answer" : "answers"} still to mark.`}
             </p>
-            {release.isError && <Message kind="error">{messageFrom(release.error)}</Message>}
             <Button onClick={() => release.mutate()} disabled={release.isPending}>
               Release results to students
             </Button>
@@ -178,6 +178,7 @@ function AttemptAnswers({ attemptId, testId }: { attemptId: string; testId: stri
     await queryClient.invalidateQueries({ queryKey: ["results", testId] });
   };
   const mark = useMutation({
+    meta: { ok: "Mark saved." },
     mutationFn: async (args: { itemId: string; points: number }) =>
       unwrap(
         await supabase.rpc("mark_answer", {
@@ -194,7 +195,6 @@ function AttemptAnswers({ attemptId, testId }: { attemptId: string; testId: stri
 
   return (
     <Card title="Answers">
-      {mark.isError && <Message kind="error">{messageFrom(mark.error)}</Message>}
       <ol className="space-y-4">
         {detail.data.items.map((item, i) => (
           <li key={item.id} className="border-b border-border pb-4 last:border-0">
@@ -273,6 +273,7 @@ function FixKey({
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState<Json>(item.correct);
   const fix = useMutation({
+    meta: { ok: "Answer corrected." },
     mutationFn: async () =>
       unwrap(await supabase.rpc("fix_item_key", { p_item_id: itemId, p_correct: value })),
     onSuccess: async () => {
@@ -334,7 +335,6 @@ function FixKey({
       <p className="text-text-muted">
         Every finished attempt is graded again. Marks you gave by hand stay.
       </p>
-      {fix.isError && <Message kind="error">{messageFrom(fix.error)}</Message>}
       <div className="flex gap-2">
         <Button onClick={() => fix.mutate()} disabled={fix.isPending}>
           Save and regrade

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RiCheckLine, RiErrorWarningLine } from "@remixicon/react";
 import { messageFrom } from "../../lib/errors";
 import { Button, Message } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { describeAnswer } from "../questions/describe";
 import { useSaveQuestion } from "./api";
 import { TYPE_LABEL, type QuestionInput } from "./question";
@@ -12,7 +13,7 @@ import type { ImportRow } from "./prompt";
  * The good rows are saved through save_question, which checks each one again.
  */
 export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTags: string[] }) {
-  const save = useSaveQuestion();
+  const save = useSaveQuestion({ quiet: true });
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<{ added: number; errors: string[] } | null>(null);
   const good = rows.filter(
@@ -35,6 +36,9 @@ export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTag
     }
     setBusy(false);
     setReport({ added, errors });
+    const saved = `Saved ${added} ${added === 1 ? "question" : "questions"} to your bank.`;
+    if (errors.length === 0) toast.ok(saved);
+    else toast.error(`${saved} ${errors.length} could not be saved; they are listed below.`);
   }
 
   if (rows.length === 0) {
@@ -105,20 +109,22 @@ export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTag
           </tbody>
         </table>
       </div>
-      {report ? (
-        <Message kind={report.errors.length ? "error" : "ok"}>
-          Saved {report.added} {report.added === 1 ? "question" : "questions"} to your bank.
+      {report && report.errors.length > 0 && (
+        <Message kind="error">
           {report.errors.map((e) => (
-            <span key={e} className="mt-1 block">
+            <span key={e} className="block">
               {e}
             </span>
           ))}
         </Message>
-      ) : (
-        <Button onClick={saveGood} disabled={busy || good.length === 0}>
-          {busy ? "Saving…" : `Save ${good.length} ${good.length === 1 ? "question" : "questions"}`}
-        </Button>
       )}
+      <Button onClick={saveGood} disabled={busy || report !== null || good.length === 0}>
+        {report
+          ? "Saved"
+          : busy
+            ? "Saving…"
+            : `Save ${good.length} ${good.length === 1 ? "question" : "questions"}`}
+      </Button>
     </div>
   );
 }

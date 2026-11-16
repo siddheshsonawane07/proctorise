@@ -1,15 +1,15 @@
-import { useState, type FormEvent } from "react";
+import { type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
-import { Button, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Field, Loading } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
 
 /** Reached from the reset email; the client has already exchanged the link for a session. */
 export function ResetPassword() {
   const state = useSession();
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
 
   if (state.status === "loading") return <Loading />;
   if (!state.session) {
@@ -30,7 +30,7 @@ export function ResetPassword() {
     event.preventDefault();
     const password = String(new FormData(event.currentTarget).get("password"));
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) setError(messageFrom(error));
+    if (error) toast.error(messageFrom(error));
     else navigate("/app", { replace: true });
   }
 
@@ -46,7 +46,6 @@ export function ResetPassword() {
           required
           minLength={8}
         />
-        {error && <Message kind="error">{error}</Message>}
         <Button type="submit" className="w-full">
           Save password
         </Button>

@@ -8,6 +8,7 @@ import {
   RiUserLine,
 } from "@remixicon/react";
 import { Button, Loading, Message } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { messageFrom } from "../../lib/errors";
 import { downloadCsv } from "../../lib/csv";
 import { formatWhen } from "../../lib/time";
@@ -40,7 +41,6 @@ export function Roster({ classId }: { classId: string }) {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [bulkTime, setBulkTime] = useState(1.5);
   const [open, setOpen] = useState<string | null>(null);
-  const [exporting, setExporting] = useState<string | null>(null);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -92,7 +92,6 @@ export function Roster({ classId }: { classId: string }) {
   }
 
   async function exportAll() {
-    setExporting(null);
     try {
       const marks = await fetchClassMarks(classId);
       const published = (tests.data ?? []).filter((t) => t.status !== "draft");
@@ -121,7 +120,7 @@ export function Roster({ classId }: { classId: string }) {
       }
       downloadCsv("students-and-marks.csv", rows);
     } catch (error) {
-      setExporting(messageFrom(error));
+      toast.error(messageFrom(error));
     }
   }
 
@@ -166,9 +165,6 @@ export function Roster({ classId }: { classId: string }) {
           </span>
         </Button>
       </div>
-
-      {exporting && <Message kind="error">{exporting}</Message>}
-      {setMembers.isError && <Message kind="error">{messageFrom(setMembers.error)}</Message>}
 
       {pickedShown.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-2.5">

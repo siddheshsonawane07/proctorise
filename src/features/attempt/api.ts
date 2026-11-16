@@ -38,6 +38,7 @@ export function browserSession(): string {
 
 export function useStartAttempt() {
   return useMutation({
+    meta: { quiet: true },
     mutationFn: async (testId: string) =>
       unwrap(
         await supabase.rpc("start_attempt", { p_test_id: testId, p_session: browserSession() }),
@@ -58,6 +59,7 @@ export async function saveAnswer(attemptId: string, itemId: string, response: Js
 export function useSubmitAttempt() {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { quiet: true },
     mutationFn: async (attemptId: string) =>
       unwrap(await supabase.rpc("submit_attempt", { p_attempt_id: attemptId })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-attempts"] }),

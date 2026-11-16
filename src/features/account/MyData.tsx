@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Button, Card, Field, Message } from "../../app/ui/form";
+import { Button, Card, Field } from "../../app/ui/form";
 import { unwrap } from "../classes/api";
 import { useProfile } from "../auth/useProfile";
 
@@ -41,7 +40,6 @@ export function MyData() {
           Your profile, classes, attempts, answers and every event recorded during your tests, as
           one file. Pictures are listed but not included.
         </p>
-        {download.isError && <Message kind="error">{messageFrom(download.error)}</Message>}
         <Button onClick={() => download.mutate()} disabled={download.isPending}>
           Download my data
         </Button>
@@ -69,7 +67,6 @@ export function MyData() {
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="off"
             />
-            {remove.isError && <Message kind="error">{messageFrom(remove.error)}</Message>}
             <Button
               onClick={() => remove.mutate()}
               disabled={remove.isPending || confirm !== "DELETE"}

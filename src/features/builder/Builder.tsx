@@ -1,12 +1,16 @@
-import { useState, type FormEvent } from "react";
+import { useState, type ButtonHTMLAttributes, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { Button, Card, Field, Loading, Message, TextArea } from "../../app/ui/form";
+import { useQueryClient } from "@tanstack/react-query";
+import { RiAddLine, RiArrowDownLine, RiArrowUpLine } from "@remixicon/react";
+import { Button, Card, Field, Loading, Message, Select, TextArea } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
 import { messageFrom } from "../../lib/errors";
 import { MAX_LIVE_STUDENTS } from "../../lib/limits";
 import { formatWhen, fromLocalInput, toLocalInput } from "../../lib/time";
-import { useBank } from "../bank/api";
+import { useBank, type BankQuestion } from "../bank/api";
+import { QuestionEditor } from "../bank/QuestionEditor";
 import { TYPE_LABEL } from "../bank/question";
 import { TEST_STATUS_LABEL, useDeleteTest, useDuplicateTest, type TestRow } from "../classes/api";
 import { DeleteTest } from "../classes/DeleteTest";
@@ -54,9 +58,9 @@ function Header({ test }: { test: TestRow }) {
         <Link to={`/app/classes/${test.class_id}`} className="text-sm text-accent underline">
           Back to the class
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold">{test.title}</h1>
+        <h1 className="mt-1 text-title-1-bold tracking-tight text-text">{test.title}</h1>
         {test.status === "draft" && (
-          <p className="text-sm text-text-muted">{TEST_STATUS_LABEL.draft}</p>
+          <p className="text-body-regular text-text-muted">{TEST_STATUS_LABEL.draft}</p>
         )}
       </div>
       <Link to={`/app/tests/${test.id}/preview`} className="text-accent underline">
@@ -72,18 +76,17 @@ function DraftBuilder({ test }: { test: TestRow }) {
   return (
     <div className="space-y-6">
       <Header test={test} />
-      <Details test={test} />
       <Questions testId={test.id} draft={draft.data ?? []} loading={draft.isPending} />
+      <Details test={test} />
       <ProctoringSettings test={test} />
       <Card title="Publish">
         <p className="text-text-muted">
           Publishing freezes the questions: editing your bank afterwards won't change this test.
           Students in the class see it at once, and can start it from {formatWhen(test.opens_at)}.
         </p>
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           On the free plan, about {MAX_LIVE_STUDENTS} students can take a test at the same time.
         </p>
-        {publish.isError && <Message kind="error">{messageFrom(publish.error)}</Message>}
         <Button onClick={() => publish.mutate(undefined)} disabled={publish.isPending}>
           Publish to the class
         </Button>
@@ -98,13 +101,11 @@ function CopyOrDelete({ test }: { test: TestRow }) {
   const copy = useDuplicateTest(test.class_id);
   const remove = useDeleteTest(test.class_id);
   const navigate = useNavigate();
-  const error = copy.error ?? remove.error;
   return (
     <Card title="Copy or delete">
-      <p className="text-sm text-text-muted">
+      <p className="text-body-regular text-text-muted">
         A copy is a new draft in this class with the same questions and settings.
       </p>
-      {error && <Message kind="error">{messageFrom(error)}</Message>}
       <div className="flex flex-wrap items-start gap-2">
         <Button
           variant="plain"
@@ -130,12 +131,10 @@ function CopyOrDelete({ test }: { test: TestRow }) {
 function Details({ test }: { test: TestRow }) {
   const live = test.status !== "draft";
   const update = useUpdateTest(test.id);
-  const [saved, setSaved] = useState(false);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
-    setSaved(false);
     update.mutate(
       {
         title: String(f.get("title")),
@@ -150,14 +149,14 @@ function Details({ test }: { test: TestRow }) {
         reveal_answers: f.get("reveal_answers") === "on",
         retention_days: Number(f.get("retention_days")),
       },
-      { onSuccess: () => setSaved(true) },
+      { onSuccess: () => toast.ok("Saved.") },
     );
   }
 
   return (
     <Card title="Details">
       {live && (
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           You can still change these. Students already taking the test keep the time they started
           with.
         </p>
@@ -205,26 +204,20 @@ function Details({ test }: { test: TestRow }) {
             defaultValue={test.max_attempts}
             required
           />
-          <Select
-            label="Results"
-            name="results_release"
-            defaultValue={test.results_release}
-            options={[
-              ["manual", "When I release them"],
-              ["after_close", "When the test closes"],
-              ["immediate", "As soon as each student submits"],
-            ]}
-          />
+          <Select label="Results" name="results_release" defaultValue={test.results_release}>
+            <option value="manual">When I release them</option>
+            <option value="after_close">When the test closes</option>
+            <option value="immediate">As soon as each student submits</option>
+          </Select>
           <Select
             label="Keep camera snapshots for"
             name="retention_days"
             defaultValue={String(test.retention_days)}
-            options={[
-              ["7", "7 days"],
-              ["30", "30 days"],
-              ["90", "90 days"],
-            ]}
-          />
+          >
+            <option value="7">7 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+          </Select>
         </div>
         <label className="flex items-center gap-2">
           <input type="checkbox" name="shuffle_items" defaultChecked={test.shuffle_items} />
@@ -238,42 +231,11 @@ function Details({ test }: { test: TestRow }) {
           <input type="checkbox" name="reveal_answers" defaultChecked={test.reveal_answers} />
           With their results, show students the right answers
         </label>
-        {update.isError && <Message kind="error">{messageFrom(update.error)}</Message>}
-        {saved && <Message kind="ok">Saved.</Message>}
         <Button type="submit" disabled={update.isPending}>
           Save details
         </Button>
       </form>
     </Card>
-  );
-}
-
-function Select({
-  label,
-  name,
-  defaultValue,
-  options,
-}: {
-  label: string;
-  name: string;
-  defaultValue: string;
-  options: [string, string][];
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm font-medium">{label}</span>
-      <select
-        name={name}
-        defaultValue={defaultValue}
-        className="mt-1 block w-full rounded-md border border-border bg-surface px-3 py-2"
-      >
-        {options.map(([value, text]) => (
-          <option key={value} value={value}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
 
@@ -291,11 +253,15 @@ function Questions({
   const remove = useRemoveQuestion(testId);
   const reorder = useReorder(testId);
   const setPoints = useSetPoints(testId);
+  const queryClient = useQueryClient();
+  // One thing open at a time: writing a new question, picking from the bank, or changing one.
+  const [panel, setPanel] = useState<"write" | "bank" | { edit: BankQuestion } | null>(null);
   const inTest = new Set(draft.map((q) => q.id));
   const available = (bank.data ?? []).filter((q) => !inTest.has(q.id));
   const busy = add.isPending || remove.isPending || reorder.isPending || setPoints.isPending;
-  const error = add.error ?? remove.error ?? reorder.error ?? setPoints.error;
   const total = draft.reduce((sum, q) => sum + q.points, 0);
+  // After the last one, whatever gaps removing has left: two rows may never share a position.
+  const nextPosition = Math.max(-1, ...draft.map((q) => q.sortOrder)) + 1;
 
   function move(index: number, by: number) {
     const ids = draft.map((q) => q.id);
@@ -307,86 +273,209 @@ function Questions({
   return (
     <Card title={`Questions (${draft.length}, ${total} points)`}>
       {loading && <Loading />}
-      {error && <Message kind="error">{messageFrom(error)}</Message>}
       {draft.length === 0 && !loading && (
-        <p className="text-text-muted">Add questions from your bank below.</p>
-      )}
-      <ol className="space-y-2">
-        {draft.map((q, i) => (
-          <li
-            key={q.id}
-            className="flex flex-wrap items-center gap-2 rounded-md border border-border p-3"
-          >
-            <span className="w-6 text-text-muted">{i + 1}.</span>
-            <span className="min-w-0 flex-1 truncate">{q.prompt}</span>
-            <label className="flex items-center gap-1 text-sm">
-              <span className="sr-only">Points for question {i + 1}</span>
-              <input
-                type="number"
-                min="0.25"
-                max="100"
-                step="0.25"
-                defaultValue={q.points}
-                disabled={busy}
-                onBlur={(e) => {
-                  const value = Number(e.target.value);
-                  if (value > 0 && value !== q.points) {
-                    setPoints.mutate({
-                      questionId: q.id,
-                      points: value === q.bankPoints ? null : value,
-                    });
-                  }
-                }}
-                className="w-20 rounded border border-border bg-surface px-2 py-1"
-              />
-              points
-            </label>
-            <Button variant="plain" disabled={busy || i === 0} onClick={() => move(i, -1)}>
-              <span aria-hidden>↑</span>
-              <span className="sr-only">Move question {i + 1} up</span>
-            </Button>
-            <Button
-              variant="plain"
-              disabled={busy || i === draft.length - 1}
-              onClick={() => move(i, 1)}
-            >
-              <span aria-hidden>↓</span>
-              <span className="sr-only">Move question {i + 1} down</span>
-            </Button>
-            <Button variant="plain" disabled={busy} onClick={() => remove.mutate(q.id)}>
-              Remove
-            </Button>
-          </li>
-        ))}
-      </ol>
-
-      <h3 className="pt-2 font-medium">From your bank</h3>
-      {bank.isPending && <Loading />}
-      {bank.data?.length === 0 && (
         <p className="text-text-muted">
-          Your bank is empty.{" "}
-          <Link to="/app/bank" className="text-accent underline">
-            Write some questions
-          </Link>
-          .
+          No questions yet. Write one here, or add ones you've already written.
         </p>
       )}
-      <ul className="space-y-2">
-        {available.map((q) => (
-          <li key={q.id} className="flex items-center gap-2">
-            <Button
-              variant="plain"
-              disabled={busy}
-              onClick={() => add.mutate({ questionId: q.id, position: draft.length })}
+      <ol className="space-y-2">
+        {draft.map((q, i) => {
+          const mine = bank.data?.find((b) => b.id === q.id);
+          if (typeof panel === "object" && panel?.edit.id === q.id) {
+            return (
+              <li key={q.id} className="space-y-2">
+                <p className="text-body-regular text-text-muted">
+                  Changing question {i + 1} changes it in your bank too, and in any other draft that
+                  uses it. Published tests keep their own copy.
+                </p>
+                <QuestionEditor
+                  question={panel.edit}
+                  onDone={() => setPanel(null)}
+                  onSaved={async () => {
+                    await queryClient.invalidateQueries({ queryKey: ["test", testId, "draft"] });
+                    toast.ok("Question saved.");
+                  }}
+                />
+              </li>
+            );
+          }
+          return (
+            <li
+              key={q.id}
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-border p-3"
             >
+              <span className="w-6 text-text-muted">{i + 1}.</span>
+              <div className="min-w-40 flex-1">
+                <p className="truncate text-text">{q.prompt}</p>
+                <p className="text-caption-1-regular text-text-muted">{TYPE_LABEL[q.type]}</p>
+              </div>
+              <label className="flex items-center gap-1.5 text-body-regular">
+                <span className="sr-only">Points for question {i + 1}</span>
+                <input
+                  type="number"
+                  min="0.25"
+                  max="100"
+                  step="0.25"
+                  defaultValue={q.points}
+                  disabled={busy}
+                  onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    if (value > 0 && value !== q.points) {
+                      setPoints.mutate({
+                        questionId: q.id,
+                        points: value === q.bankPoints ? null : value,
+                      });
+                    }
+                  }}
+                  className="w-20 rounded-lg bg-background-tertiary-default px-2 py-1.5 focus:outline-2 focus:outline-accent"
+                />
+                points
+              </label>
+              <IconButton
+                label={`Move question ${i + 1} up`}
+                disabled={busy || i === 0}
+                onClick={() => move(i, -1)}
+              >
+                <RiArrowUpLine aria-hidden className="size-4" />
+              </IconButton>
+              <IconButton
+                label={`Move question ${i + 1} down`}
+                disabled={busy || i === draft.length - 1}
+                onClick={() => move(i, 1)}
+              >
+                <RiArrowDownLine aria-hidden className="size-4" />
+              </IconButton>
+              {mine && (
+                <Button variant="plain" disabled={busy} onClick={() => setPanel({ edit: mine })}>
+                  Edit<span className="sr-only"> question {i + 1}</span>
+                </Button>
+              )}
+              <Button variant="plain" disabled={busy} onClick={() => remove.mutate(q.id)}>
+                Remove<span className="sr-only"> question {i + 1}</span>
+              </Button>
+            </li>
+          );
+        })}
+      </ol>
+
+      {panel === null && (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Button onClick={() => setPanel("write")}>
+            <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
+            Write a question
+          </Button>
+          <Button variant="plain" onClick={() => setPanel("bank")}>
+            Add from your bank
+          </Button>
+          <Link to="/app/bank" className="px-2 text-accent underline">
+            Add many at once
+          </Link>
+        </div>
+      )}
+      {panel === "write" && (
+        <QuestionEditor
+          question={null}
+          another
+          onDone={() => setPanel(null)}
+          onSaved={async (id) => {
+            await add.mutateAsync({ questionId: id, position: nextPosition });
+            toast.ok("Question added to the test.");
+          }}
+        />
+      )}
+      {panel === "bank" && (
+        <BankPicker
+          questions={available}
+          empty={bank.data?.length === 0}
+          busy={busy}
+          onAdd={(id) => add.mutate({ questionId: id, position: nextPosition })}
+          onClose={() => setPanel(null)}
+        />
+      )}
+    </Card>
+  );
+}
+
+function IconButton({
+  label,
+  children,
+  ...button
+}: { label: string; children: ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      {...button}
+      className="grid size-8 place-items-center rounded-lg text-text-muted hover:bg-surface-muted hover:text-text disabled:opacity-40"
+    >
+      {children}
+      <span className="sr-only">{label}</span>
+    </button>
+  );
+}
+
+/** Questions already written, to add to this test one press at a time. */
+function BankPicker({
+  questions,
+  empty,
+  busy,
+  onAdd,
+  onClose,
+}: {
+  questions: BankQuestion[];
+  empty: boolean;
+  busy: boolean;
+  onAdd: (id: string) => void;
+  onClose: () => void;
+}) {
+  const [search, setSearch] = useState("");
+  const words = search.toLowerCase().split(/\s+/).filter(Boolean);
+  const shown = questions.filter((q) => {
+    const text = `${q.prompt} ${q.tags.join(" ")}`.toLowerCase();
+    return words.every((w) => text.includes(w));
+  });
+  return (
+    <section
+      aria-label="Add from your bank"
+      className="space-y-3 rounded-2xl border border-accent/50 p-4"
+    >
+      <Field
+        label="Search your bank"
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Words from the question, or a tag"
+      />
+      {shown.length === 0 && (
+        <p className="text-text-muted">
+          {empty
+            ? "Your bank is empty. Write a question here, or add many at once."
+            : questions.length === 0
+              ? "Every question in your bank is already in this test."
+              : "No question matches those words."}
+        </p>
+      )}
+      <ul className="max-h-80 divide-y divide-border overflow-y-auto">
+        {shown.map((q) => (
+          <li key={q.id} className="flex items-center gap-3 py-2">
+            <Button variant="plain" disabled={busy} onClick={() => onAdd(q.id)}>
               Add
             </Button>
-            <span className="min-w-0 flex-1 truncate">{q.prompt}</span>
-            <span className="text-sm text-text-muted">{TYPE_LABEL[q.type]}</span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-text">{q.prompt}</p>
+              <p className="text-caption-1-regular text-text-muted">
+                {TYPE_LABEL[q.type]}
+                {q.tags.length > 0 && `, ${q.tags.join(", ")}`}
+              </p>
+            </div>
           </li>
         ))}
       </ul>
-    </Card>
+      <div className="flex justify-end">
+        <Button variant="plain" onClick={onClose}>
+          Done
+        </Button>
+      </div>
+    </section>
   );
 }
 
@@ -404,7 +493,7 @@ function ProctoringSettings({ test }: { test: TestRow }) {
   return (
     <Card title="Proctoring">
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">How closely to watch</legend>
+        <legend className="text-body-medium text-text-primary">How closely to watch</legend>
         {(Object.keys(PRESETS) as Preset[]).map((preset) => (
           <label key={preset} className="flex items-start gap-2">
             <input
@@ -422,7 +511,7 @@ function ProctoringSettings({ test }: { test: TestRow }) {
         ))}
       </fieldset>
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Also require</legend>
+        <legend className="text-body-medium text-text-primary">Also require</legend>
         <Toggle
           checked={p.identity_check}
           onChange={(v) => set({ identity_check: v })}
@@ -440,30 +529,29 @@ function ProctoringSettings({ test }: { test: TestRow }) {
         />
       </fieldset>
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Sound</legend>
+        <legend className="text-body-medium text-text-primary">Sound</legend>
         <Toggle
           checked={speaksWarnings(p)}
           onChange={(v) => set({ spoken_warnings: v })}
           label="Read the rules aloud at the start, and speak a short warning when something is flagged"
         />
       </fieldset>
-      <label className="block">
-        <span className="text-sm font-medium">Camera snapshot every</span>
-        <select
+      <div className="max-w-xs">
+        <Select
+          label="Camera snapshot every"
           value={p.snapshot_interval_s}
           onChange={(e) => set({ snapshot_interval_s: Number(e.target.value) })}
-          className="mt-1 block rounded-md border border-border bg-surface px-3 py-2"
         >
           {SNAPSHOT_INTERVALS.map((s) => (
             <option key={s} value={s}>
               {s < 60 ? `${s} seconds` : `${s / 60} ${s === 60 ? "minute" : "minutes"}`}
             </option>
           ))}
-        </select>
-      </label>
+        </Select>
+      </div>
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Ending a test on its own</legend>
-        <p className="text-sm text-text-muted">
+        <legend className="text-body-medium text-text-primary">Ending a test on its own</legend>
+        <p className="text-body-regular text-text-muted">
           Off unless you turn it on. Camera checks never end a test by themselves; you review them.
         </p>
         <Toggle
@@ -479,7 +567,6 @@ function ProctoringSettings({ test }: { test: TestRow }) {
           disabled={!p.phone_required}
         />
       </fieldset>
-      {update.isError && <Message kind="error">{messageFrom(update.error)}</Message>}
     </Card>
   );
 }
@@ -514,7 +601,6 @@ function PublishedTest({ test }: { test: TestRow }) {
   const cancel = useCancelTest(test.id);
   const reopen = useReopenTest(test.id);
   const cancelled = test.status === "closed";
-  const error = unpublish.error ?? cancel.error ?? reopen.error;
   return (
     <div className="space-y-6">
       <Header test={test} />
@@ -542,7 +628,7 @@ function PublishedTest({ test }: { test: TestRow }) {
       </Card>
       <Details test={test} />
       <Card title="Questions and proctoring">
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           These are fixed once a test is published. To change them, take the test back to a draft
           (only possible until a student starts it), or make a copy and publish that.
         </p>
@@ -557,12 +643,11 @@ function PublishedTest({ test }: { test: TestRow }) {
         )}
       </Card>
       <Card title={cancelled ? "Reopen the test" : "Cancel the test"}>
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           {cancelled
             ? "Reopening publishes it again with the window above. Check the dates first."
             : "Calls the test off. No one can start it, and anyone taking it now is handed in as they stand. Attempts and results are kept, and you can reopen it."}
         </p>
-        {error && <Message kind="error">{messageFrom(error)}</Message>}
         {cancelled ? (
           <Button
             variant="plain"

@@ -252,7 +252,6 @@ function AttemptPanel({ row, onClose }: { row: Overview; onClose: () => void }) 
   const terminate = useTerminate();
   const [ending, setEnding] = useState(false);
   const running = row.status === "in_progress";
-  const error = warn.error ?? extend.error ?? terminate.error;
 
   function onWarn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -286,9 +285,6 @@ function AttemptPanel({ row, onClose }: { row: Overview; onClose: () => void }) 
           Close
         </button>
       </div>
-      {error && <Message kind="error">{messageFrom(error)}</Message>}
-      {warn.isSuccess && <Message kind="ok">Warning sent.</Message>}
-      {extend.isSuccess && <Message kind="ok">Time added.</Message>}
 
       {running && (
         <div className="grid gap-4 md:grid-cols-2">

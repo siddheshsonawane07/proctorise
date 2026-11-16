@@ -1,12 +1,14 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { RiAddLine } from "@remixicon/react";
 import { Button, Card, Field, Loading, Message, TextArea } from "../../app/ui/form";
+import { buttonClass } from "../../app/ui/buttonClass";
 import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
+import { toast } from "../../app/ui/toast";
 import { messageFrom } from "../../lib/errors";
 import { formatWhen, testWindow } from "../../lib/time";
 import {
-  TEST_STATUS_LABEL,
   useTeachingClasses,
   useAddCoTeacher,
   useClass,
@@ -30,6 +32,8 @@ import { useMyAttempts, type MyAttempt } from "../attempt/api";
 import { isTeacher } from "../auth/roles";
 import { Roster } from "./Roster";
 import { DeleteTest } from "./DeleteTest";
+import { ClassCode } from "./ClassCode";
+import { classBand } from "./colour";
 
 export function ClassPage() {
   const { classId = "" } = useParams();
@@ -68,10 +72,7 @@ function StudentClass({ cls }: { cls: ClassRow }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{cls.name}</h1>
-        {cls.description && <p className="mt-1 text-text-muted">{cls.description}</p>}
-      </div>
+      <Banner cls={cls} />
       {tests.isPending && <Loading />}
       {tests.data?.length === 0 && <p className="text-text-muted">No tests yet.</p>}
       <TestGroup title="Open now" tests={groups.open} />
@@ -79,11 +80,10 @@ function StudentClass({ cls }: { cls: ClassRow }) {
       <TestGroup title="Closed" tests={groups.closed} />
       <TestGroup title="Cancelled by your teacher" tests={groups.cancelled} />
       <Card title="Leave this class">
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           You'll stop seeing this class and its tests. Your teacher keeps the results of tests
           you've taken. You can join again with the class code.
         </p>
-        {leave.isError && <Message kind="error">{messageFrom(leave.error)}</Message>}
         <Confirm
           label="Leave this class"
           question={`Leave ${cls.name}?`}
@@ -103,12 +103,14 @@ function TestGroup({ title, tests }: { title: string; tests: TestRow[] }) {
     <Card title={title}>
       <ul className="divide-y divide-border">
         {tests.map((test) => (
-          <li key={test.id} className="py-2">
-            <p className="font-medium">{test.title}</p>
-            <p className="text-sm text-text-muted">
-              {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)} · {test.duration_min}{" "}
-              minutes
-            </p>
+          <li key={test.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <div>
+              <p className="text-body-medium text-text">{test.title}</p>
+              <p className="text-body-regular text-text-muted">
+                {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)}, {test.duration_min}{" "}
+                minutes
+              </p>
+            </div>
             <TestAction
               test={test}
               attempts={(attempts.data ?? []).filter((a) => a.test_id === test.id)}
@@ -128,9 +130,9 @@ function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }
     testWindow(test.opens_at, test.closes_at) === "open" &&
     attempts.length < test.max_attempts;
   return (
-    <div className="mt-1 flex flex-wrap gap-3 text-sm">
+    <div className="flex flex-wrap items-center gap-3">
       {(open || canStart) && (
-        <Link to={`/app/take/${test.id}`} className="font-medium text-accent underline">
+        <Link to={`/app/take/${test.id}`} className={buttonClass("primary")}>
           {open ? "Continue" : done.length ? "Try again" : "Start"}
         </Link>
       )}
@@ -143,40 +145,46 @@ function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }
   );
 }
 
-type Tab = "tests" | "students" | "teachers" | "settings";
+/** The top of a class page, in the class's colour. */
+function Banner({ cls, children }: { cls: ClassRow; children?: ReactNode }) {
+  return (
+    <div className={`${classBand(cls.id)} rounded-2xl px-5 py-6 text-white sm:px-7`}>
+      <h1 className="text-title-1-bold tracking-tight text-white">{cls.name}</h1>
+      {cls.description && <p className="mt-1 max-w-2xl text-white">{cls.description}</p>}
+      {children}
+    </div>
+  );
+}
+
+const TABS = [
+  { id: "tests", label: "Tests" },
+  { id: "people", label: "People" },
+  { id: "settings", label: "Settings" },
+] as const;
+type Tab = (typeof TABS)[number]["id"];
 
 function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
-  const [tab, setTab] = useState<Tab>("tests");
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "tests", label: "Tests" },
-    { id: "students", label: "Students" },
-    { id: "teachers", label: "Teachers" },
-    { id: "settings", label: "Settings" },
-  ];
+  // The tab is in the address, so Back and a shared link both land on it.
+  const [params, setParams] = useSearchParams();
+  const tab: Tab = TABS.find((t) => t.id === params.get("tab"))?.id ?? "tests";
   return (
     <div>
-      <h1 className="text-title-1-bold tracking-tight text-text">{cls.name}</h1>
-      {cls.description && <p className="mt-1 text-text-muted">{cls.description}</p>}
-      <p className="mt-1 text-text-muted">
-        Join code:{" "}
-        <strong className="rounded-md bg-surface-muted px-2 py-0.5 font-mono tracking-wider text-text">
-          {cls.join_code}
-        </strong>
-        {!cls.join_open && " (joining is closed)"}
-      </p>
-      <div
-        role="tablist"
-        aria-label="Class"
-        className="mt-5 flex flex-wrap gap-1 border-b border-border"
-      >
-        {tabs.map((t) => (
+      <Banner cls={cls}>
+        <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <ClassCode code={cls.join_code} onBand />
+          {!cls.join_open && <span className="text-white">Joining is closed</span>}
+          {cls.archived_at && <span className="text-white">Archived</span>}
+        </p>
+      </Banner>
+      <div role="tablist" aria-label="Class" className="mt-4 flex gap-1 border-b border-border">
+        {TABS.map((t) => (
           <button
             key={t.id}
             role="tab"
             type="button"
             aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`-mb-px border-b-2 px-3 py-2 text-body-medium ${
+            onClick={() => setParams(t.id === "tests" ? {} : { tab: t.id }, { replace: true })}
+            className={`-mb-px border-b-2 px-4 py-2.5 text-body-medium ${
               tab === t.id
                 ? "border-accent text-accent"
                 : "border-transparent text-text-muted hover:text-text"
@@ -188,8 +196,22 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
       </div>
       <div role="tabpanel" className="mt-6">
         {tab === "tests" && <TeacherTests classId={cls.id} />}
-        {tab === "students" && <Roster classId={cls.id} />}
-        {tab === "teachers" && <Teachers classId={cls.id} owner={owner} />}
+        {tab === "people" && (
+          <div className="space-y-8">
+            <section aria-labelledby="teachers-title" className="space-y-3">
+              <h2 id="teachers-title" className="text-title-3-semibold text-text">
+                Teachers
+              </h2>
+              <Teachers classId={cls.id} owner={owner} />
+            </section>
+            <section aria-labelledby="students-title" className="space-y-3">
+              <h2 id="students-title" className="text-title-3-semibold text-text">
+                Students
+              </h2>
+              <Roster classId={cls.id} />
+            </section>
+          </div>
+        )}
         {tab === "settings" && <Settings cls={cls} owner={owner} />}
       </div>
     </div>
@@ -210,12 +232,17 @@ function TeacherTests({ classId }: { classId: string }) {
         }
         disabled={create.isPending}
       >
+        <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
         New test
       </Button>
-      {create.isError && <Message kind="error">{messageFrom(create.error)}</Message>}
       {tests.isPending && <Loading />}
-      {tests.data?.length === 0 && <p className="text-text-muted">No tests yet.</p>}
-      <ul className="divide-y divide-border">
+      {tests.data?.length === 0 && (
+        <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-text-muted">
+          No tests yet. A new test starts as a draft: add its questions, then publish it to the
+          class.
+        </p>
+      )}
+      <ul className="space-y-3">
         {tests.data?.map((test) => (
           <TeacherTest key={test.id} test={test} />
         ))}
@@ -224,46 +251,59 @@ function TeacherTests({ classId }: { classId: string }) {
   );
 }
 
+/** Where a test stands, in a word. The word carries it; the colour only helps. */
+function testState(test: TestRow): { label: string; className: string } {
+  const quiet = "bg-surface-muted text-text-muted";
+  if (test.status === "draft") return { label: "Draft", className: quiet };
+  if (test.status === "closed") return { label: "Cancelled", className: quiet };
+  const window = testWindow(test.opens_at, test.closes_at);
+  if (window === "open") return { label: "Open now", className: "bg-accent/10 text-accent" };
+  if (window === "upcoming") return { label: "Scheduled", className: "bg-info/10 text-info" };
+  return { label: "Closed", className: quiet };
+}
+
 function TeacherTest({ test }: { test: TestRow }) {
   const remove = useDeleteTest(test.class_id);
   const copy = useDuplicateTest(test.class_id);
   const navigate = useNavigate();
-  const error = remove.error ?? copy.error;
+  const state = testState(test);
   return (
-    <li className="space-y-2 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <Link to={`/app/tests/${test.id}/edit`} className="font-medium text-accent">
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-xs">
+      <div className="min-w-0">
+        <p className="flex flex-wrap items-center gap-2">
+          <Link to={`/app/tests/${test.id}/edit`} className="text-body-semibold text-accent">
             {test.title}
           </Link>
-          <p className="text-sm text-text-muted">
-            {TEST_STATUS_LABEL[test.status]} · {formatWhen(test.opens_at)} to{" "}
-            {formatWhen(test.closes_at)}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {test.status !== "draft" && (
-            <Link to={`/app/tests/${test.id}/results`} className="px-2 text-accent underline">
-              Results
-            </Link>
-          )}
-          <Button
-            variant="plain"
-            disabled={copy.isPending}
-            onClick={() =>
-              copy.mutate(test.id, { onSuccess: (id) => navigate(`/app/tests/${id}/edit`) })
-            }
-          >
-            Copy
-          </Button>
-          <DeleteTest
-            test={test}
-            busy={remove.isPending}
-            onConfirm={() => remove.mutate(test.id)}
-          />
-        </div>
+          <span className={`rounded-full px-2 py-0.5 text-caption-1-semibold ${state.className}`}>
+            {state.label}
+          </span>
+        </p>
+        <p className="mt-0.5 text-body-regular text-text-muted">
+          {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)}
+        </p>
       </div>
-      {error && <Message kind="error">{messageFrom(error)}</Message>}
+      <div className="flex flex-wrap items-center gap-2">
+        {state.label === "Open now" && (
+          <Link to={`/app/tests/${test.id}/live`} className={buttonClass("plain")}>
+            Watch live
+          </Link>
+        )}
+        {test.status !== "draft" && (
+          <Link to={`/app/tests/${test.id}/results`} className={buttonClass("plain")}>
+            Results
+          </Link>
+        )}
+        <Button
+          variant="plain"
+          disabled={copy.isPending}
+          onClick={() =>
+            copy.mutate(test.id, { onSuccess: (id) => navigate(`/app/tests/${id}/edit`) })
+          }
+        >
+          Copy
+        </Button>
+        <DeleteTest test={test} busy={remove.isPending} onConfirm={() => remove.mutate(test.id)} />
+      </div>
     </li>
   );
 }
@@ -283,14 +323,14 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-xs">
       {teachers.isPending && <Loading />}
       <ul className="divide-y divide-border">
         {teachers.data?.map((t) => (
           <li key={t.teacher_id} className="flex items-center justify-between py-2">
             <span>
               {t.full_name || t.email}{" "}
-              <span className="text-sm text-text-muted">
+              <span className="ml-1 text-body-regular text-text-muted">
                 {t.kind === "owner" ? "Owner" : "Co-teacher"}
               </span>
             </span>
@@ -323,7 +363,9 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
         </form>
       ) : (
         <>
-          <p className="text-sm text-text-muted">Only the owner can add or remove teachers.</p>
+          <p className="text-body-regular text-text-muted">
+            Only the owner can add or remove teachers.
+          </p>
           <Confirm
             label="Leave this class"
             question="Stop teaching this class? Its tests and results stay with the other teachers."
@@ -336,9 +378,6 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
           />
         </>
       )}
-      {add.isError && <Message kind="error">{messageFrom(add.error)}</Message>}
-      {remove.isError && <Message kind="error">{messageFrom(remove.error)}</Message>}
-      {stop.isError && <Message kind="error">{messageFrom(stop.error)}</Message>}
     </div>
   );
 }
@@ -346,15 +385,13 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
 function Settings({ cls, owner }: { cls: ClassRow; owner: boolean }) {
   const update = useUpdateClass(cls.id);
   const rotate = useRotateCode(cls.id);
-  const [saved, setSaved] = useState(false);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
-    setSaved(false);
     update.mutate(
       { name: String(f.get("name")).trim(), description: String(f.get("description")).trim() },
-      { onSuccess: () => setSaved(true) },
+      { onSuccess: () => toast.ok("Saved.") },
     );
   }
 
@@ -369,7 +406,6 @@ function Settings({ cls, owner }: { cls: ClassRow; owner: boolean }) {
             defaultValue={cls.description}
             maxLength={500}
           />
-          {saved && <Message kind="ok">Saved.</Message>}
           <Button type="submit" disabled={update.isPending}>
             Save
           </Button>
@@ -381,11 +417,20 @@ function Settings({ cls, owner }: { cls: ClassRow; owner: boolean }) {
             type="checkbox"
             checked={cls.join_open}
             disabled={update.isPending}
-            onChange={(e) => update.mutate({ join_open: e.target.checked })}
+            onChange={(e) => {
+              const open = e.target.checked;
+              update.mutate(
+                { join_open: open },
+                {
+                  onSuccess: () =>
+                    toast.ok(open ? "Students can join with the code." : "Joining is closed."),
+                },
+              );
+            }}
           />
           <span>Students can join with the code</span>
         </label>
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           Turn this off once everyone has joined, so the code can't be passed on.
         </p>
         <Button
@@ -397,22 +442,24 @@ function Settings({ cls, owner }: { cls: ClassRow; owner: boolean }) {
         </Button>
       </Card>
       <Card title="Archive">
-        <p className="text-sm text-text-muted">
+        <p className="text-body-regular text-text-muted">
           An archived class keeps its tests and results, and no one new can join.
         </p>
         <Button
           variant="plain"
           disabled={update.isPending}
           onClick={() =>
-            update.mutate({ archived_at: cls.archived_at ? null : new Date().toISOString() })
+            update.mutate(
+              { archived_at: cls.archived_at ? null : new Date().toISOString() },
+              {
+                onSuccess: () => toast.ok(cls.archived_at ? "Class restored." : "Class archived."),
+              },
+            )
           }
         >
           {cls.archived_at ? "Restore class" : "Archive class"}
         </Button>
       </Card>
-      {(update.isError || rotate.isError) && (
-        <Message kind="error">{messageFrom(update.error ?? rotate.error)}</Message>
-      )}
       {owner && <HandOver cls={cls} />}
       {owner && <DeleteClass cls={cls} />}
     </div>
@@ -424,7 +471,7 @@ function HandOver({ cls }: { cls: ClassRow }) {
   const [email, setEmail] = useState("");
   return (
     <Card title="Hand over this class">
-      <p className="text-sm text-text-muted">
+      <p className="text-body-regular text-text-muted">
         Make another approved teacher the owner. You stay on as a co-teacher.
       </p>
       <Field
@@ -433,8 +480,6 @@ function HandOver({ cls }: { cls: ClassRow }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      {transfer.isError && <Message kind="error">{messageFrom(transfer.error)}</Message>}
-      {transfer.isSuccess && <Message kind="ok">Handed over. You are now a co-teacher.</Message>}
       <Confirm
         label="Hand over"
         question={`Make ${email.trim()} the owner of ${cls.name}? Only they will be able to add teachers or delete it.`}
@@ -452,12 +497,11 @@ function DeleteClass({ cls }: { cls: ClassRow }) {
   const navigate = useNavigate();
   return (
     <Card title="Delete this class">
-      <p className="text-sm text-text-muted">
+      <p className="text-body-regular text-text-muted">
         Deletes the class with every test in it, and every student's answers, results and pictures.
         This can't be undone. To keep the results and only stop new students joining, archive it
         instead.
       </p>
-      {remove.isError && <Message kind="error">{messageFrom(remove.error)}</Message>}
       <Confirm
         label="Delete this class"
         question={`Delete ${cls.name} and everything in it, for good?`}

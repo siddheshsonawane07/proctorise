@@ -38,6 +38,7 @@ export function PhonePairing({
   const [qr, setQr] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const create = useMutation({
+    meta: { quiet: true },
     mutationFn: async () =>
       unwrap(await supabase.rpc("create_pairing", { p_test_id: testId })) as unknown as Created,
     onSuccess: async (c) => {

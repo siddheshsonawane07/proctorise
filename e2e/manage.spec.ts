@@ -14,7 +14,7 @@ async function signInAs(page: Page, email: string) {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
 }
 
 /** A teacher with a class, made through the API; returns the teacher's token and the class. */
@@ -77,9 +77,10 @@ test("a teacher manages a published test and the class; a student leaves", async
   await expect(teacher.getByRole("heading", { name: "Unit quiz (moved)" })).toBeVisible();
 
   // The student sees the new title, open.
-  await pupil.getByRole("link", { name: "Chemistry 10" }).click();
+  await pupil.getByRole("main").getByRole("link", { name: "Chemistry 10" }).click();
+  await expect(pupil.getByRole("heading", { name: "Chemistry 10" })).toBeVisible();
   await expect(pupil.getByRole("heading", { name: "Open now" })).toBeVisible();
-  await expect(pupil.getByText("Unit quiz (moved)")).toBeVisible();
+  await expect(pupil.getByText("Unit quiz (moved)", { exact: true })).toBeVisible();
   await expect(pupil.getByText(/45\s+minutes/)).toBeVisible();
 
   // Cancel: the student can no longer start it.
@@ -119,7 +120,7 @@ test("a teacher manages a published test and the class; a student leaves", async
   await pupil.getByRole("button", { name: "Leave this class" }).click();
   await pupil.getByRole("button", { name: "Yes, leave" }).click();
   await expect(pupil.getByText("Classes you join will appear here.")).toBeVisible();
-  await teacher.getByRole("tab", { name: "Students" }).click();
+  await teacher.getByRole("tab", { name: "People" }).click();
   await teacher.getByRole("button", { name: /^Left/ }).click();
   await expect(teacher.getByRole("row").filter({ hasText: "Sam Student" })).toBeVisible();
 
@@ -144,18 +145,19 @@ test("a teacher switches to the student side to join another teacher's class", a
   await createUser({ email, password: PASSWORD, fullName: "Bo Both", teacher: true });
   await signInAs(page, email);
 
-  await expect(page.getByLabel("New class")).toBeVisible();
-  await expect(page.getByLabel("Join a class")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Create class" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Join class" })).toHaveCount(0);
   const menu = page.getByRole("complementary");
   await menu.getByRole("button", { name: "Student" }).click();
-  await expect(page.getByLabel("New class")).toHaveCount(0);
-  await page.getByLabel("Join a class").fill(other.code);
-  await page.getByRole("button", { name: "Join" }).click();
+  await expect(page.getByRole("button", { name: "Create class" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Join class" }).click();
+  await page.getByLabel("Class code").fill(other.code);
+  await page.getByRole("button", { name: "Join", exact: true }).click();
   await expect(page.getByText("You joined History 9.")).toBeVisible();
 
   // The choice survives a reload, and switching back shows only the teaching side.
   await page.reload();
-  await expect(page.getByRole("link", { name: "History 9" })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("link", { name: "History 9" })).toBeVisible();
   await menu.getByRole("button", { name: "Teacher" }).click();
   await expect(page.getByText("Classes you teach will appear here.")).toBeVisible();
   await expect(page.getByRole("link", { name: "History 9" })).toHaveCount(0);
@@ -164,8 +166,8 @@ test("a teacher switches to the student side to join another teacher's class", a
   await rpcAs(other.token, "add_co_teacher", { p_class_id: other.classId, p_email: email });
   await page.reload();
   await expect(page.getByText("Co-teacher")).toBeVisible();
-  await page.getByRole("link", { name: "History 9" }).click();
-  await page.getByRole("tab", { name: "Teachers" }).click();
+  await page.getByRole("main").getByRole("link", { name: "History 9" }).click();
+  await page.getByRole("tab", { name: "People" }).click();
   await page.getByRole("button", { name: "Leave this class" }).click();
   await page.getByRole("button", { name: "Yes, leave" }).click();
   await expect(page.getByText("Classes you teach will appear here.")).toBeVisible();
@@ -196,8 +198,8 @@ test("the admin has only the admin's pages, and hands over or deletes any class"
   await expect(menu.getByRole("link", { name: "Classes" })).toBeVisible();
   await expect(menu.getByRole("link", { name: "Question bank" })).toHaveCount(0);
   await expect(menu.getByRole("link", { name: "Your photo" })).toHaveCount(0);
-  await expect(page.getByLabel("Join a class")).toHaveCount(0);
-  await expect(page.getByLabel("New class")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Join class" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Create class" })).toHaveCount(0);
 
   await menu.getByRole("link", { name: "Classes" }).click();
   const item = page.getByRole("listitem").filter({ hasText: "Orphaned class" });

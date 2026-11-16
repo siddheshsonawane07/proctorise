@@ -54,9 +54,11 @@ export function usePublishedItems(testId: string, enabled: boolean) {
   });
 }
 
-function useTestMutation<A>(testId: string, fn: (args: A) => Promise<unknown>) {
+/** `ok` is what the corner notification says when it works; without it, nothing needs saying. */
+function useTestMutation<A>(testId: string, fn: (args: A) => Promise<unknown>, ok?: string) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: ok ? { ok } : {},
     mutationFn: fn,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["test", testId] });
@@ -97,14 +99,17 @@ export function useAddQuestion(testId: string) {
 }
 
 export function useRemoveQuestion(testId: string) {
-  return useTestMutation(testId, async (questionId: string) =>
-    unwrap(
-      await supabase
-        .from("test_questions")
-        .delete()
-        .eq("test_id", testId)
-        .eq("question_id", questionId),
-    ),
+  return useTestMutation(
+    testId,
+    async (questionId: string) =>
+      unwrap(
+        await supabase
+          .from("test_questions")
+          .delete()
+          .eq("test_id", testId)
+          .eq("question_id", questionId),
+      ),
+    "Question taken out of the test. It is still in your bank.",
   );
 }
 
@@ -136,25 +141,33 @@ export function useSetPoints(testId: string) {
 }
 
 export function usePublish(testId: string) {
-  return useTestMutation(testId, async () =>
-    unwrap(await supabase.rpc("publish_test", { p_test_id: testId })),
+  return useTestMutation(
+    testId,
+    async () => unwrap(await supabase.rpc("publish_test", { p_test_id: testId })),
+    "Published to the class.",
   );
 }
 
 export function useUnpublish(testId: string) {
-  return useTestMutation(testId, async () =>
-    unwrap(await supabase.rpc("unpublish_test", { p_test_id: testId })),
+  return useTestMutation(
+    testId,
+    async () => unwrap(await supabase.rpc("unpublish_test", { p_test_id: testId })),
+    "Back to a draft.",
   );
 }
 
 export function useCancelTest(testId: string) {
-  return useTestMutation(testId, async () =>
-    unwrap(await supabase.rpc("cancel_test", { p_test_id: testId })),
+  return useTestMutation(
+    testId,
+    async () => unwrap(await supabase.rpc("cancel_test", { p_test_id: testId })),
+    "Test cancelled.",
   );
 }
 
 export function useReopenTest(testId: string) {
-  return useTestMutation(testId, async () =>
-    unwrap(await supabase.rpc("reopen_test", { p_test_id: testId })),
+  return useTestMutation(
+    testId,
+    async () => unwrap(await supabase.rpc("reopen_test", { p_test_id: testId })),
+    "Test reopened.",
   );
 }

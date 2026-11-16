@@ -84,9 +84,11 @@ export function useSnapshots(attemptId: string, enabled: boolean) {
   });
 }
 
-function useRefreshing<A>(fn: (args: A) => Promise<unknown>) {
+/** `ok` is what the corner notification says when it works. */
+function useRefreshing<A>(fn: (args: A) => Promise<unknown>, ok?: string) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: ok ? { ok } : {},
     mutationFn: fn,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["flags"] });
@@ -126,26 +128,34 @@ export const useSetIntegrity = () =>
   );
 
 export const useWarn = () =>
-  useRefreshing(async (a: { attemptId: string; message: string }) =>
-    unwrap(await supabase.rpc("warn_student", { p_attempt_id: a.attemptId, p_message: a.message })),
+  useRefreshing(
+    async (a: { attemptId: string; message: string }) =>
+      unwrap(
+        await supabase.rpc("warn_student", { p_attempt_id: a.attemptId, p_message: a.message }),
+      ),
+    "Warning sent.",
   );
 
 export const useExtend = () =>
-  useRefreshing(async (a: { attemptId: string; minutes: number; reason: string }) =>
-    unwrap(
-      await supabase.rpc("extend_attempt", {
-        p_attempt_id: a.attemptId,
-        p_minutes: a.minutes,
-        p_reason: a.reason,
-      }),
-    ),
+  useRefreshing(
+    async (a: { attemptId: string; minutes: number; reason: string }) =>
+      unwrap(
+        await supabase.rpc("extend_attempt", {
+          p_attempt_id: a.attemptId,
+          p_minutes: a.minutes,
+          p_reason: a.reason,
+        }),
+      ),
+    "Time added.",
   );
 
 export const useTerminate = () =>
-  useRefreshing(async (a: { attemptId: string; reason: string }) =>
-    unwrap(
-      await supabase.rpc("terminate_attempt", { p_attempt_id: a.attemptId, p_reason: a.reason }),
-    ),
+  useRefreshing(
+    async (a: { attemptId: string; reason: string }) =>
+      unwrap(
+        await supabase.rpc("terminate_attempt", { p_attempt_id: a.attemptId, p_reason: a.reason }),
+      ),
+    "Test ended for this student.",
   );
 
 export const useVoid = () =>

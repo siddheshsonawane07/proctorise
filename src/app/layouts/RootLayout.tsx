@@ -21,14 +21,26 @@ import { useProfile, type Profile } from "../../features/auth/useProfile";
 import { isAdmin } from "../../features/auth/roles";
 import { useView, type View } from "../../features/auth/view";
 import { ViewSwitch } from "../../features/auth/ViewSwitch";
+import { useJoinedClasses, useTeachingClasses } from "../../features/classes/api";
+import { classBand } from "../../features/classes/colour";
 import { cx } from "@/utils/cx";
 import { buttonClass } from "../ui/buttonClass";
+import { Toaster } from "../ui/Toaster";
 
 /**
  * Three shells: signed-in pages get a sidebar; the test and the phone page get a bare bar, so
  * nothing distracts from the test; everything else gets the public header and footer.
  */
 export function RootLayout() {
+  return (
+    <>
+      <Shell />
+      <Toaster />
+    </>
+  );
+}
+
+function Shell() {
   const { pathname } = useLocation();
   if (pathname.startsWith("/app/take/") || pathname.startsWith("/pair")) return <FocusShell />;
   if (pathname === "/app" || pathname.startsWith("/app/")) return <AppShell />;
@@ -119,15 +131,22 @@ function FocusShell() {
   );
 }
 
-type NavItem = { to: string; label: string; icon: RemixiconComponentType };
+/** A class's line carries its colour (`band`) where other lines carry an icon. */
+type NavItem = { to: string; label: string; icon?: RemixiconComponentType; band?: string };
+type NavClass = { id: string; name: string };
 
-/** One menu per role: the admin's, a teacher's or a student's. */
-function navFor(profile: Profile | undefined, view: View): { title?: string; items: NavItem[] }[] {
-  const home: NavItem = { to: "/app", label: "Home", icon: RiHome5Line };
+const MENU_CLASSES = 8;
+
+/** One menu per role: the admin's, a teacher's or a student's. Classes are listed by name. */
+function navFor(
+  profile: Profile | undefined,
+  view: View,
+  classes: NavClass[],
+): { title?: string; items: NavItem[] }[] {
   const data: NavItem = { to: "/app/my-data", label: "Your data", icon: RiShieldUserLine };
   if (isAdmin(profile)) {
     return [
-      { items: [home] },
+      { items: [{ to: "/app", label: "Home", icon: RiHome5Line }] },
       {
         title: "Admin",
         items: [
@@ -139,9 +158,16 @@ function navFor(profile: Profile | undefined, view: View): { title?: string; ite
       { title: "You", items: [data] },
     ];
   }
+  const home: NavItem = { to: "/app", label: "Classes", icon: RiGroupLine };
+  const mine: NavItem[] = classes.slice(0, MENU_CLASSES).map((c) => ({
+    to: `/app/classes/${c.id}`,
+    label: c.name,
+    band: classBand(c.id),
+  }));
   if (view === "teacher") {
     return [
-      { items: [home, { to: "/app/bank", label: "Question bank", icon: RiBookOpenLine }] },
+      { items: [home, ...mine] },
+      { items: [{ to: "/app/bank", label: "Question bank", icon: RiBookOpenLine }] },
       {
         title: "You",
         items: [data, { to: "/help/teachers", label: "Help", icon: RiQuestionLine }],
@@ -149,7 +175,7 @@ function navFor(profile: Profile | undefined, view: View): { title?: string; ite
     ];
   }
   return [
-    { items: [home] },
+    { items: [home, ...mine] },
     {
       title: "You",
       items: [
@@ -218,6 +244,10 @@ function Sidebar() {
     navigate("/", { replace: true });
   }
   const view = useView(profile.data);
+  const teaching = useTeachingClasses(view === "teacher" && !isAdmin(profile.data));
+  const joined = useJoinedClasses();
+  const classes =
+    view === "teacher" ? (teaching.data ?? []).filter((c) => !c.archived_at) : (joined.data ?? []);
   const email = state.status === "ready" ? state.session?.user.email : undefined;
   const name = profile.data?.full_name || email || "";
 
@@ -225,15 +255,13 @@ function Sidebar() {
     <div className="flex flex-1 flex-col overflow-y-auto px-3 pb-4">
       <ViewSwitch className="mx-1 mt-2" />
       <nav aria-label="Main" className="flex-1 space-y-5 pt-2">
-        {navFor(profile.data, view).map((group, i) => (
+        {navFor(profile.data, view, classes).map((group, i) => (
           <div key={group.title ?? i}>
             {group.title && (
-              <p className="px-3 pb-1.5 text-caption-1-semibold tracking-wide text-text-muted uppercase">
-                {group.title}
-              </p>
+              <p className="px-3 pb-1.5 text-caption-1-semibold text-text-muted">{group.title}</p>
             )}
             <ul className="space-y-0.5">
-              {group.items.map(({ to, label, icon: Icon }) => (
+              {group.items.map(({ to, label, icon: Icon, band }) => (
                 <li key={to}>
                   <NavLink
                     to={to}
@@ -247,8 +275,12 @@ function Sidebar() {
                       )
                     }
                   >
-                    <Icon aria-hidden className="size-[18px] shrink-0" />
-                    {label}
+                    {Icon ? (
+                      <Icon aria-hidden className="size-[18px] shrink-0" />
+                    ) : (
+                      <span aria-hidden className={cx("mx-[3px] size-3 shrink-0 rounded", band)} />
+                    )}
+                    <span className="truncate">{label}</span>
                   </NavLink>
                 </li>
               ))}

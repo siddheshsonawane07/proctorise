@@ -35,7 +35,7 @@ test("student and teacher pages have no accessibility violations", async ({ brow
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   // Without this the first goto races the sign-in, and every check below reads the sign-in page.
-  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
   for (const path of [
     "/app",
     `/app/classes/${classId}`,
@@ -47,10 +47,17 @@ test("student and teacher pages have no accessibility violations", async ({ brow
     await check(page);
   }
 
-  // The student side of a teacher's account, and a confirmation open on the class's settings.
+  // The window for a new class, open over the page.
   await page.goto("/app");
+  await page.getByRole("button", { name: "Create class" }).click();
+  await expect(page.getByRole("dialog", { name: "Create a class" })).toBeVisible();
+  await check(page);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  // The student side of a teacher's account, and a confirmation open on the class's settings.
   await page.getByRole("complementary").getByRole("button", { name: "Student" }).click();
-  await expect(page.getByLabel("Join a class")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Join class" })).toBeVisible();
   await check(page);
   await page.getByRole("complementary").getByRole("button", { name: "Teacher" }).click();
   await page.goto(`/app/classes/${classId}`);
@@ -67,7 +74,7 @@ test("the admin's pages have no accessibility violations", async ({ page }) => {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
   for (const path of ["/app", "/app/admin/classes", "/app/admin/teachers", "/app/admin/usage"]) {
     await page.goto(path);
     await check(page);

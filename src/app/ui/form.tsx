@@ -46,6 +46,21 @@ export function TextArea({
   );
 }
 
+export function Select({
+  label,
+  children,
+  ...select
+}: { label: string } & ComponentPropsWithRef<"select">) {
+  return (
+    <label className="block">
+      <span className="text-body-medium text-text-primary">{label}</span>
+      <select {...select} className={fieldClass}>
+        {children}
+      </select>
+    </label>
+  );
+}
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "plain" | "danger";
 };

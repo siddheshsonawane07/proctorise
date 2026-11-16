@@ -20,9 +20,6 @@ export function Flags({ attemptId }: { attemptId: string }) {
   const kinds = [...new Set(flags.data.filter((f) => f.verdict === null).map((f) => f.kind))];
   return (
     <div className="space-y-3">
-      {(review.isError || dismissKind.isError) && (
-        <Message kind="error">{messageFrom(review.error ?? dismissKind.error)}</Message>
-      )}
       <ul className="space-y-3">
         {flags.data.map((f) => {
           const seconds = f.ended_at

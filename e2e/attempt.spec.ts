@@ -120,7 +120,7 @@ test("answers survive closing the browser, and the server keeps the time", async
   await first.getByLabel("Email").fill(studentEmail);
   await first.getByLabel("Password").fill(PASSWORD);
   await first.getByRole("button", { name: "Sign in" }).click();
-  await expect(first.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  await expect(first.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
   await first.goto(`/app/take/${testId}`);
   await enter(first, "Start the test");
   await first.getByLabel("H2O").check();

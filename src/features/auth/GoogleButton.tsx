@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
-import { Button, Message } from "../../app/ui/form";
+import { Button } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 
 /** Shown only where Google sign-in is configured (`VITE_AUTH_GOOGLE=on`). */
 export function GoogleButton({ next }: { next: string }) {
-  const [error, setError] = useState<string | null>(null);
   if (import.meta.env.VITE_AUTH_GOOGLE !== "on") return null;
 
   async function onClick() {
@@ -13,7 +12,7 @@ export function GoogleButton({ next }: { next: string }) {
       provider: "google",
       options: { redirectTo: `${window.location.origin}${next}` },
     });
-    if (error) setError(messageFrom(error));
+    if (error) toast.error(messageFrom(error));
   }
 
   return (
@@ -21,7 +20,6 @@ export function GoogleButton({ next }: { next: string }) {
       <Button variant="plain" className="w-full" onClick={onClick}>
         Continue with Google
       </Button>
-      {error && <Message kind="error">{error}</Message>}
     </div>
   );
 }
