@@ -97,11 +97,13 @@ select is((select count(*)::int from public.test_items where test_id = current_s
   'publishing copies both questions');
 select is((select points from public.test_items where test_id = current_setting('t.test')::uuid and position = 0),
   2.00::numeric, 'with the bank''s points');
-select is((select count(*)::int from public.tests where id = current_setting('t.test')::uuid
-           and title = 'Changed'), 0, 'setup check');
-update public.tests set title = 'Changed' where id = current_setting('t.test')::uuid;
-select is((select title from public.tests where id = current_setting('t.test')::uuid), 'Quiz 1',
-  'a published test cannot be edited');
+-- Its details stay editable (manage.test.sql); what students sit and agree to does not.
+select throws_ok($$ update public.tests set proctoring = jsonb_set(proctoring, '{preset}', '"light"')
+                    where id = current_setting('t.test')::uuid $$,
+  'P0001', null, 'a published test''s proctoring settings cannot be edited');
+delete from public.test_questions where test_id = current_setting('t.test')::uuid;
+select is((select count(*)::int from public.test_questions
+           where test_id = current_setting('t.test')::uuid), 2, 'nor its questions');
 select public.save_question(current_setting('t.q1')::uuid, 'single', 'What is 2 + 3?',
   '[{"id":"a","text":"5"},{"id":"b","text":"4"}]', 2, '{}', '"a"');
 select is((select prompt from public.test_items where test_id = current_setting('t.test')::uuid and position = 0),

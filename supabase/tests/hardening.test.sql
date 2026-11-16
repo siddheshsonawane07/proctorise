@@ -8,7 +8,7 @@ select plan(17);
 select is(
   (select array_agg(tablename::text order by tablename) from pg_tables where schemaname = 'public'),
   array['answers', 'attempts', 'audit_log', 'class_members', 'class_teachers', 'classes',
-        'device_pairings', 'evidence', 'flag_reviews', 'identity_enrolments', 'join_failures',
+        'device_pairings', 'evidence', 'evidence_purge', 'flag_reviews', 'identity_enrolments', 'join_failures',
         'proctor_events', 'profiles', 'question_keys', 'questions', 'test_item_keys', 'test_items',
         'test_questions', 'tests'],
   'every table in public is known: add a new one here only with its policies and tests');

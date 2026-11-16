@@ -7,6 +7,12 @@ export type ClassRow = Tables<"classes">;
 export type TestRow = Tables<"tests">;
 export type MemberStatus = Database["public"]["Enums"]["member_status"];
 
+export const TEST_STATUS_LABEL: Record<TestRow["status"], string> = {
+  draft: "Draft",
+  published: "Published",
+  closed: "Cancelled",
+};
+
 function useUserId(): string | undefined {
   const state = useSession();
   return state.status === "ready" ? state.session?.user.id : undefined;
@@ -117,7 +123,7 @@ export type JoinResult =
   | { joined: true; class_id: string; name: string }
   | {
       joined: false;
-      reason: "no_match" | "too_many" | "removed";
+      reason: "no_match" | "too_many" | "removed" | "teacher";
     };
 
 export function useJoinClass() {
@@ -131,7 +137,7 @@ export function useJoinClass() {
 export function useUpdateClass(classId: string) {
   return useClassMutation(
     classId,
-    async (fields: Partial<Pick<ClassRow, "name" | "join_open" | "archived_at">>) =>
+    async (fields: Partial<Pick<ClassRow, "name" | "description" | "join_open" | "archived_at">>) =>
       unwrap(await supabase.from("classes").update(fields).eq("id", classId)),
   );
 }
@@ -168,6 +174,61 @@ export function useRemoveCoTeacher(classId: string) {
     unwrap(
       await supabase.rpc("remove_co_teacher", { p_class_id: classId, p_teacher_id: teacherId }),
     ),
+  );
+}
+
+/**
+ * Leaving, handing over and deleting change what every list shows, and are rare: they refresh
+ * everything rather than name each list. The refresh is not waited for: the page that asked is
+ * about to lose its class, and would unmount before it could move the person on.
+ */
+function useSweepingMutation<A>(fn: (args: A) => Promise<unknown>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => void queryClient.invalidateQueries(),
+  });
+}
+
+export function useLeaveClass() {
+  return useSweepingMutation(async (classId: string) =>
+    unwrap(await supabase.rpc("leave_class", { p_class_id: classId })),
+  );
+}
+
+/** A co-teacher takes themselves off a class. */
+export function useStopTeaching() {
+  return useSweepingMutation(async (args: { classId: string; teacherId: string }) =>
+    unwrap(
+      await supabase.rpc("remove_co_teacher", {
+        p_class_id: args.classId,
+        p_teacher_id: args.teacherId,
+      }),
+    ),
+  );
+}
+
+export function useTransferClass() {
+  return useSweepingMutation(async (args: { classId: string; email: string }) =>
+    unwrap(await supabase.rpc("transfer_class", { p_class_id: args.classId, p_email: args.email })),
+  );
+}
+
+export function useDeleteClass() {
+  return useSweepingMutation(async (classId: string) =>
+    unwrap(await supabase.rpc("delete_class", { p_class_id: classId })),
+  );
+}
+
+export function useDeleteTest(classId: string) {
+  return useClassMutation(classId, async (testId: string) =>
+    unwrap(await supabase.rpc("delete_test", { p_test_id: testId })),
+  );
+}
+
+export function useDuplicateTest(classId: string) {
+  return useClassMutation(classId, async (testId: string) =>
+    unwrap(await supabase.rpc("duplicate_test", { p_test_id: testId })),
   );
 }
 

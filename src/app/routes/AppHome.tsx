@@ -2,7 +2,9 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { BecomeTeacher } from "../../features/account/BecomeTeacher";
 import { useProfile } from "../../features/auth/useProfile";
-import { isTeacher } from "../../features/auth/roles";
+import { isAdmin, isTeacher } from "../../features/auth/roles";
+import { useView } from "../../features/auth/view";
+import { ViewSwitch } from "../../features/auth/ViewSwitch";
 import {
   useCreateClass,
   useJoinClass,
@@ -17,46 +19,106 @@ const JOIN_REASONS: Record<Exclude<JoinResult, { joined: true }>["reason"], stri
   no_match: "That code didn't match an open class. Check it with your teacher.",
   too_many: "Too many wrong codes. Try again in an hour.",
   removed: "Your teacher removed you from this class. Ask them to add you back.",
+  teacher: "You teach this class, so you can't join it as a student.",
 };
 
+/** One home per role: the admin's, a teacher's, or a student's. Never two at once. */
 export function AppHome() {
   const { data: profile } = useProfile();
+  const view = useView(profile);
   if (!profile) return null; // RequireAuth renders this only once the profile has loaded.
-  const teacher = isTeacher(profile);
   const firstName = profile.full_name.split(" ")[0] || "there";
 
   return (
     <div className="space-y-6">
       <h1 className="text-title-1-bold tracking-tight text-text">Hello, {firstName}</h1>
-      {profile.role === "admin" && (
-        <Card title="Admin">
-          <div className="flex flex-wrap gap-4">
-            <Link to="/app/admin/teachers" className="text-accent underline">
-              Teacher requests and teachers
+      {isAdmin(profile) ? (
+        <AdminHome />
+      ) : view === "teacher" ? (
+        <>
+          <Switching>
+            You're using Proctorise as a teacher. To take a test in someone else's class, switch to
+            Student.
+          </Switching>
+          <TeachingClasses />
+        </>
+      ) : (
+        <>
+          {isTeacher(profile) && (
+            <Switching>
+              You're using Proctorise as a student. To run your own classes and tests, switch to
+              Teacher.
+            </Switching>
+          )}
+          <JoinedClasses />
+          <Card title="Your photo for tests">
+            <p className="text-text-muted">
+              Some tests check it's you by comparing your face with a photo you take here.
+            </p>
+            <Link to="/app/identity" className="text-accent underline">
+              Set up or replace your photo
             </Link>
-            <Link to="/app/admin/usage" className="text-accent underline">
-              Usage against the free plan
+          </Card>
+          <Card title="Your data">
+            <Link to="/app/my-data" className="text-accent underline">
+              Download your data, or delete your account
             </Link>
-          </div>
-        </Card>
+          </Card>
+          {profile.role === "student" && <BecomeTeacher profile={profile} />}
+        </>
       )}
-      {teacher && <TeachingClasses />}
-      <JoinedClasses showEmpty={!teacher} />
-      <Card title="Your photo for tests">
-        <p className="text-text-muted">
-          Some tests check it's you by comparing your face with a photo you take here.
-        </p>
-        <Link to="/app/identity" className="text-accent underline">
-          Set up or replace your photo
-        </Link>
-      </Card>
-      <Card title="Your data">
-        <Link to="/app/my-data" className="text-accent underline">
-          Download your data, or delete your account
-        </Link>
-      </Card>
-      {profile.role === "student" && <BecomeTeacher profile={profile} />}
     </div>
+  );
+}
+
+/** The sidebar holds the switch on a wide screen; on a narrow one it is here. */
+function Switching({ children }: { children: string }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-text-muted">{children}</p>
+      <ViewSwitch className="max-w-xs lg:hidden" />
+    </div>
+  );
+}
+
+const ADMIN_PAGES = [
+  {
+    to: "/app/admin/teachers",
+    title: "Teachers",
+    text: "Approve or decline requests for teacher access, and pause a teacher.",
+  },
+  {
+    to: "/app/admin/classes",
+    title: "Classes",
+    text: "Every class on the site. Hand one to another teacher, or delete it.",
+  },
+  {
+    to: "/app/admin/usage",
+    title: "Usage",
+    text: "Database, file storage and activity against the free plan.",
+  },
+];
+
+function AdminHome() {
+  return (
+    <>
+      <p className="text-text-muted">
+        This is the admin account. It looks after the site and doesn't teach or take tests; use a
+        separate account for those.
+      </p>
+      <div className="grid gap-4 md:grid-cols-3">
+        {ADMIN_PAGES.map((page) => (
+          <Link
+            key={page.to}
+            to={page.to}
+            className="rounded-2xl border border-border-table bg-background-primary-default p-5 no-underline shadow-xs hover:border-accent"
+          >
+            <span className="text-headline-semibold text-accent">{page.title}</span>
+            <span className="mt-1 block text-body-regular text-text-muted">{page.text}</span>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -83,6 +145,9 @@ function TeachingClasses() {
             <Link to={`/app/classes/${c.id}`} className="font-medium text-accent">
               {c.name}
             </Link>
+            {c.kind === "co_teacher" && (
+              <span className="ml-2 text-sm text-text-muted">Co-teacher</span>
+            )}
             {c.archived_at && <span className="ml-2 text-sm text-text-muted">Archived</span>}
           </li>
         ))}
@@ -109,7 +174,7 @@ function TeachingClasses() {
   );
 }
 
-function JoinedClasses({ showEmpty }: { showEmpty: boolean }) {
+function JoinedClasses() {
   const classes = useJoinedClasses();
   const join = useJoinClass();
   const [result, setResult] = useState<JoinResult | null>(null);
@@ -126,7 +191,6 @@ function JoinedClasses({ showEmpty }: { showEmpty: boolean }) {
     });
   }
 
-  if (!showEmpty && classes.data?.length === 0) return null;
   return (
     <Card title="Your classes">
       {classes.data?.length === 0 && (

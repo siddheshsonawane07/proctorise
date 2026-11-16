@@ -146,3 +146,15 @@ export function useUnpublish(testId: string) {
     unwrap(await supabase.rpc("unpublish_test", { p_test_id: testId })),
   );
 }
+
+export function useCancelTest(testId: string) {
+  return useTestMutation(testId, async () =>
+    unwrap(await supabase.rpc("cancel_test", { p_test_id: testId })),
+  );
+}
+
+export function useReopenTest(testId: string) {
+  return useTestMutation(testId, async () =>
+    unwrap(await supabase.rpc("reopen_test", { p_test_id: testId })),
+  );
+}

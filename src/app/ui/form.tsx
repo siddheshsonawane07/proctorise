@@ -46,10 +46,12 @@ export function TextArea({
   );
 }
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "plain" };
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "plain" | "danger";
+};
 
 export function Button({ variant = "primary", ...props }: ButtonProps) {
-  return <BoardButton variant={variant === "primary" ? "primary" : "secondary"} {...props} />;
+  return <BoardButton variant={variant === "plain" ? "secondary" : variant} {...props} />;
 }
 
 /** A message the person needs to read: an error (role=alert) or a confirmation (role=status). */

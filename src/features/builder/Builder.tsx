@@ -1,19 +1,23 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { Button, Card, Field, Loading, Message, TextArea } from "../../app/ui/form";
+import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
 import { messageFrom } from "../../lib/errors";
 import { MAX_LIVE_STUDENTS } from "../../lib/limits";
 import { formatWhen, fromLocalInput, toLocalInput } from "../../lib/time";
 import { useBank } from "../bank/api";
 import { TYPE_LABEL } from "../bank/question";
-import type { TestRow } from "../classes/api";
+import { TEST_STATUS_LABEL, useDeleteTest, useDuplicateTest, type TestRow } from "../classes/api";
+import { DeleteTest } from "../classes/DeleteTest";
 import {
   useAddQuestion,
+  useCancelTest,
   useDraftQuestions,
   usePublish,
   usePublishedItems,
   useRemoveQuestion,
+  useReopenTest,
   useReorder,
   useSetPoints,
   useTest,
@@ -51,6 +55,9 @@ function Header({ test }: { test: TestRow }) {
           Back to the class
         </Link>
         <h1 className="mt-1 text-2xl font-semibold">{test.title}</h1>
+        {test.status === "draft" && (
+          <p className="text-sm text-text-muted">{TEST_STATUS_LABEL.draft}</p>
+        )}
       </div>
       <Link to={`/app/tests/${test.id}/preview`} className="text-accent underline">
         Preview as a student
@@ -81,11 +88,47 @@ function DraftBuilder({ test }: { test: TestRow }) {
           Publish to the class
         </Button>
       </Card>
+      <CopyOrDelete test={test} />
     </div>
   );
 }
 
+/** For any test, draft or not: a copy to change freely, or gone altogether. */
+function CopyOrDelete({ test }: { test: TestRow }) {
+  const copy = useDuplicateTest(test.class_id);
+  const remove = useDeleteTest(test.class_id);
+  const navigate = useNavigate();
+  const error = copy.error ?? remove.error;
+  return (
+    <Card title="Copy or delete">
+      <p className="text-sm text-text-muted">
+        A copy is a new draft in this class with the same questions and settings.
+      </p>
+      {error && <Message kind="error">{messageFrom(error)}</Message>}
+      <div className="flex flex-wrap items-start gap-2">
+        <Button
+          variant="plain"
+          disabled={copy.isPending}
+          onClick={() =>
+            copy.mutate(test.id, { onSuccess: (id) => navigate(`/app/tests/${id}/edit`) })
+          }
+        >
+          Make a copy
+        </Button>
+        <DeleteTest
+          test={test}
+          busy={remove.isPending}
+          onConfirm={() =>
+            remove.mutate(test.id, { onSuccess: () => navigate(`/app/classes/${test.class_id}`) })
+          }
+        />
+      </div>
+    </Card>
+  );
+}
+
 function Details({ test }: { test: TestRow }) {
+  const live = test.status !== "draft";
   const update = useUpdateTest(test.id);
   const [saved, setSaved] = useState(false);
 
@@ -113,6 +156,12 @@ function Details({ test }: { test: TestRow }) {
 
   return (
     <Card title="Details">
+      {live && (
+        <p className="text-sm text-text-muted">
+          You can still change these. Students already taking the test keep the time they started
+          with.
+        </p>
+      )}
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Title" name="title" defaultValue={test.title} required maxLength={200} />
         <TextArea
@@ -462,13 +511,19 @@ function Toggle({
 function PublishedTest({ test }: { test: TestRow }) {
   const items = usePublishedItems(test.id, true);
   const unpublish = useUnpublish(test.id);
+  const cancel = useCancelTest(test.id);
+  const reopen = useReopenTest(test.id);
+  const cancelled = test.status === "closed";
+  const error = unpublish.error ?? cancel.error ?? reopen.error;
   return (
     <div className="space-y-6">
       <Header test={test} />
-      <Card title="Published">
+      <Card title={cancelled ? "Cancelled" : "Published"}>
         <p className="text-text-muted">
-          Open from {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)} ·{" "}
-          {test.duration_min} minutes · {items.data?.length ?? "…"} questions
+          {cancelled
+            ? "No one can start this test. Attempts made before it was cancelled are kept."
+            : `Open from ${formatWhen(test.opens_at)} to ${formatWhen(test.closes_at)}`}{" "}
+          · {test.duration_min} minutes · {items.data?.length ?? "…"} questions
         </p>
         <div className="flex flex-wrap gap-4">
           <Link to={`/app/tests/${test.id}/live`} className="font-medium text-accent underline">
@@ -484,18 +539,49 @@ function PublishedTest({ test }: { test: TestRow }) {
         >
           Results and marking
         </Link>
-        <p className="text-sm text-text-muted">
-          To change it, take it back to a draft. That's only possible until a student starts it.
-        </p>
-        {unpublish.isError && <Message kind="error">{messageFrom(unpublish.error)}</Message>}
-        <Button
-          variant="plain"
-          onClick={() => unpublish.mutate(undefined)}
-          disabled={unpublish.isPending}
-        >
-          Back to draft
-        </Button>
       </Card>
+      <Details test={test} />
+      <Card title="Questions and proctoring">
+        <p className="text-sm text-text-muted">
+          These are fixed once a test is published. To change them, take the test back to a draft
+          (only possible until a student starts it), or make a copy and publish that.
+        </p>
+        {!cancelled && (
+          <Button
+            variant="plain"
+            onClick={() => unpublish.mutate(undefined)}
+            disabled={unpublish.isPending}
+          >
+            Back to draft
+          </Button>
+        )}
+      </Card>
+      <Card title={cancelled ? "Reopen the test" : "Cancel the test"}>
+        <p className="text-sm text-text-muted">
+          {cancelled
+            ? "Reopening publishes it again with the window above. Check the dates first."
+            : "Calls the test off. No one can start it, and anyone taking it now is handed in as they stand. Attempts and results are kept, and you can reopen it."}
+        </p>
+        {error && <Message kind="error">{messageFrom(error)}</Message>}
+        {cancelled ? (
+          <Button
+            variant="plain"
+            onClick={() => reopen.mutate(undefined)}
+            disabled={reopen.isPending}
+          >
+            Reopen this test
+          </Button>
+        ) : (
+          <Confirm
+            label="Cancel this test"
+            question={`Cancel “${test.title}”? Students taking it right now are handed in at once.`}
+            yes="Yes, cancel it"
+            busy={cancel.isPending}
+            onConfirm={() => cancel.mutate(undefined)}
+          />
+        )}
+      </Card>
+      <CopyOrDelete test={test} />
     </div>
   );
 }

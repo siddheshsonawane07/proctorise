@@ -25,7 +25,7 @@ describe("rowToQuestion", () => {
 
   it("maps option letters to ids", () => {
     expect(rowToQuestion(rows[0]!)).toMatchObject({ type: "single", correct: "b" });
-    expect(rowToQuestion(rows[1]!)).toMatchObject({ type: "multiple", correct: ["a", "c"] });
+    expect(rowToQuestion(rows[1]!)).toMatchObject({ type: "multiple", correct: ["b", "c"] });
   });
 
   it("keeps an empty short-text key for marking by hand", () => {
@@ -33,7 +33,7 @@ describe("rowToQuestion", () => {
   });
 
   it("reads a numeric tolerance", () => {
-    expect(rowToQuestion(rows[5]!)).toMatchObject({ correct: 3.14, tolerance: 0.005 });
+    expect(rowToQuestion(rows[5]!)).toMatchObject({ correct: 1.41, tolerance: 0.005 });
   });
 
   it("explains a letter outside the options", () => {

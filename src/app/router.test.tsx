@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import type { Session } from "@supabase/supabase-js";
@@ -7,6 +7,7 @@ import { DESKTOP_QUERY, PHONE_QUERY } from "../lib/useMediaQuery";
 import { mediaMatches } from "../test/setup";
 import { SessionContext } from "../features/auth/session";
 import type { Profile } from "../features/auth/useProfile";
+import { setView } from "../features/auth/view";
 
 const USER_ID = "11111111-1111-1111-1111-111111111111";
 
@@ -105,6 +106,50 @@ describe("signing in", () => {
 
   it("keeps a student out of the admin page", async () => {
     renderAt("/app/admin/teachers", profile());
+    expect(
+      await screen.findByRole("heading", { name: "You don't have access" }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("one role at a time", () => {
+  const teacher = profile({ role: "teacher", teacher_status: "approved" });
+  afterEach(() => act(() => setView("teacher")));
+
+  it("shows a teacher the teaching side only, until they switch", async () => {
+    renderAt("/app", teacher);
+    expect(await screen.findByText("Classes you teach will appear here.")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Join a class")).not.toBeInTheDocument();
+
+    const menu = screen.getByRole("complementary");
+    act(() => within(menu).getByRole("button", { name: "Student" }).click());
+    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
+    expect(screen.queryByLabelText("New class")).not.toBeInTheDocument();
+    expect(within(menu).queryByRole("link", { name: "Question bank" })).not.toBeInTheDocument();
+    expect(within(menu).getByRole("link", { name: "Your photo" })).toBeInTheDocument();
+  });
+
+  it("gives a student no switch", async () => {
+    renderAt("/app", profile());
+    expect(await screen.findByLabelText("Join a class")).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Use Proctorise as" })).not.toBeInTheDocument();
+  });
+
+  it("shows the admin only the admin's pages", async () => {
+    renderAt("/app", profile({ role: "admin" }));
+    const menu = await screen.findByRole("complementary");
+    for (const name of ["Teachers", "Classes", "Usage"]) {
+      expect(within(menu).getByRole("link", { name })).toBeInTheDocument();
+    }
+    expect(within(menu).queryByRole("link", { name: "Question bank" })).not.toBeInTheDocument();
+    expect(within(menu).queryByRole("link", { name: "Your photo" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Join a class")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("New class")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Use Proctorise as" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the admin out of the question bank", async () => {
+    renderAt("/app/bank", profile({ role: "admin" }));
     expect(
       await screen.findByRole("heading", { name: "You don't have access" }),
     ).toBeInTheDocument();

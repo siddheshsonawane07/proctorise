@@ -11,15 +11,18 @@ export function HelpTeachers() {
       </Step>
       <Step n={2} title="Make a class">
         On your home page, create a class. Share its join code with your students. Turn joining off
-        once everyone is in.
+        once everyone is in. Under the class's <em>Settings</em> you can rename it, hand it to
+        another teacher, archive it or delete it.
       </Step>
       <Step n={3} title="Write questions">
         Open <em>Your question bank</em>. Write questions one by one, or import a spreadsheet saved
-        as CSV (download the template there).
+        as CSV (download the template there, or try the sample questions).
       </Step>
       <Step n={4} title="Build and publish a test">
         In the class, make a new test: its window, time allowed, questions, and how closely to
-        watch. <em>Standard</em> suits most tests. Preview it as a student, then publish.
+        watch. <em>Standard</em> suits most tests. Preview it as a student, then publish. After
+        publishing you can still change its title, dates and time allowed, cancel it, copy it or
+        delete it; its questions and proctoring settings are fixed.
       </Step>
       <Step n={5} title="Watch it live">
         From the test, open <em>Watch live</em>. Students needing attention come first. You can send
@@ -29,6 +32,10 @@ export function HelpTeachers() {
         Open <em>Review flags</em>. Look at each flag's picture, then dismiss or confirm it, and
         give each attempt your verdict. A flag is something noticed, not proof. Then release
         results.
+      </Step>
+      <Step n={7} title="If you are also a student">
+        Your menu has a <em>Teacher</em> and <em>Student</em> switch. As a student you can join
+        someone else's class and take their tests; switch back to teach.
       </Step>
       <p className="text-sm text-text-muted">
         On the free plan, about 95 students can take a test at the same time.
@@ -43,7 +50,8 @@ export function HelpStudents() {
       <h1 className="text-3xl font-semibold">For students</h1>
       <Step n={1} title="Before the test day">
         Join your class with the code from your teacher. If your test checks it's you, take your
-        photo under <em>Your photo for tests</em>.
+        photo under <em>Your photo for tests</em>. You can leave a class from its page; your teacher
+        keeps the results of tests you've taken.
       </Step>
       <Step n={2} title="What you need">
         A laptop or desktop with a webcam, Chrome or Edge, a quiet room where you are alone, good

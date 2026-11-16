@@ -5,6 +5,7 @@ import {
   RiCameraLine,
   RiCloseLine,
   RiDashboard3Line,
+  RiGroupLine,
   RiHome5Line,
   RiLogoutBoxRLine,
   RiMenuLine,
@@ -17,7 +18,9 @@ import {
 import { supabase } from "../../lib/supabase";
 import { useSession } from "../../features/auth/session";
 import { useProfile, type Profile } from "../../features/auth/useProfile";
-import { isTeacher } from "../../features/auth/roles";
+import { isAdmin } from "../../features/auth/roles";
+import { useView, type View } from "../../features/auth/view";
+import { ViewSwitch } from "../../features/auth/ViewSwitch";
 import { cx } from "@/utils/cx";
 import { buttonClass } from "../ui/buttonClass";
 
@@ -118,35 +121,44 @@ function FocusShell() {
 
 type NavItem = { to: string; label: string; icon: RemixiconComponentType };
 
-function navFor(profile: Profile | undefined): { title?: string; items: NavItem[] }[] {
-  const groups: { title?: string; items: NavItem[] }[] = [
-    { items: [{ to: "/app", label: "Home", icon: RiHome5Line }] },
-  ];
-  if (isTeacher(profile)) {
-    groups[0]!.items.push({ to: "/app/bank", label: "Question bank", icon: RiBookOpenLine });
-  }
-  if (profile?.role === "admin") {
-    groups.push({
-      title: "Admin",
-      items: [
-        { to: "/app/admin/teachers", label: "Teachers", icon: RiUserStarLine },
-        { to: "/app/admin/usage", label: "Usage", icon: RiDashboard3Line },
-      ],
-    });
-  }
-  groups.push({
-    title: "You",
-    items: [
-      { to: "/app/identity", label: "Your photo", icon: RiCameraLine },
-      { to: "/app/my-data", label: "Your data", icon: RiShieldUserLine },
+/** One menu per role: the admin's, a teacher's or a student's. */
+function navFor(profile: Profile | undefined, view: View): { title?: string; items: NavItem[] }[] {
+  const home: NavItem = { to: "/app", label: "Home", icon: RiHome5Line };
+  const data: NavItem = { to: "/app/my-data", label: "Your data", icon: RiShieldUserLine };
+  if (isAdmin(profile)) {
+    return [
+      { items: [home] },
       {
-        to: isTeacher(profile) ? "/help/teachers" : "/help/students",
-        label: "Help",
-        icon: RiQuestionLine,
+        title: "Admin",
+        items: [
+          { to: "/app/admin/teachers", label: "Teachers", icon: RiUserStarLine },
+          { to: "/app/admin/classes", label: "Classes", icon: RiGroupLine },
+          { to: "/app/admin/usage", label: "Usage", icon: RiDashboard3Line },
+        ],
       },
-    ],
-  });
-  return groups;
+      { title: "You", items: [data] },
+    ];
+  }
+  if (view === "teacher") {
+    return [
+      { items: [home, { to: "/app/bank", label: "Question bank", icon: RiBookOpenLine }] },
+      {
+        title: "You",
+        items: [data, { to: "/help/teachers", label: "Help", icon: RiQuestionLine }],
+      },
+    ];
+  }
+  return [
+    { items: [home] },
+    {
+      title: "You",
+      items: [
+        { to: "/app/identity", label: "Your photo", icon: RiCameraLine },
+        data,
+        { to: "/help/students", label: "Help", icon: RiQuestionLine },
+      ],
+    },
+  ];
 }
 
 function AppShell() {
@@ -205,13 +217,15 @@ function Sidebar() {
     await supabase.auth.signOut();
     navigate("/", { replace: true });
   }
+  const view = useView(profile.data);
   const email = state.status === "ready" ? state.session?.user.email : undefined;
   const name = profile.data?.full_name || email || "";
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-3 pb-4">
+      <ViewSwitch className="mx-1 mt-2" />
       <nav aria-label="Main" className="flex-1 space-y-5 pt-2">
-        {navFor(profile.data).map((group, i) => (
+        {navFor(profile.data, view).map((group, i) => (
           <div key={group.title ?? i}>
             {group.title && (
               <p className="px-3 pb-1.5 text-caption-1-semibold tracking-wide text-text-muted uppercase">

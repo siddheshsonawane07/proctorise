@@ -23,6 +23,11 @@ import {
 
 const MULTIPLIERS = [1, 1.25, 1.5, 2];
 const timeLabel = (m: number) => (m === 1 ? "None" : `${m}× time`);
+const STATUS_LABEL: Record<MemberStatus, string> = {
+  active: "In the class",
+  removed: "Removed",
+  left: "Left",
+};
 
 type Filter = "all" | MemberStatus;
 
@@ -62,7 +67,11 @@ export function Roster({ classId }: { classId: string }) {
     all: roster.data.length,
     active: roster.data.filter((r) => r.status === "active").length,
     removed: roster.data.filter((r) => r.status === "removed").length,
+    left: roster.data.filter((r) => r.status === "left").length,
   };
+  // "Left" is offered only once someone has left.
+  const filters: Filter[] =
+    counts.left > 0 ? ["active", "removed", "left", "all"] : ["active", "removed", "all"];
   const pickedShown = shown.filter((r) => picked.has(r.student_id));
   const allPicked = shown.length > 0 && pickedShown.length === shown.length;
 
@@ -94,7 +103,7 @@ export function Roster({ classId }: { classId: string }) {
         const row: (string | number | null)[] = [
           r.full_name,
           r.email,
-          r.status === "active" ? "In the class" : "Removed",
+          STATUS_LABEL[r.status],
           timeLabel(Number(r.time_multiplier)),
           r.joined_at.slice(0, 10),
         ];
@@ -134,7 +143,7 @@ export function Roster({ classId }: { classId: string }) {
           />
         </label>
         <div className="flex rounded-xl bg-surface-muted p-1" role="group" aria-label="Show">
-          {(["active", "removed", "all"] as const).map((f) => (
+          {filters.map((f) => (
             <button
               key={f}
               type="button"
@@ -145,7 +154,7 @@ export function Roster({ classId }: { classId: string }) {
                 filter === f ? "bg-surface text-text shadow-xs" : "text-text-muted hover:text-text",
               )}
             >
-              {f === "active" ? "In the class" : f === "removed" ? "Removed" : "Everyone"}{" "}
+              {f === "all" ? "Everyone" : STATUS_LABEL[f]}{" "}
               <span className="text-text-muted">{counts[f]}</span>
             </button>
           ))}
@@ -185,7 +194,7 @@ export function Roster({ classId }: { classId: string }) {
           >
             Set extra time
           </Button>
-          {filter !== "removed" && (
+          {filter !== "removed" && filter !== "left" && (
             <Button
               variant="plain"
               disabled={setMembers.isPending}
@@ -246,7 +255,7 @@ export function Roster({ classId }: { classId: string }) {
                 key={r.student_id}
                 className={cx(
                   picked.has(r.student_id) && "bg-accent/5",
-                  r.status === "removed" && "text-text-muted",
+                  r.status !== "active" && "text-text-muted",
                 )}
               >
                 <td className="px-4 py-2.5">
@@ -265,9 +274,9 @@ export function Roster({ classId }: { classId: string }) {
                   >
                     {r.full_name || "No name"}
                   </button>
-                  {r.status === "removed" && (
+                  {r.status !== "active" && (
                     <span className="ml-2 rounded-md bg-surface-muted px-1.5 py-0.5 text-caption-1-medium">
-                      Removed
+                      {STATUS_LABEL[r.status]}
                     </span>
                   )}
                 </td>

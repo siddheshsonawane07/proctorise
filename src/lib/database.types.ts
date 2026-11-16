@@ -258,6 +258,7 @@ export type Database = {
         Row: {
           archived_at: string | null;
           created_at: string;
+          description: string;
           id: string;
           join_code: string;
           join_open: boolean;
@@ -267,6 +268,7 @@ export type Database = {
         Insert: {
           archived_at?: string | null;
           created_at?: string;
+          description?: string;
           id?: string;
           join_code: string;
           join_open?: boolean;
@@ -275,6 +277,7 @@ export type Database = {
         Update: {
           archived_at?: string | null;
           created_at?: string;
+          description?: string;
           id?: string;
           join_code?: string;
           join_open?: boolean;
@@ -388,6 +391,22 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      evidence_purge: {
+        Row: {
+          path: string;
+          queued_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          path: string;
+          queued_at?: string;
+        };
+        Update: {
+          path?: string;
+          queued_at?: string;
+        };
+        Relationships: [];
       };
       flag_reviews: {
         Row: {
@@ -857,6 +876,19 @@ export type Database = {
         }[];
       };
       add_co_teacher: { Args: { p_class_id: string; p_email: string }; Returns: undefined };
+      admin_list_classes: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          archived_at: string;
+          created_at: string;
+          id: string;
+          name: string;
+          owner_email: string;
+          owner_name: string;
+          students: number;
+          tests: number;
+        }[];
+      };
       admin_list_people: {
         Args: { p_status?: Database["public"]["Enums"]["teacher_status"] };
         Returns: {
@@ -885,6 +917,7 @@ export type Database = {
       can_use_pairing_channel: { Args: { p_topic: string }; Returns: boolean };
       can_write_topic: { Args: { p_topic: string }; Returns: boolean };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
+      cancel_test: { Args: { p_test_id: string }; Returns: number };
       check_question: {
         Args: {
           p_correct: Json;
@@ -957,6 +990,8 @@ export type Database = {
       confirm_adult: { Args: Record<PropertyKey, never>; Returns: undefined };
       create_class: { Args: { p_name: string }; Returns: string };
       create_pairing: { Args: { p_test_id: string }; Returns: Json };
+      delete_class: { Args: { p_class_id: string }; Returns: undefined };
+      delete_test: { Args: { p_test_id: string }; Returns: undefined };
       dismiss_kind: {
         Args: { p_attempt_id: string; p_kind: string; p_note?: string };
         Returns: number;
@@ -974,6 +1009,7 @@ export type Database = {
           type: Database["public"]["Enums"]["question_type"];
         }[];
       };
+      duplicate_test: { Args: { p_test_id: string }; Returns: string };
       event_class: { Args: { p_event_id: number }; Returns: string };
       evidence_slot_open: { Args: { p_path: string }; Returns: boolean };
       expired_evidence: {
@@ -1009,6 +1045,7 @@ export type Database = {
       is_class_owner: { Args: { p_class_id: string }; Returns: boolean };
       is_class_teacher: { Args: { p_class_id: string }; Returns: boolean };
       join_class: { Args: { p_code: string }; Returns: Json };
+      leave_class: { Args: { p_class_id: string }; Returns: undefined };
       live_overview: {
         Args: { p_test_id: string };
         Returns: {
@@ -1071,6 +1108,7 @@ export type Database = {
       };
       release_results: { Args: { p_test_id: string }; Returns: undefined };
       remove_co_teacher: { Args: { p_class_id: string; p_teacher_id: string }; Returns: undefined };
+      reopen_test: { Args: { p_test_id: string }; Returns: undefined };
       request_account_deletion: { Args: { p_confirm: string }; Returns: undefined };
       request_teacher: { Args: { p_institution: string; p_note: string }; Returns: undefined };
       reserve_evidence: {
@@ -1180,6 +1218,7 @@ export type Database = {
           to_mark: number;
         }[];
       };
+      transfer_class: { Args: { p_class_id: string; p_email: string }; Returns: undefined };
       unpublish_test: { Args: { p_test_id: string }; Returns: undefined };
       update_proctor_events: { Args: { p_updates: Json }; Returns: undefined };
       valid_proctoring: { Args: { p: Json }; Returns: boolean };
@@ -1195,7 +1234,7 @@ export type Database = {
       class_teacher_kind: "owner" | "co_teacher";
       flag_verdict: "dismissed" | "confirmed";
       integrity_status: "clean" | "flagged" | "reviewed_ok" | "reviewed_violation";
-      member_status: "active" | "removed";
+      member_status: "active" | "removed" | "left";
       proctor_device: "laptop" | "phone";
       proctor_severity: "info" | "warn" | "high";
       question_type: "single" | "multiple" | "true_false" | "short_text" | "numeric";
@@ -1321,7 +1360,7 @@ export const Constants = {
       class_teacher_kind: ["owner", "co_teacher"],
       flag_verdict: ["dismissed", "confirmed"],
       integrity_status: ["clean", "flagged", "reviewed_ok", "reviewed_violation"],
-      member_status: ["active", "removed"],
+      member_status: ["active", "removed", "left"],
       proctor_device: ["laptop", "phone"],
       proctor_severity: ["info", "warn", "high"],
       question_type: ["single", "multiple", "true_false", "short_text", "numeric"],

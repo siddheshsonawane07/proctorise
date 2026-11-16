@@ -48,18 +48,23 @@ select pg_temp.act_as('d0000000-0000-0000-0000-000000000002');
 select set_config('seed.class', public.create_class('Demo class')::text, true);
 update public.classes set join_code = 'TRYME234' where id = current_setting('seed.class')::uuid;
 
-select set_config('seed.q0', public.save_question(null, 'single', 'What is 2 + 2?',
-  '[{"id":"a","text":"3"},{"id":"b","text":"4"},{"id":"c","text":"5"}]', 1, '{arithmetic}', '"b"')::text, true);
-select set_config('seed.q1', public.save_question(null, 'multiple', 'Which of these are **prime**?',
-  '[{"id":"a","text":"2"},{"id":"b","text":"4"},{"id":"c","text":"5"},{"id":"d","text":"9"}]', 2, '{primes}', '["a","c"]')::text, true);
-select set_config('seed.q2', public.save_question(null, 'true_false', 'The Earth orbits the Sun.',
-  '[]', 1, '{science}', 'true')::text, true);
-select set_config('seed.q3', public.save_question(null, 'short_text', 'What is the capital of France?',
-  '[]', 1, '{geography}', '["Paris"]')::text, true);
-select set_config('seed.q4', public.save_question(null, 'numeric', 'What is pi to two decimal places?',
-  '[]', 1, '{}', '3.14', 0.005)::text, true);
-select set_config('seed.q5', public.save_question(null, 'short_text', 'In one sentence, why is the sky blue?',
-  '[]', 3, '{science}', '[]')::text, true);
+select set_config('seed.q0', public.save_question(null, 'single',
+  'A ray of light passes from air into glass. What happens to its speed?',
+  '[{"id":"a","text":"It increases"},{"id":"b","text":"It decreases"},{"id":"c","text":"It stays the same"},{"id":"d","text":"It becomes zero"}]',
+  1, '{science,light}', '"b"')::text, true);
+select set_config('seed.q1', public.save_question(null, 'multiple', 'Which of these are **prime numbers**?',
+  '[{"id":"a","text":"21"},{"id":"b","text":"23"},{"id":"c","text":"29"},{"id":"d","text":"39"}]',
+  2, '{maths,numbers}', '["b","c"]')::text, true);
+select set_config('seed.q2', public.save_question(null, 'true_false',
+  'The angles of any triangle add up to 180 degrees.', '[]', 1, '{maths,geometry}', 'true')::text, true);
+select set_config('seed.q3', public.save_question(null, 'short_text',
+  'Which gas do green plants take in from the air to make their food?',
+  '[]', 1, '{science,plants}', '["Carbon dioxide","CO2"]')::text, true);
+select set_config('seed.q4', public.save_question(null, 'numeric',
+  'What is the square root of 2, to two decimal places?', '[]', 1, '{maths,numbers}', '1.41', 0.005)::text, true);
+select set_config('seed.q5', public.save_question(null, 'short_text',
+  'In two or three sentences, explain why we see lightning before we hear thunder.',
+  '[]', 3, '{science,sound}', '[]')::text, true);
 
 insert into public.tests (class_id, title, instructions, duration_min, opens_at, closes_at, results_release, reveal_answers)
 values (current_setting('seed.class')::uuid, 'Demo quiz', 'Six questions. You may take it once.',

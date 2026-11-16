@@ -53,9 +53,9 @@ describe("readQuestionsCsv", () => {
   it("reads an AI reply with a sentence and a code block around the CSV", () => {
     const reply = `Here are your questions:\n\n\`\`\`csv\n${CSV_TEMPLATE}\`\`\`\nGood luck!`;
     const rows = readQuestionsCsv(reply);
-    expect(rows.map((r) => r.row)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(rows.slice(0, 6).every((r) => typeof r.result === "object")).toBe(true);
-    expect(rows[6]!.result).toBe('Unknown type "Good luck!"');
+    expect(rows.map((r) => r.row)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(rows.slice(0, 10).every((r) => typeof r.result === "object")).toBe(true);
+    expect(rows[10]!.result).toBe('Unknown type "Good luck!"');
   });
 
   it("gives each bad row its reason", () => {

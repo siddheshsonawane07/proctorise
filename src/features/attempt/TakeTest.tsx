@@ -57,7 +57,8 @@ export function TakeTest() {
   const settings = t.proctoring as Proctoring;
   const mine = (attempts.data ?? []).filter((a) => a.test_id === testId);
   const open = mine.find((a) => a.status === "in_progress");
-  const windowOpen = clock >= Date.parse(t.opens_at) && clock < Date.parse(t.closes_at);
+  const windowOpen =
+    t.status === "published" && clock >= Date.parse(t.opens_at) && clock < Date.parse(t.closes_at);
   const left = t.max_attempts - mine.length;
   // Every test is watched at least in the browser; light just has no camera checks.
   const needsChecks = true;
@@ -149,9 +150,11 @@ export function TakeTest() {
         </Button>
       ) : !windowOpen ? (
         <Message kind="error">
-          {clock < Date.parse(t.opens_at)
-            ? `This test opens ${formatWhen(t.opens_at)}.`
-            : "This test has closed."}
+          {t.status === "closed"
+            ? "Your teacher cancelled this test."
+            : clock < Date.parse(t.opens_at)
+              ? `This test opens ${formatWhen(t.opens_at)}.`
+              : "This test has closed."}
         </Message>
       ) : left <= 0 ? (
         <Message kind="ok">You've used all your attempts.</Message>

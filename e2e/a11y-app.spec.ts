@@ -4,6 +4,7 @@ import { createUser, hasStack, rpcAs, signIn, uniqueEmail } from "./support/supa
 
 // WCAG 2.2 AA on signed-in pages, against the local stack.
 test.skip(!hasStack, "needs the local Supabase stack (npm run db:start)");
+test.setTimeout(90_000);
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const PASSWORD = "correct-horse-battery";
@@ -33,6 +34,8 @@ test("student and teacher pages have no accessibility violations", async ({ brow
   await page.getByLabel("Email").fill(teacherEmail);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
+  // Without this the first goto races the sign-in, and every check below reads the sign-in page.
+  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
   for (const path of [
     "/app",
     `/app/classes/${classId}`,
@@ -40,6 +43,32 @@ test("student and teacher pages have no accessibility violations", async ({ brow
     "/app/my-data",
     "/app/identity",
   ]) {
+    await page.goto(path);
+    await check(page);
+  }
+
+  // The student side of a teacher's account, and a confirmation open on the class's settings.
+  await page.goto("/app");
+  await page.getByRole("complementary").getByRole("button", { name: "Student" }).click();
+  await expect(page.getByLabel("Join a class")).toBeVisible();
+  await check(page);
+  await page.getByRole("complementary").getByRole("button", { name: "Teacher" }).click();
+  await page.goto(`/app/classes/${classId}`);
+  await page.getByRole("tab", { name: "Settings" }).click();
+  await page.getByRole("button", { name: "Delete this class" }).click();
+  await expect(page.getByRole("button", { name: "Delete the class" })).toBeVisible();
+  await check(page);
+});
+
+test("the admin's pages have no accessibility violations", async ({ page }) => {
+  const email = uniqueEmail("admin");
+  await createUser({ email, password: PASSWORD, fullName: "Ada Admin", admin: true });
+  await page.goto("/sign-in");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("heading", { name: /^Hello/ })).toBeVisible();
+  for (const path of ["/app", "/app/admin/classes", "/app/admin/teachers", "/app/admin/usage"]) {
     await page.goto(path);
     await check(page);
   }

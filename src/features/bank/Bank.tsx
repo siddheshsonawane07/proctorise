@@ -140,6 +140,15 @@ function CsvImport() {
         <Button variant="plain" onClick={downloadTemplate}>
           Download the template
         </Button>
+        <Button
+          variant="plain"
+          onClick={() => {
+            setName("sample");
+            setRows(readQuestionsCsv(CSV_TEMPLATE));
+          }}
+        >
+          Try the sample questions
+        </Button>
         <label className="text-body-regular">
           <span className="sr-only">CSV file</span>
           <input type="file" accept=".csv,text/csv" onChange={onFile} />

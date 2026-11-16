@@ -36,7 +36,7 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   const code = (await teacher.locator("strong.font-mono").textContent())!.trim();
   expect(code).toMatch(/^[A-Z2-9]{8}$/);
 
-  // Six questions of five types, from the CSV template.
+  // Ten questions of five types, from the CSV template.
   // Nothing saves until the teacher has seen every row (Phase-9-Critic #6).
   await teacher.goto("/app/bank");
   await teacher.getByRole("button", { name: "Import a spreadsheet" }).click();
@@ -45,9 +45,9 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
     mimeType: "text/csv",
     buffer: Buffer.from(CSV_TEMPLATE),
   });
-  await expect(teacher.getByText("6 ready.")).toBeVisible();
-  await teacher.getByRole("button", { name: "Save 6 questions" }).click();
-  await expect(teacher.getByText("Saved 6 questions to your bank.")).toBeVisible();
+  await expect(teacher.getByText("10 ready.")).toBeVisible();
+  await teacher.getByRole("button", { name: "Save 10 questions" }).click();
+  await expect(teacher.getByText("Saved 10 questions to your bank.")).toBeVisible();
 
   // A test with three of them, open now.
   await teacher.goto("/app");

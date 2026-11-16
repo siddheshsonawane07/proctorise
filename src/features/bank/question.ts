@@ -65,16 +65,21 @@ export function parseCsv(text: string): string[][] {
 
 export const CSV_HEADER = ["type", "prompt", "options", "correct", "points", "tags", "tolerance"];
 
+/** Ten sample questions, one or more of every type: the import's template, and a way to try it. */
 export const CSV_TEMPLATE =
   CSV_HEADER.join(",") +
   "\n" +
   [
-    'single,"What is 2 + 2?",3|4|5,B,1,arithmetic,',
-    'multiple,"Which are prime?",2|4|5|9,A|C,2,primes,',
-    'true_false,"The Earth orbits the Sun.",,true,1,,',
-    'short_text,"Capital of France?",,Paris,1,geography,',
-    'short_text,"Explain photosynthesis briefly.",,,3,biology,',
-    'numeric,"Value of pi to two places?",,3.14,1,,0.005',
+    'single,"A ray of light passes from air into glass. What happens to its speed?",It increases|It decreases|It stays the same|It becomes zero,B,1,science|light,',
+    'multiple,"Which of these are **prime numbers**?",21|23|29|39,B|C,2,maths|numbers,',
+    'true_false,"The angles of any triangle add up to 180 degrees.",,true,1,maths|geometry,',
+    'short_text,"Which gas do green plants take in from the air to make their food?",,Carbon dioxide|CO2,1,science|plants,',
+    'short_text,"In two or three sentences, explain why we see lightning before we hear thunder.",,,3,science|sound,',
+    'numeric,"What is the square root of 2, to two decimal places?",,1.41,1,maths|numbers,0.005',
+    'single,"Who wrote the Indian national anthem, *Jana Gana Mana*?",Rabindranath Tagore|Bankim Chandra Chatterjee|Sarojini Naidu|Muhammad Iqbal,A,1,general,',
+    'single,"What is the value of 3x + 7 when x = 5?",15|22|36|57,B,1,maths|algebra,',
+    'multiple,"Which of these are renewable sources of energy?",Solar|Coal|Wind|Natural gas,A|C,2,science|energy,',
+    'true_false,"Sound travels faster through air than through steel.",,false,1,science|sound,',
   ].join("\n") +
   "\n";
 
