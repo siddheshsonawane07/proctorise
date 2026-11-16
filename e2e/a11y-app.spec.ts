@@ -47,6 +47,16 @@ test("student and teacher pages have no accessibility violations", async ({ brow
     await check(page);
   }
 
+  // A draft test: its questions with the editor open, then its Publish tab.
+  await page.goto(`/app/classes/${classId}`);
+  await page.getByRole("button", { name: "New test" }).click();
+  await page.getByRole("button", { name: "Write a question" }).click();
+  await expect(page.getByRole("region", { name: "New question" })).toBeVisible();
+  await check(page);
+  await page.getByRole("tab", { name: "Publish" }).click();
+  await expect(page.getByRole("button", { name: "Publish to the class" })).toBeVisible();
+  await check(page);
+
   // The window for a new class, open over the page.
   await page.goto("/app");
   await page.getByRole("button", { name: "Create class" }).click();

@@ -7,12 +7,6 @@ export type ClassRow = Tables<"classes">;
 export type TestRow = Tables<"tests">;
 export type MemberStatus = Database["public"]["Enums"]["member_status"];
 
-export const TEST_STATUS_LABEL: Record<TestRow["status"], string> = {
-  draft: "Draft",
-  published: "Published",
-  closed: "Cancelled",
-};
-
 function useUserId(): string | undefined {
   const state = useSession();
   return state.status === "ready" ? state.session?.user.id : undefined;

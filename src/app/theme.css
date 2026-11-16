@@ -169,3 +169,12 @@ body {
     animation: none;
   }
 }
+
+/* Tick boxes and round buttons in the app's teal, a size a finger or a tired eye can find. */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  accent-color: var(--color-accent);
+}

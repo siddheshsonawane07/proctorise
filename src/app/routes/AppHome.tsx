@@ -15,6 +15,7 @@ import {
   type CardTest,
   type JoinResult,
 } from "../../features/classes/api";
+import { ClassArt } from "../../features/classes/ClassArt";
 import { ClassCode } from "../../features/classes/ClassCode";
 import { classBand } from "../../features/classes/colour";
 import { formatWhen, testWindow } from "../../lib/time";
@@ -142,13 +143,14 @@ function ClassCard({
   footer?: ReactNode;
 }) {
   return (
-    <li className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
+    <li className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xs transition-shadow hover:shadow-md">
       <Link
         to={`/app/classes/${id}`}
-        className={`${classBand(id)} flex h-24 flex-col justify-end px-4 py-3 text-white no-underline hover:underline focus-visible:outline-offset-[-3px] focus-visible:outline-white`}
+        className={`${classBand(id)} relative flex h-28 flex-col justify-end overflow-hidden px-4 py-3 text-white no-underline hover:underline focus-visible:outline-offset-[-3px] focus-visible:outline-white`}
       >
-        <span className="line-clamp-2 text-headline-semibold">{name}</span>
-        {note && <span className="text-caption-1-regular text-white">{note}</span>}
+        <ClassArt classId={id} />
+        <span className="relative line-clamp-2 text-headline-semibold">{name}</span>
+        {note && <span className="relative text-caption-1-regular text-white">{note}</span>}
       </Link>
       <div className="flex-1 space-y-1 px-4 py-3 text-body-regular text-text">{children}</div>
       {footer && (

@@ -6,14 +6,18 @@
 const BANDS = [
   "bg-teal-700",
   "bg-blue-700",
-  "bg-lime-800",
+  "bg-green-800",
   "bg-amber-800",
   "bg-rose-700",
   "bg-slate-700",
 ] as const;
 
-export function classBand(classId: string): string {
+export function classHash(text: string): number {
   let hash = 0;
-  for (let i = 0; i < classId.length; i++) hash = (hash * 31 + classId.charCodeAt(i)) >>> 0;
-  return BANDS[hash % BANDS.length]!;
+  for (let i = 0; i < text.length; i++) hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+  return hash;
+}
+
+export function classBand(classId: string): string {
+  return BANDS[classHash(classId) % BANDS.length]!;
 }

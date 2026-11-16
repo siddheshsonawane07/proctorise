@@ -1,8 +1,12 @@
 import { useState, type ButtonHTMLAttributes, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { RiAddLine, RiArrowDownLine, RiArrowUpLine } from "@remixicon/react";
+import { RiAddLine, RiArrowDownLine, RiArrowLeftLine, RiArrowUpLine } from "@remixicon/react";
 import { Button, Card, Field, Loading, Message, Select, TextArea } from "../../app/ui/form";
+import { inputClass } from "../../app/ui/inputClass";
+import { buttonClass } from "../../app/ui/buttonClass";
+import { Tabs, TabPanel } from "../../app/ui/Tabs";
+import { useTab } from "../../app/ui/useTab";
 import { toast } from "../../app/ui/toast";
 import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
@@ -12,8 +16,10 @@ import { formatWhen, fromLocalInput, toLocalInput } from "../../lib/time";
 import { useBank, type BankQuestion } from "../bank/api";
 import { QuestionEditor } from "../bank/QuestionEditor";
 import { TYPE_LABEL } from "../bank/question";
-import { TEST_STATUS_LABEL, useDeleteTest, useDuplicateTest, type TestRow } from "../classes/api";
+import { useDeleteTest, useDuplicateTest, type TestRow } from "../classes/api";
 import { DeleteTest } from "../classes/DeleteTest";
+import { TestState } from "../classes/TestState";
+import { testState } from "../classes/stateOfTest";
 import {
   useAddQuestion,
   useCancelTest,
@@ -53,45 +59,85 @@ export function Builder() {
 
 function Header({ test }: { test: TestRow }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <Link to={`/app/classes/${test.class_id}`} className="text-sm text-accent underline">
-          Back to the class
-        </Link>
-        <h1 className="mt-1 text-title-1-bold tracking-tight text-text">{test.title}</h1>
-        {test.status === "draft" && (
-          <p className="text-body-regular text-text-muted">{TEST_STATUS_LABEL.draft}</p>
-        )}
-      </div>
-      <Link to={`/app/tests/${test.id}/preview`} className="text-accent underline">
-        Preview as a student
+    <div className="space-y-3">
+      <Link
+        to={`/app/classes/${test.class_id}`}
+        className="inline-flex items-center gap-1 text-body-medium text-text-muted no-underline hover:text-text"
+      >
+        <RiArrowLeftLine aria-hidden className="size-4" />
+        Back to the class
       </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <h1 className="text-title-1-bold tracking-tight text-text">{test.title}</h1>
+          <TestState test={test} />
+        </div>
+        <Link to={`/app/tests/${test.id}/preview`} className={buttonClass("plain")}>
+          Preview as a student
+        </Link>
+      </div>
     </div>
   );
 }
 
+const DRAFT_TABS = [
+  { id: "questions", label: "Questions" },
+  { id: "settings", label: "Settings" },
+  { id: "proctoring", label: "Proctoring" },
+  { id: "publish", label: "Publish" },
+] as const;
+
+/** A draft, left to right: write the questions, set the times, choose the watching, publish. */
 function DraftBuilder({ test }: { test: TestRow }) {
   const draft = useDraftQuestions(test.id, true);
   const publish = usePublish(test.id);
+  const [tab, setTab] = useTab(DRAFT_TABS);
+  const questions = draft.data ?? [];
+  const points = questions.reduce((sum, q) => sum + q.points, 0);
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Header test={test} />
-      <Questions testId={test.id} draft={draft.data ?? []} loading={draft.isPending} />
-      <Details test={test} />
-      <ProctoringSettings test={test} />
-      <Card title="Publish">
-        <p className="text-text-muted">
-          Publishing freezes the questions: editing your bank afterwards won't change this test.
-          Students in the class see it at once, and can start it from {formatWhen(test.opens_at)}.
-        </p>
-        <p className="text-body-regular text-text-muted">
-          On the free plan, about {MAX_LIVE_STUDENTS} students can take a test at the same time.
-        </p>
-        <Button onClick={() => publish.mutate(undefined)} disabled={publish.isPending}>
-          Publish to the class
-        </Button>
-      </Card>
-      <CopyOrDelete test={test} />
+      <Tabs label="Test" tabs={DRAFT_TABS} tab={tab} onChange={setTab} />
+      <TabPanel label="Questions" show={tab === "questions"}>
+        <Questions testId={test.id} draft={questions} loading={draft.isPending} />
+      </TabPanel>
+      <TabPanel label="Settings" show={tab === "settings"}>
+        <Details test={test} />
+        <CopyOrDelete test={test} />
+      </TabPanel>
+      <TabPanel label="Proctoring" show={tab === "proctoring"}>
+        <ProctoringSettings test={test} />
+      </TabPanel>
+      <TabPanel label="Publish" show={tab === "publish"}>
+        <Card title="Publish">
+          <dl className="grid gap-x-6 gap-y-2 text-body-regular sm:grid-cols-[10rem_1fr]">
+            <dt className="text-text-muted">Questions</dt>
+            <dd className="text-text">
+              {questions.length === 0
+                ? "None yet. Add at least one on the Questions tab."
+                : `${questions.length}, worth ${points} ${points === 1 ? "point" : "points"}`}
+            </dd>
+            <dt className="text-text-muted">Open to students</dt>
+            <dd className="text-text">
+              {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)}
+            </dd>
+            <dt className="text-text-muted">Time allowed</dt>
+            <dd className="text-text">{test.duration_min} minutes</dd>
+            <dt className="text-text-muted">Proctoring</dt>
+            <dd className="text-text">{PRESETS[(test.proctoring as Proctoring).preset].label}</dd>
+          </dl>
+          <p className="text-text-muted">
+            Publishing freezes the questions: editing your bank afterwards won't change this test.
+            Students in the class see it at once, and can start it from {formatWhen(test.opens_at)}.
+          </p>
+          <p className="text-body-regular text-text-muted">
+            On the free plan, about {MAX_LIVE_STUDENTS} students can take a test at the same time.
+          </p>
+          <Button onClick={() => publish.mutate(undefined)} disabled={publish.isPending}>
+            Publish to the class
+          </Button>
+        </Card>
+      </TabPanel>
     </div>
   );
 }
@@ -327,7 +373,7 @@ function Questions({
                       });
                     }
                   }}
-                  className="w-20 rounded-lg bg-background-tertiary-default px-2 py-1.5 focus:outline-2 focus:outline-accent"
+                  className={`w-20 ${inputClass} px-2 py-1.5`}
                 />
                 points
               </label>
@@ -595,78 +641,89 @@ function Toggle({
   );
 }
 
+const LIVE_TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "settings", label: "Settings" },
+] as const;
+
 function PublishedTest({ test }: { test: TestRow }) {
   const items = usePublishedItems(test.id, true);
   const unpublish = useUnpublish(test.id);
   const cancel = useCancelTest(test.id);
   const reopen = useReopenTest(test.id);
+  const [tab, setTab] = useTab(LIVE_TABS);
   const cancelled = test.status === "closed";
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Header test={test} />
-      <Card title={cancelled ? "Cancelled" : "Published"}>
-        <p className="text-text-muted">
-          {cancelled
-            ? "No one can start this test. Attempts made before it was cancelled are kept."
-            : `Open from ${formatWhen(test.opens_at)} to ${formatWhen(test.closes_at)}`}{" "}
-          · {test.duration_min} minutes · {items.data?.length ?? "…"} questions
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <Link to={`/app/tests/${test.id}/live`} className="font-medium text-accent underline">
-            Watch live
-          </Link>
-          <Link to={`/app/tests/${test.id}/review`} className="font-medium text-accent underline">
-            Review flags
-          </Link>
-        </div>
-        <Link
-          to={`/app/tests/${test.id}/results`}
-          className="inline-block font-medium text-accent underline"
-        >
-          Results and marking
-        </Link>
-      </Card>
-      <Details test={test} />
-      <Card title="Questions and proctoring">
-        <p className="text-body-regular text-text-muted">
-          These are fixed once a test is published. To change them, take the test back to a draft
-          (only possible until a student starts it), or make a copy and publish that.
-        </p>
-        {!cancelled && (
-          <Button
-            variant="plain"
-            onClick={() => unpublish.mutate(undefined)}
-            disabled={unpublish.isPending}
-          >
-            Back to draft
-          </Button>
-        )}
-      </Card>
-      <Card title={cancelled ? "Reopen the test" : "Cancel the test"}>
-        <p className="text-body-regular text-text-muted">
-          {cancelled
-            ? "Reopening publishes it again with the window above. Check the dates first."
-            : "Calls the test off. No one can start it, and anyone taking it now is handed in as they stand. Attempts and results are kept, and you can reopen it."}
-        </p>
-        {cancelled ? (
-          <Button
-            variant="plain"
-            onClick={() => reopen.mutate(undefined)}
-            disabled={reopen.isPending}
-          >
-            Reopen this test
-          </Button>
-        ) : (
-          <Confirm
-            label="Cancel this test"
-            question={`Cancel “${test.title}”? Students taking it right now are handed in at once.`}
-            yes="Yes, cancel it"
-            busy={cancel.isPending}
-            onConfirm={() => cancel.mutate(undefined)}
-          />
-        )}
-      </Card>
-      <CopyOrDelete test={test} />
+      <Tabs label="Test" tabs={LIVE_TABS} tab={tab} onChange={setTab} />
+      <TabPanel label="Overview" show={tab === "overview"}>
+        <Card title={cancelled ? "Cancelled" : "Published"}>
+          <p className="text-text-muted">
+            {cancelled
+              ? "No one can start this test. Attempts made before it was cancelled are kept."
+              : `Open from ${formatWhen(test.opens_at)} to ${formatWhen(test.closes_at)}.`}{" "}
+            {test.duration_min} minutes, {items.data?.length ?? "…"} questions.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to={`/app/tests/${test.id}/live`}
+              className={buttonClass(testState(test) === "Open now" ? "primary" : "plain")}
+            >
+              Watch live
+            </Link>
+            <Link to={`/app/tests/${test.id}/review`} className={buttonClass("plain")}>
+              Review flags
+            </Link>
+            <Link to={`/app/tests/${test.id}/results`} className={buttonClass("plain")}>
+              Results and marking
+            </Link>
+          </div>
+        </Card>
+        <Card title="Questions and proctoring">
+          <p className="text-body-regular text-text-muted">
+            These are fixed once a test is published. To change them, take the test back to a draft
+            (only possible until a student starts it), or make a copy and publish that.
+          </p>
+          {!cancelled && (
+            <Button
+              variant="plain"
+              onClick={() => unpublish.mutate(undefined)}
+              disabled={unpublish.isPending}
+            >
+              Back to draft
+            </Button>
+          )}
+        </Card>
+        <Card title={cancelled ? "Reopen the test" : "Cancel the test"}>
+          <p className="text-body-regular text-text-muted">
+            {cancelled
+              ? "Reopening publishes it again with the window in Settings. Check the dates first."
+              : "Calls the test off. No one can start it, and anyone taking it now is handed in as they stand. Attempts and results are kept, and you can reopen it."}
+          </p>
+          {cancelled ? (
+            <Button
+              variant="plain"
+              onClick={() => reopen.mutate(undefined)}
+              disabled={reopen.isPending}
+            >
+              Reopen this test
+            </Button>
+          ) : (
+            <Confirm
+              label="Cancel this test"
+              question={`Cancel “${test.title}”? Students taking it right now are handed in at once.`}
+              yes="Yes, cancel it"
+              busy={cancel.isPending}
+              onConfirm={() => cancel.mutate(undefined)}
+            />
+          )}
+        </Card>
+      </TabPanel>
+      <TabPanel label="Settings" show={tab === "settings"}>
+        <Details test={test} />
+        <CopyOrDelete test={test} />
+      </TabPanel>
     </div>
   );
 }

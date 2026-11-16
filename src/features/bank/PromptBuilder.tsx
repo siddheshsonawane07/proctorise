@@ -1,13 +1,13 @@
 import { useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { RiFileCopyLine, RiSparkling2Line } from "@remixicon/react";
 import { Button, Card, Field, TextArea } from "../../app/ui/form";
+import { inputClass } from "../../app/ui/inputClass";
 import { BOARDS } from "./syllabus";
 import { buildPrompt, readQuestionsCsv, selectionTags, type Difficulty } from "./prompt";
 import { TYPE_LABEL, type QuestionType } from "./question";
 import { ImportPreview } from "./ImportPreview";
 
-const selectClass =
-  "mt-1.5 block w-full rounded-2lg bg-background-tertiary-default px-3 py-2 text-body-regular text-text-primary ring-2 ring-transparent ring-inset hover:ring-border-button-hover focus:ring-border-button-active focus:outline-none";
+const selectClass = `mt-1.5 block w-full ${inputClass}`;
 
 const ALL_TYPES: QuestionType[] = ["single", "multiple", "true_false", "short_text", "numeric"];
 

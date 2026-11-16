@@ -57,6 +57,7 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   await teacher.getByRole("main").getByRole("link", { name: "Physics 1" }).click();
   await teacher.getByRole("button", { name: "New test" }).click();
   await expect(teacher.getByRole("heading", { name: "Untitled test" })).toBeVisible();
+  await teacher.getByRole("tab", { name: "Settings" }).click();
   await teacher.getByLabel("Title", { exact: true }).fill("Week 1 quiz");
   const now = new Date(Date.now() - 60_000);
   const later = new Date(Date.now() + 86_400_000);
@@ -66,6 +67,7 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   await teacher.getByLabel("Closes", { exact: true }).fill(local(later));
   await teacher.getByRole("button", { name: "Save details" }).click();
   await expect(teacher.getByText("Saved.")).toBeVisible();
+  await teacher.getByRole("tab", { name: "Questions" }).click();
   await teacher.getByRole("button", { name: "Add from your bank" }).click();
   for (let i = 0; i < 3; i++) {
     await teacher.getByRole("button", { name: "Add", exact: true }).first().click();
@@ -82,8 +84,11 @@ test("a teacher builds and publishes a test; a student joins and sees it", async
   await editor.getByRole("button", { name: "Save question" }).click();
   await expect(teacher.getByText("Question added to the test.")).toBeVisible();
   await expect(teacher.getByRole("heading", { name: "Questions (4,", exact: false })).toBeVisible();
+  await teacher.getByRole("tab", { name: "Proctoring" }).click();
   await teacher.getByLabel("A phone as a side camera").check();
   await expect(teacher.getByLabel("A phone as a side camera")).toBeChecked();
+  await teacher.getByRole("tab", { name: "Publish" }).click();
+  await expect(teacher.getByText("4, worth 5 points")).toBeVisible();
   await teacher.getByRole("button", { name: "Publish to the class" }).click();
   await expect(teacher.getByRole("heading", { name: "Published" })).toBeVisible();
 

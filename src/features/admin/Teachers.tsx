@@ -40,8 +40,12 @@ export function Teachers() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Teachers</h1>
-      <div role="tablist" aria-label="Teacher status" className="mt-4 flex gap-2">
+      <h1 className="text-title-1-bold tracking-tight text-text">Teachers</h1>
+      <div
+        role="tablist"
+        aria-label="Teacher status"
+        className="mt-4 flex gap-1 overflow-x-auto border-b border-border"
+      >
         {TABS.map((t) => (
           <button
             key={t.status}
@@ -49,8 +53,10 @@ export function Teachers() {
             type="button"
             aria-selected={tab === t.status}
             onClick={() => setTab(t.status)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              tab === t.status ? "bg-accent text-accent-text" : "border border-border"
+            className={`-mb-px border-b-2 px-4 py-2.5 text-body-medium whitespace-nowrap ${
+              tab === t.status
+                ? "border-accent text-accent"
+                : "border-transparent text-text-muted hover:text-text"
             }`}
           >
             {t.label}
@@ -89,15 +95,17 @@ function PersonRow({ person }: { person: Person }) {
   const pending = ACTIONS[person.teacher_status].find((a) => a.to === asking);
 
   return (
-    <li className="rounded-lg border border-border p-4">
-      <p className="font-medium">
-        {name} <span className="text-sm font-normal text-text-muted">{person.email}</span>
+    <li className="rounded-2xl border border-border bg-surface p-4 shadow-xs sm:p-5">
+      <p className="text-body-semibold text-text">
+        {name} <span className="ml-1 text-body-regular text-text-muted">{person.email}</span>
       </p>
-      {person.institution && <p className="text-sm text-text-muted">{person.institution}</p>}
-      {person.teacher_note && <p className="mt-1 text-sm">{person.teacher_note}</p>}
+      {person.institution && (
+        <p className="text-body-regular text-text-muted">{person.institution}</p>
+      )}
+      {person.teacher_note && <p className="mt-1 text-body-regular">{person.teacher_note}</p>}
       {pending ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-sm">{pending.verb.replace("{name}", name)}</span>
+          <span className="text-body-regular">{pending.verb.replace("{name}", name)}</span>
           <Button onClick={() => change.mutate(pending.to)} disabled={change.isPending}>
             Yes, {pending.label.toLowerCase()}
           </Button>

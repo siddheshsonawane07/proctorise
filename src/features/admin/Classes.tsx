@@ -20,7 +20,7 @@ export function Classes() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Classes</h1>
+      <h1 className="text-title-1-bold tracking-tight text-text">Classes</h1>
       <p className="mt-1 text-text-muted">
         Every class on the site. You can't open a class or its tests from here; you can give it to
         another teacher, or delete it.
@@ -51,17 +51,21 @@ function ClassItem({ cls }: { cls: ClassSummary }) {
   }
 
   return (
-    <li className="space-y-3 rounded-lg border border-border p-4">
-      <div>
-        <p className="font-medium">
-          {cls.name}
-          {cls.archived_at && (
-            <span className="ml-2 text-sm font-normal text-text-muted">Archived</span>
-          )}
-        </p>
-        <p className="text-sm text-text-muted">
-          {cls.owner_email ? `${cls.owner_name || "No name"} (${cls.owner_email})` : "No owner"} ·{" "}
-          {plural(cls.students, "student")} · {plural(cls.tests, "test")} · made{" "}
+    <li className="space-y-3 rounded-2xl border border-border bg-surface p-4 shadow-xs sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0">
+          <p className="text-body-semibold text-text">
+            {cls.name}
+            {cls.archived_at && (
+              <span className="ml-2 text-body-regular text-text-muted">Archived</span>
+            )}
+          </p>
+          <p className="text-body-regular text-text-muted">
+            {cls.owner_email ? `${cls.owner_name || "No name"}, ${cls.owner_email}` : "No owner"}
+          </p>
+        </div>
+        <p className="text-body-regular text-text-muted">
+          {plural(cls.students, "student")}, {plural(cls.tests, "test")}. Made{" "}
           {new Date(cls.created_at).toLocaleDateString()}
         </p>
       </div>

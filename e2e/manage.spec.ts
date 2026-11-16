@@ -70,6 +70,7 @@ test("a teacher manages a published test and the class; a student leaves", async
   // Edit a published test's details.
   await teacher.goto(`/app/tests/${testId}/edit`);
   await expect(teacher.getByRole("heading", { name: "Published" })).toBeVisible();
+  await teacher.getByRole("tab", { name: "Settings" }).click();
   await teacher.getByLabel("Title", { exact: true }).fill("Unit quiz (moved)");
   await teacher.getByLabel("Time allowed (minutes)").fill("45");
   await teacher.getByRole("button", { name: "Save details" }).click();
@@ -84,6 +85,7 @@ test("a teacher manages a published test and the class; a student leaves", async
   await expect(pupil.getByText(/45\s+minutes/)).toBeVisible();
 
   // Cancel: the student can no longer start it.
+  await teacher.getByRole("tab", { name: "Overview" }).click();
   await teacher.getByRole("button", { name: "Cancel this test" }).click();
   await teacher.getByRole("button", { name: "Yes, cancel it" }).click();
   await expect(teacher.getByRole("heading", { name: "Cancelled" })).toBeVisible();
@@ -100,9 +102,11 @@ test("a teacher manages a published test and the class; a student leaves", async
   await expect(pupil.getByRole("link", { name: "Start" })).toBeVisible();
 
   // A copy is a draft; deleting it returns to the class.
+  await teacher.getByRole("tab", { name: "Settings" }).click();
   await teacher.getByRole("button", { name: "Make a copy" }).click();
   await expect(teacher.getByRole("heading", { name: "Copy of Unit quiz (moved)" })).toBeVisible();
   await expect(teacher.getByRole("heading", { name: "Questions (1, 1 points)" })).toBeVisible();
+  await teacher.getByRole("tab", { name: "Settings" }).click();
   await teacher.getByRole("button", { name: "Delete", exact: true }).click();
   await teacher.getByRole("button", { name: "Yes, delete it" }).click();
   await expect(teacher.getByRole("heading", { name: "Chemistry 10" })).toBeVisible();

@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { RiAddLine } from "@remixicon/react";
 import { Button, Card, Field, Loading, Message, TextArea } from "../../app/ui/form";
 import { buttonClass } from "../../app/ui/buttonClass";
@@ -32,7 +32,12 @@ import { useMyAttempts, type MyAttempt } from "../attempt/api";
 import { isTeacher } from "../auth/roles";
 import { Roster } from "./Roster";
 import { DeleteTest } from "./DeleteTest";
+import { Tabs } from "../../app/ui/Tabs";
+import { useTab } from "../../app/ui/useTab";
+import { ClassArt } from "./ClassArt";
 import { ClassCode } from "./ClassCode";
+import { TestState } from "./TestState";
+import { testState } from "./stateOfTest";
 import { classBand } from "./colour";
 
 export function ClassPage() {
@@ -148,10 +153,15 @@ function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }
 /** The top of a class page, in the class's colour. */
 function Banner({ cls, children }: { cls: ClassRow; children?: ReactNode }) {
   return (
-    <div className={`${classBand(cls.id)} rounded-2xl px-5 py-6 text-white sm:px-7`}>
-      <h1 className="text-title-1-bold tracking-tight text-white">{cls.name}</h1>
-      {cls.description && <p className="mt-1 max-w-2xl text-white">{cls.description}</p>}
-      {children}
+    <div
+      className={`${classBand(cls.id)} relative overflow-hidden rounded-2xl px-5 py-7 text-white sm:px-7`}
+    >
+      <ClassArt classId={cls.id} />
+      <div className="relative">
+        <h1 className="text-title-1-bold tracking-tight text-white">{cls.name}</h1>
+        {cls.description && <p className="mt-1 max-w-2xl text-white">{cls.description}</p>}
+        {children}
+      </div>
     </div>
   );
 }
@@ -161,14 +171,11 @@ const TABS = [
   { id: "people", label: "People" },
   { id: "settings", label: "Settings" },
 ] as const;
-type Tab = (typeof TABS)[number]["id"];
 
 function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
-  // The tab is in the address, so Back and a shared link both land on it.
-  const [params, setParams] = useSearchParams();
-  const tab: Tab = TABS.find((t) => t.id === params.get("tab"))?.id ?? "tests";
+  const [tab, setTab] = useTab(TABS);
   return (
-    <div>
+    <div className="space-y-5">
       <Banner cls={cls}>
         <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
           <ClassCode code={cls.join_code} onBand />
@@ -176,25 +183,8 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
           {cls.archived_at && <span className="text-white">Archived</span>}
         </p>
       </Banner>
-      <div role="tablist" aria-label="Class" className="mt-4 flex gap-1 border-b border-border">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            type="button"
-            aria-selected={tab === t.id}
-            onClick={() => setParams(t.id === "tests" ? {} : { tab: t.id }, { replace: true })}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-body-medium ${
-              tab === t.id
-                ? "border-accent text-accent"
-                : "border-transparent text-text-muted hover:text-text"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" className="mt-6">
+      <Tabs label="Class" tabs={TABS} tab={tab} onChange={setTab} />
+      <div role="tabpanel">
         {tab === "tests" && <TeacherTests classId={cls.id} />}
         {tab === "people" && (
           <div className="space-y-8">
@@ -251,22 +241,10 @@ function TeacherTests({ classId }: { classId: string }) {
   );
 }
 
-/** Where a test stands, in a word. The word carries it; the colour only helps. */
-function testState(test: TestRow): { label: string; className: string } {
-  const quiet = "bg-surface-muted text-text-muted";
-  if (test.status === "draft") return { label: "Draft", className: quiet };
-  if (test.status === "closed") return { label: "Cancelled", className: quiet };
-  const window = testWindow(test.opens_at, test.closes_at);
-  if (window === "open") return { label: "Open now", className: "bg-accent/10 text-accent" };
-  if (window === "upcoming") return { label: "Scheduled", className: "bg-info/10 text-info" };
-  return { label: "Closed", className: quiet };
-}
-
 function TeacherTest({ test }: { test: TestRow }) {
   const remove = useDeleteTest(test.class_id);
   const copy = useDuplicateTest(test.class_id);
   const navigate = useNavigate();
-  const state = testState(test);
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-xs">
       <div className="min-w-0">
@@ -274,16 +252,14 @@ function TeacherTest({ test }: { test: TestRow }) {
           <Link to={`/app/tests/${test.id}/edit`} className="text-body-semibold text-accent">
             {test.title}
           </Link>
-          <span className={`rounded-full px-2 py-0.5 text-caption-1-semibold ${state.className}`}>
-            {state.label}
-          </span>
+          <TestState test={test} />
         </p>
         <p className="mt-0.5 text-body-regular text-text-muted">
           {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)}
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        {state.label === "Open now" && (
+        {testState(test) === "Open now" && (
           <Link to={`/app/tests/${test.id}/live`} className={buttonClass("plain")}>
             Watch live
           </Link>

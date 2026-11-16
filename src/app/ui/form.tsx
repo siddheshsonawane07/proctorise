@@ -8,18 +8,13 @@ import { RiCheckboxCircleFill, RiErrorWarningFill } from "@remixicon/react";
 import { Button as BoardButton } from "@/components/base/buttons/button";
 import { cx } from "@/utils/cx";
 import { useWaiting } from "./busy";
+import { inputClass } from "./inputClass";
 
 /*
  * The app's shared form parts, in BoardUI's look. Fields copy BoardUI's input styling onto plain
  * elements rather than using its React Aria input, which would add to every page's first load.
  */
-const fieldClass = cx(
-  "mt-1.5 block w-full rounded-2lg border-0 bg-background-tertiary-default px-3 py-2",
-  "text-body-regular text-text-primary placeholder:text-text-tertiary",
-  "ring-2 ring-transparent ring-inset transition-[box-shadow,background-color] duration-150",
-  "hover:ring-border-button-hover focus:ring-border-button-active focus:outline-none",
-  "disabled:cursor-not-allowed disabled:opacity-60",
-);
+const fieldClass = cx("mt-1.5 block w-full", inputClass);
 
 export function Field({
   label,

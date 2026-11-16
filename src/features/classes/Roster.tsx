@@ -8,6 +8,7 @@ import {
   RiUserLine,
 } from "@remixicon/react";
 import { Button, Loading, Message } from "../../app/ui/form";
+import { inputClass } from "../../app/ui/inputClass";
 import { toast } from "../../app/ui/toast";
 import { messageFrom } from "../../lib/errors";
 import { downloadCsv } from "../../lib/csv";
@@ -138,7 +139,7 @@ export function Roster({ classId }: { classId: string }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name or email"
-            className="block w-full rounded-2lg bg-background-tertiary-default py-2 pr-3 pl-9 text-body-regular text-text-primary ring-2 ring-transparent ring-inset hover:ring-border-button-hover focus:ring-border-button-active focus:outline-none"
+            className={`block w-full ${inputClass} pl-9`}
           />
         </label>
         <div className="flex rounded-xl bg-surface-muted p-1" role="group" aria-label="Show">

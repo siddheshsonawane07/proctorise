@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { RiCloseLine } from "@remixicon/react";
 import { Button, Field, TextArea } from "../../app/ui/form";
+import { inputClass } from "../../app/ui/inputClass";
 import { Markdown } from "../../app/ui/Markdown";
 import { toast } from "../../app/ui/toast";
 import { LETTERS, optionsFrom, TYPE_LABEL, type QuestionType } from "./question";
@@ -55,9 +56,6 @@ function draftFrom(q: BankQuestion | null): Draft {
     tags: q.tags.join(", "),
   };
 }
-
-const optionClass =
-  "min-w-0 flex-1 rounded-2lg border-0 bg-background-tertiary-default px-3 py-2 text-body-regular text-text-primary ring-2 ring-transparent ring-inset hover:ring-border-button-hover focus:ring-border-button-active focus:outline-none";
 
 /**
  * Writes or changes one question. `onSaved` gets the question's id once it is in the bank (a test
@@ -237,7 +235,7 @@ export function QuestionEditor({
                       addOption();
                     }
                   }}
-                  className={optionClass}
+                  className={`min-w-0 flex-1 ${inputClass}`}
                 />
                 <button
                   type="button"
