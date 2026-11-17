@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router";
+import { Empty } from "../../app/ui/Empty";
+import { BackLink } from "../../app/ui/BackLink";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -82,9 +84,7 @@ export function LiveGrid() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link to={`/app/tests/${testId}/edit`} className="text-body-medium text-accent">
-            ← Back to the test
-          </Link>
+          <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
           <h1 className="mt-1 flex items-center gap-3 text-page text-text">
             Live: {test.data?.title}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-high/10 px-2.5 py-1 text-caption-1-semibold text-high">
@@ -113,9 +113,9 @@ export function LiveGrid() {
         </p>
       )}
       {rows.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-border p-8 text-center text-text-muted">
-          No one has started yet.
-        </p>
+        <Empty title="No one has started yet.">
+          Students appear here the moment they start, with their progress and any flags.
+        </Empty>
       )}
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((r) => (
@@ -155,14 +155,14 @@ function Tile({
   const name = row.full_name || "Student";
   return (
     <li
-      className={`space-y-3 rounded-2xl border bg-surface p-4 shadow-xs transition-shadow hover:shadow-md ${
+      className={`space-y-3 rounded-2xl border bg-surface p-4 ${
         attention ? "border-border border-l-4 border-l-high" : "border-border"
       }`}
     >
       <div className="flex items-start gap-3">
         <span
           aria-hidden
-          className="grid size-10 shrink-0 place-items-center rounded-full bg-accent/10 text-body-semibold text-accent"
+          className="grid size-10 shrink-0 place-items-center rounded-full border border-border-button-default text-body-semibold text-text"
         >
           {name
             .split(" ")

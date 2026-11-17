@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
+import { BackLink } from "../../app/ui/BackLink";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { formatWhen } from "../../lib/time";
@@ -78,9 +79,7 @@ export function Results() {
   return (
     <div className="space-y-6">
       <div>
-        <Link to={`/app/tests/${testId}/edit`} className="text-sm text-accent underline">
-          Back to the test
-        </Link>
+        <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
         <h1 className="mt-1 text-page text-text">Results: {t?.title}</h1>
       </div>
       <Card title="Releasing results">

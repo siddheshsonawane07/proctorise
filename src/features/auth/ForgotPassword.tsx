@@ -18,7 +18,7 @@ export function ForgotPassword() {
   }
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
+    <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
       <h1 className="text-page text-text">Reset your password</h1>
       {done ? (
         <p className="mt-3 text-text-muted">

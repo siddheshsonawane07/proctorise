@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
+import { Empty } from "../ui/Empty";
 import { RiAddLine } from "@remixicon/react";
 import { BecomeTeacher } from "../../features/account/BecomeTeacher";
 import { useProfile } from "../../features/auth/useProfile";
@@ -225,15 +226,6 @@ function TeacherHome() {
         )}
       </div>
       {creating && <CreateClass onClose={() => setCreating(false)} />}
-    </div>
-  );
-}
-
-function Empty({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border px-5 py-8 text-center">
-      <p className="text-body-medium text-text">{title}</p>
-      <p className="mt-1 text-text-muted">{children}</p>
     </div>
   );
 }

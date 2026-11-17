@@ -38,7 +38,7 @@ export function SignUp() {
 
   if (sentTo) {
     return (
-      <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
+      <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
         <h1 className="text-page text-text">Check your email</h1>
         <p className="mt-3 text-text-muted">
           We sent a link to <strong className="text-text">{sentTo}</strong>. Open it to finish
@@ -49,7 +49,7 @@ export function SignUp() {
   }
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
+    <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
       <h1 className="text-page text-text">Create an account</h1>
       <p className="mt-2 text-sm text-text-muted">
         Everyone starts as a student. Teachers ask for teacher access after signing up.

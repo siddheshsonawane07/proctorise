@@ -75,10 +75,19 @@ function FooterLinks({ className }: { className?: string }) {
   );
 }
 
+/** The pages that are a sheet of paper on the desk: signing in and its neighbours. */
+const ON_THE_DESK = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password"];
+
 function PublicShell() {
   const state = useSession();
+  const { pathname } = useLocation();
   return (
-    <div className="flex min-h-dvh flex-col bg-surface">
+    <div
+      className={cx(
+        "flex min-h-dvh flex-col",
+        ON_THE_DESK.includes(pathname) ? "bg-surface-muted" : "bg-surface",
+      )}
+    >
       <header className="sticky top-0 z-20 border-b border-border/70 bg-surface/90 backdrop-blur">
         <nav
           aria-label="Main"
@@ -213,16 +222,19 @@ function AppShell() {
       <aside
         id="app-sidebar"
         className={cx(
-          "z-20 flex w-full flex-col border-border bg-surface-muted lg:sticky lg:top-0 lg:h-dvh lg:w-60 lg:shrink-0 lg:border-r",
+          "z-20 flex w-full flex-col border-border bg-surface-muted lg:w-60 lg:shrink-0 lg:border-r",
           open
             ? "max-lg:fixed max-lg:inset-x-0 max-lg:top-[57px] max-lg:bottom-0"
             : "max-lg:hidden",
         )}
       >
-        <div className="hidden px-4 pt-5 pb-3 lg:block">
-          <Logo />
+        {/* The desk runs the page's full height; only what is on it stays in view. */}
+        <div className="flex min-h-0 flex-1 flex-col lg:sticky lg:top-0 lg:h-dvh lg:flex-none">
+          <div className="hidden px-4 pt-5 pb-3 lg:block">
+            <Logo />
+          </div>
+          <Sidebar />
         </div>
-        <Sidebar />
       </aside>
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-10 lg:py-12">
         <div className="mx-auto max-w-5xl">

@@ -73,17 +73,14 @@ export function Bank() {
             </div>
           </div>
           {shown.length === 0 && <p className="text-text-muted">No question matches that.</p>}
-          <ul className="space-y-3">
+          <ul className="divide-y divide-border rounded-2xl border border-border">
             {shown.map((q) =>
               editing !== "new" && editing?.id === q.id ? (
-                <li key={q.id}>
+                <li key={q.id} className="bg-surface-muted p-3 sm:p-4">
                   <QuestionEditor question={q} onDone={() => setEditing(null)} />
                 </li>
               ) : (
-                <li
-                  key={q.id}
-                  className="rounded-2xl border border-border bg-surface p-4 shadow-xs sm:p-5"
-                >
+                <li key={q.id} className="p-4 sm:px-5 sm:py-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <Markdown>{q.prompt}</Markdown>
@@ -102,10 +99,24 @@ export function Bank() {
                     </div>
                   </div>
                   <Answer question={q} />
-                  <p className="mt-3 text-caption-1-regular text-text-muted">
-                    {TYPE_LABEL[q.type]}, {Number(q.points)}{" "}
-                    {Number(q.points) === 1 ? "point" : "points"}
-                    {q.tags.length > 0 && `. Tags: ${q.tags.join(", ")}`}
+                  <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-caption-1-regular text-text-muted">
+                    <span>
+                      {TYPE_LABEL[q.type]}, {Number(q.points)}{" "}
+                      {Number(q.points) === 1 ? "point" : "points"}
+                    </span>
+                    {q.tags.length > 0 && (
+                      <span className="flex flex-wrap gap-1.5">
+                        <span className="sr-only">Tags:</span>
+                        {q.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded bg-surface-muted px-1.5 py-0.5 text-caption-1-medium text-text"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </span>
+                    )}
                   </p>
                 </li>
               ),

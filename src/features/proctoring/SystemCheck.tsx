@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import {
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiErrorWarningFill,
+  RiTimeLine,
+  type RemixiconComponentType,
+} from "@remixicon/react";
 import { supabase } from "../../lib/supabase";
 import { Button, Card } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
@@ -22,6 +29,12 @@ export type CheckedDevices = {
 };
 
 const MARK: Record<Check["state"], string> = { pass: "OK", warn: "Note", block: "Fix", wait: "…" };
+const ICON: Record<Check["state"], RemixiconComponentType> = {
+  pass: RiCheckboxCircleFill,
+  warn: RiErrorWarningFill,
+  block: RiCloseCircleFill,
+  wait: RiTimeLine,
+};
 
 function isChromium(): boolean {
   const brands = (navigator as Navigator & { userAgentData?: { brands: { brand: string }[] } })
@@ -257,7 +270,7 @@ export function SystemCheck({
 
   return (
     <Card title="Checking your computer">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={needsCamera(proctoring) ? "grid gap-6 md:grid-cols-2" : ""}>
         <div ref={videoBox} hidden={!needsCamera(proctoring)}>
           {cameraOn ? (
             <Preview stream={cameraOn} />
@@ -265,27 +278,33 @@ export function SystemCheck({
             <div className="aspect-[4/3] rounded-lg bg-surface-muted" />
           )}
         </div>
-        <ul className="space-y-2">
-          {checks.map((c) => (
-            <li key={c.label} className="flex gap-2 text-sm">
-              <span
-                className={`w-10 shrink-0 font-medium ${
-                  c.state === "pass"
-                    ? "text-accent"
-                    : c.state === "block"
-                      ? "text-high"
-                      : c.state === "warn"
-                        ? "text-warn"
-                        : "text-text-muted"
-                }`}
-              >
-                {MARK[c.state]}
-              </span>
-              <span>
-                <span className="font-medium">{c.label}:</span> {c.text}
-              </span>
-            </li>
-          ))}
+        {/* A checklist: green for done, amber for a note, red for what must be fixed first. */}
+        <ul className="divide-y divide-border">
+          {checks.map((c) => {
+            const Icon = ICON[c.state];
+            return (
+              <li key={c.label} className="flex items-start gap-3 py-2.5 text-body-regular">
+                <span
+                  className={`flex w-16 shrink-0 items-center gap-1.5 font-semibold ${
+                    c.state === "pass"
+                      ? "text-ok"
+                      : c.state === "block"
+                        ? "text-high"
+                        : c.state === "warn"
+                          ? "text-warn"
+                          : "text-text-muted"
+                  }`}
+                >
+                  <Icon aria-hidden className="size-4 shrink-0" />
+                  {MARK[c.state]}
+                </span>
+                <span>
+                  <span className="font-semibold text-text">{c.label}:</span>{" "}
+                  <span className="text-text-muted">{c.text}</span>
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
       {camera.state.status === "refused" && (

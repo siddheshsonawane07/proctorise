@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { BackLink } from "../../app/ui/BackLink";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
@@ -135,9 +135,7 @@ export function Enrolment() {
           )}
         </Card>
       )}
-      <Link to="/app" className="inline-block text-accent underline">
-        Back to your classes
-      </Link>
+      <BackLink to="/app">Back to your classes</BackLink>
     </div>
   );
 }

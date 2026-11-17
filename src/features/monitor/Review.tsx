@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router";
+import { BackLink } from "../../app/ui/BackLink";
 import { Button, Card, Loading, LoadFailed } from "../../app/ui/form";
 import { useTest } from "../builder/api";
 import { Flags } from "./Flags";
@@ -30,9 +31,7 @@ export function Review() {
   return (
     <div className="space-y-6">
       <div>
-        <Link to={`/app/tests/${testId}/edit`} className="text-sm text-accent underline">
-          Back to the test
-        </Link>
+        <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
         <h1 className="mt-1 text-page text-text">Review flags: {test.data?.title}</h1>
         <p className="text-text-muted">
           A flag is something the software noticed, not proof. Look at each one before you decide.

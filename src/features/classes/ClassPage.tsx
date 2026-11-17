@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { Empty } from "../../app/ui/Empty";
 import { RiAddLine } from "@remixicon/react";
 import { Button, Card, Field, Loading, LoadFailed, TextArea } from "../../app/ui/form";
 import { buttonClass } from "../../app/ui/buttonClass";
@@ -223,10 +224,9 @@ function TeacherTests({ classId }: { classId: string }) {
       </Button>
       {tests.isPending && <Loading />}
       {tests.data?.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-text-muted">
-          No tests yet. A new test starts as a draft: add its questions, then publish it to the
-          class.
-        </p>
+        <Empty title="No tests yet.">
+          A new test starts as a draft: add its questions, then publish it to the class.
+        </Empty>
       )}
       {!!tests.data?.length && (
         <ul className="divide-y divide-border rounded-2xl border border-border">
@@ -300,14 +300,15 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-xs">
+    <div className="space-y-4">
       {teachers.isPending && <Loading />}
-      <ul className="divide-y divide-border">
+      {/* The same register as the students below: one row each, the role beside the name. */}
+      <ul className="divide-y divide-border rounded-2xl border border-border">
         {teachers.data?.map((t) => (
-          <li key={t.teacher_id} className="flex items-center justify-between py-2">
-            <span>
-              {t.full_name || t.email}{" "}
-              <span className="ml-1 text-body-regular text-text-muted">
+          <li key={t.teacher_id} className="flex items-center justify-between gap-3 px-5 py-3">
+            <span className="text-body-medium text-text">
+              {t.full_name || t.email}
+              <span className="ml-2 text-body-regular text-text-muted">
                 {t.kind === "owner" ? "Owner" : "Co-teacher"}
               </span>
             </span>
@@ -324,19 +325,18 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
         ))}
       </ul>
       {owner ? (
-        <form onSubmit={onSubmit} className="flex items-end gap-2">
-          <div className="flex-1">
-            <Field
-              label="Add a co-teacher"
-              name="email"
-              type="email"
-              required
-              hint="They need an approved teacher account."
-            />
+        <form onSubmit={onSubmit} className="max-w-xl">
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <Field label="Add a co-teacher" name="email" type="email" required />
+            </div>
+            <Button type="submit" disabled={add.isPending}>
+              Add
+            </Button>
           </div>
-          <Button type="submit" disabled={add.isPending}>
-            Add
-          </Button>
+          <p className="mt-1 text-caption-1-regular text-text-muted">
+            They need an approved teacher account.
+          </p>
         </form>
       ) : (
         <>

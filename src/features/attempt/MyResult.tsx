@@ -1,4 +1,5 @@
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
+import { BackLink } from "../../app/ui/BackLink";
 import { Card, Loading, LoadFailed } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import { describeAnswer } from "../questions/describe";
@@ -52,9 +53,7 @@ export function MyResult() {
           ))}
         </ol>
       )}
-      <Link to="/app" className="inline-block text-accent underline">
-        Back to your classes
-      </Link>
+      <BackLink to="/app">Back to your classes</BackLink>
     </div>
   );
 }

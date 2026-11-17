@@ -1,3 +1,4 @@
+import { cx } from "@/utils/cx";
 import { Button, Loading, LoadFailed } from "../../app/ui/form";
 import { EVENT_LABEL } from "../proctoring/labels";
 import { useDismissKind, useFlags, useReview } from "./api";
@@ -19,7 +20,9 @@ export function Flags({ attemptId }: { attemptId: string }) {
   const kinds = [...new Set(flags.data.filter((f) => f.verdict === null).map((f) => f.kind))];
   return (
     <div className="space-y-3">
-      <ul className="space-y-3">
+      {/* One list per attempt. The edge says how serious (red pen, highlighter); a flag already
+          decided steps back, so what is left to judge stands out. */}
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
         {flags.data.map((f) => {
           const seconds = f.ended_at
             ? Math.round((Date.parse(f.ended_at) - Date.parse(f.started_at)) / 1000)
@@ -27,7 +30,11 @@ export function Flags({ attemptId }: { attemptId: string }) {
           return (
             <li
               key={f.id}
-              className="flex flex-wrap gap-3 rounded-md border border-border p-3 text-sm"
+              className={cx(
+                "flex flex-wrap gap-4 border-l-4 p-4 text-body-regular",
+                f.severity === "high" ? "border-l-high" : "border-l-highlight",
+                f.verdict && "bg-surface-muted/60 text-text-muted",
+              )}
             >
               {f.url ? (
                 <a href={f.url} target="_blank" rel="noreferrer">
@@ -43,26 +50,26 @@ export function Flags({ attemptId }: { attemptId: string }) {
                 </div>
               )}
               <div className="min-w-0 flex-1 space-y-1">
-                <p>
+                <p className="text-headline-medium text-text">
                   <span
-                    className={`font-medium ${f.severity === "high" ? "text-high" : "text-warn"}`}
+                    className={`mr-1 font-semibold ${f.severity === "high" ? "text-high" : "text-warn"}`}
                   >
                     {f.severity === "high" ? "High" : "Warn"}
                   </span>{" "}
                   {EVENT_LABEL[f.kind] ?? f.kind}
                   {f.device === "phone" && <span className="text-text-muted"> (phone)</span>}
                 </p>
-                <p className="text-text-muted">
+                <p className="text-text-muted tabular-nums">
                   {new Date(f.started_at).toLocaleTimeString()}
                   {seconds !== null && seconds > 0 && `, for ${seconds} s`}
                 </p>
                 {f.verdict ? (
-                  <p>
+                  <p className={f.verdict === "confirmed" ? "font-semibold text-high" : ""}>
                     {f.verdict === "confirmed" ? "Confirmed" : "Dismissed"}
                     {f.note && <span className="text-text-muted">: {f.note}</span>}
                   </p>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 pt-1">
                     <Button
                       variant="plain"
                       disabled={review.isPending}

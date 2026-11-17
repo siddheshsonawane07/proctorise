@@ -113,6 +113,9 @@
   --color-ok: #1c7a43;
   /* The highlighter: behind ink text only, for "needs a look". Ink on it is 15:1. */
   --color-highlight: #ffe45c;
+  /* Exam paper: pale blue rules and a red margin line. */
+  --color-ruling: #d2def3;
+  --color-margin: #e8968f;
 }
 
 /* BoardUI's own words for the same things, so its parts wear the same ink and rules. */
@@ -154,6 +157,8 @@
     --color-high: #f38b82;
     --color-ok: #6fd39a;
     --color-highlight: #f0c451;
+    --color-ruling: #1e2636;
+    --color-margin: #6e3b38;
   }
   :root.dark {
     --color-text-primary: #e8ebf2;
@@ -187,6 +192,53 @@ body {
  * The highlighter: a swipe of yellow behind ink, for the one thing a teacher should look at.
  * Always ink on yellow, in either colour scheme, so it reads the same as on paper.
  */
+/*
+ * A sheet of exam paper, for the front door only (the landing hero, signing in): ruled every 2rem,
+ * a red margin line 2.75rem in. Content clears the margin with `sheet-x`. It is a sheet lying on
+ * the desk, so it is the one thing in the page with a soft shadow.
+ */
+@utility sheet {
+  --sheet-margin: 2.75rem;
+  @media (width < 40rem) {
+    --sheet-margin: 1.5rem;
+  }
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(
+      to right,
+      transparent var(--sheet-margin),
+      var(--color-margin) var(--sheet-margin),
+      var(--color-margin) calc(var(--sheet-margin) + 1.5px),
+      transparent calc(var(--sheet-margin) + 1.5px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(2rem - 1px),
+      var(--sheet-ruling, var(--color-ruling)) calc(2rem - 1px),
+      var(--sheet-ruling, var(--color-ruling)) 2rem
+    );
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 1px 2px rgb(20 27 45 / 0.05),
+    0 24px 48px -24px rgb(20 27 45 / 0.25);
+}
+
+/* A cover sheet: the margin, no ruling (forms are busy enough on their own). */
+@utility sheet-blank {
+  --sheet-ruling: transparent;
+}
+
+@utility sheet-x {
+  padding-left: calc(var(--sheet-margin, 2.75rem) + 1.75rem);
+  padding-right: 2rem;
+  @media (width < 40rem) {
+    padding-left: calc(var(--sheet-margin, 1.5rem) + 1rem);
+    padding-right: 1.25rem;
+  }
+}
+
 @utility marker {
   background-image: linear-gradient(
     transparent 10%,

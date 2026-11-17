@@ -44,7 +44,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-40 grid place-items-center bg-slate-900/45 p-4"
+      className="fixed inset-0 z-40 grid place-items-center bg-[#141b2d]/40 p-4 backdrop-blur-[2px]"
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
       <div
@@ -54,10 +54,10 @@ export function Dialog({
         aria-labelledby={titleId}
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className="w-full max-w-md space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-xl focus:outline-none"
+        className="w-full max-w-md space-y-5 rounded-2xl border border-border bg-surface p-6 shadow-xl focus:outline-none"
       >
         <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-headline-semibold text-text">
+          <h2 id={titleId} className="text-title-2-semibold tracking-tight text-text">
             {title}
           </h2>
           <button

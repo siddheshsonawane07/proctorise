@@ -138,8 +138,17 @@ test("a teacher turns an AI's reply into questions", async ({ page }) => {
   await page.getByRole("button", { name: "Save 2 questions" }).click();
   await expect(page.getByText("Saved 2 questions to your bank.")).toBeVisible();
 
+  // Every tag was saved: the bank shows each as its own chip on the question's row.
   await page.reload();
-  await expect(
-    page.getByText(/msbshse, class-10, science-1, refraction-of-light, easy, refraction/),
-  ).toBeVisible();
+  const row = page.locator("li").filter({ hasText: "Light bends when it passes" }).first();
+  for (const tag of [
+    "msbshse",
+    "class-10",
+    "science-1",
+    "refraction-of-light",
+    "easy",
+    "refraction",
+  ]) {
+    await expect(row.getByText(tag, { exact: true })).toBeVisible();
+  }
 });

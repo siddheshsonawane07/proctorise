@@ -1,7 +1,8 @@
 import { useState, type ButtonHTMLAttributes, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { BackLink } from "../../app/ui/BackLink";
 import { useQueryClient } from "@tanstack/react-query";
-import { RiAddLine, RiArrowDownLine, RiArrowLeftLine, RiArrowUpLine } from "@remixicon/react";
+import { RiAddLine, RiArrowDownLine, RiArrowUpLine } from "@remixicon/react";
 import { Button, Card, Field, Loading, LoadFailed, Select, TextArea } from "../../app/ui/form";
 import { inputClass } from "../../app/ui/inputClass";
 import { buttonClass } from "../../app/ui/buttonClass";
@@ -59,13 +60,7 @@ export function Builder() {
 function Header({ test }: { test: TestRow }) {
   return (
     <div className="space-y-3">
-      <Link
-        to={`/app/classes/${test.class_id}`}
-        className="inline-flex items-center gap-1 text-body-medium text-text-muted no-underline hover:text-text"
-      >
-        <RiArrowLeftLine aria-hidden className="size-4" />
-        Back to the class
-      </Link>
+      <BackLink to={`/app/classes/${test.class_id}`}>Back to the class</BackLink>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
           <h1 className="text-page text-text">{test.title}</h1>

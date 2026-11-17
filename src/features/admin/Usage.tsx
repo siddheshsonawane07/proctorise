@@ -39,21 +39,39 @@ export function Usage() {
         />
       </div>
       <Card title="Activity">
-        <ul className="space-y-1 text-sm">
-          <li>
-            {u.people} people, {u.teachers} teachers
-          </li>
-          <li>{u.attempts_this_month} attempts this month</li>
-          <li>
-            {u.attempts_now} taking a test now (the free plan manages about {LIMITS.liveStudents} at
-            once)
-          </li>
-          <li>
-            Last activity: {u.last_activity ? new Date(u.last_activity).toLocaleString() : "none"}.
-            A free project pauses after a week without any.
-          </li>
-        </ul>
+        {/* Figures to read at a glance: the number large, what it counts beside it. */}
+        <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Figure value={u.people} label={`people, of whom ${u.teachers} teach`} />
+          <Figure value={u.attempts_this_month} label="attempts this month" />
+          <Figure
+            value={u.attempts_now}
+            label={`taking a test now; the free plan manages about ${LIMITS.liveStudents} at once`}
+          />
+          <div>
+            <dt className="text-caption-1-regular text-text-muted">Last activity</dt>
+            <dd className="mt-1 text-headline-semibold text-text">
+              {u.last_activity ? new Date(u.last_activity).toLocaleString() : "None"}
+            </dd>
+            <dd className="text-caption-1-regular text-text-muted">
+              A free project pauses after a week without any.
+            </dd>
+          </div>
+        </dl>
       </Card>
+    </div>
+  );
+}
+
+function Figure({ value, label }: { value: number; label: string }) {
+  return (
+    <div>
+      <dt className="sr-only">{label}</dt>
+      <dd className="text-[2rem] leading-10 font-bold tracking-tight text-text tabular-nums">
+        {value}
+      </dd>
+      <dd aria-hidden className="text-caption-1-regular text-text-muted">
+        {label}
+      </dd>
     </div>
   );
 }

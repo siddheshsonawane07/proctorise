@@ -1,12 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import {
-  RiCloseLine,
-  RiDownload2Line,
-  RiFlagLine,
-  RiSearchLine,
-  RiUserLine,
-} from "@remixicon/react";
+import { Empty } from "../../app/ui/Empty";
+import { RiCloseLine, RiDownload2Line, RiFlagLine, RiSearchLine } from "@remixicon/react";
 import { Button, Loading, LoadFailed } from "../../app/ui/form";
 import { inputClass } from "../../app/ui/inputClass";
 import { toast } from "../../app/ui/toast";
@@ -55,13 +50,7 @@ export function Roster({ classId }: { classId: string }) {
   if (roster.isPending) return <Loading />;
   if (roster.isError) return <LoadFailed retry={roster.refetch} />;
   if (roster.data.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-        <RiUserLine aria-hidden className="mx-auto size-8 text-text-muted" />
-        <p className="mt-2 text-body-medium text-text">No students yet</p>
-        <p className="text-body-regular text-text-muted">Share the join code with your class.</p>
-      </div>
-    );
+    return <Empty title="No students yet.">Share the class code with your students.</Empty>;
   }
 
   const counts = {

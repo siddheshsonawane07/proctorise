@@ -461,13 +461,15 @@ function TestScreen({
                 aria-label={`Question ${i + 1}${isBlank(answers[it.id]) ? ", not answered" : ", answered"}${
                   flagged.has(it.id) ? ", marked for review" : ""
                 }`}
-                className={`h-10 rounded-lg border text-body-medium transition-colors ${
-                  i === index
-                    ? "border-accent bg-accent text-accent-text"
-                    : isBlank(answers[it.id])
-                      ? "border-border hover:bg-surface-muted"
-                      : "border-accent/40 bg-accent/10 text-accent"
-                } ${flagged.has(it.id) ? "ring-2 ring-warn ring-offset-1" : ""}`}
+                // Answered is filled in ink, like a shaded bubble; marked to come back to has a
+                // highlighter stroke under it; the open question has an ink ring.
+                className={`h-10 rounded-lg border text-body-semibold tabular-nums ${
+                  isBlank(answers[it.id])
+                    ? "border-border-button-default bg-surface text-text hover:bg-surface-muted"
+                    : "border-accent bg-accent text-accent-text"
+                } ${flagged.has(it.id) ? "shadow-[inset_0_-5px_0_var(--color-highlight)]" : ""} ${
+                  i === index ? "ring-2 ring-text ring-offset-2 ring-offset-surface" : ""
+                }`}
               >
                 {i + 1}
               </button>
@@ -475,15 +477,18 @@ function TestScreen({
           </nav>
           <ul className="space-y-1 text-caption-1-regular text-text-muted">
             <li className="flex items-center gap-2">
-              <span aria-hidden className="size-3 rounded border border-accent/40 bg-accent/10" />
+              <span aria-hidden className="size-3.5 rounded border border-accent bg-accent" />
               Answered
             </li>
             <li className="flex items-center gap-2">
-              <span aria-hidden className="size-3 rounded border border-border" />
+              <span aria-hidden className="size-3.5 rounded border border-border-button-default" />
               Not answered
             </li>
             <li className="flex items-center gap-2">
-              <span aria-hidden className="size-3 rounded border border-border ring-2 ring-warn" />
+              <span
+                aria-hidden
+                className="size-3.5 rounded border border-border-button-default shadow-[inset_0_-4px_0_var(--color-highlight)]"
+              />
               Marked to come back to
             </li>
           </ul>

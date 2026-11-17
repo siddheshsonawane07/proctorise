@@ -153,24 +153,28 @@ const H2 = "text-page text-text";
 export function Landing() {
   return (
     <div className="space-y-28 pb-8">
-      <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+      {/* The front door is a sheet of exam paper: every line of text sits on its 2rem ruling. */}
+      <section className="sheet sheet-x grid items-center gap-x-12 gap-y-8 py-16 lg:grid-cols-[1.15fr_1fr] lg:py-20">
         <div>
-          <h1 className="text-display-3-bold tracking-tight text-text sm:text-display-2-bold">
+          <h1 className="text-[2.75rem] leading-[4rem] font-bold tracking-[-0.025em] text-text sm:text-[3.5rem]">
             Online tests, checked fairly.
           </h1>
-          <p className="mt-5 max-w-xl text-title-3-regular text-text-muted">
+          <p className="mt-8 max-w-xl text-title-3-regular leading-8 text-pretty text-text-muted">
             Proctorise runs tests in the browser and watches for cheating with the webcam and a
             phone, so a teacher can trust the result, and a student can trust the process.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/sign-up" className={buttonClass("primary", "h-11 px-5")}>
+            <Link
+              to="/sign-up"
+              className={buttonClass("primary", "h-12 px-6 text-headline-semibold")}
+            >
               Create an account
             </Link>
-            <Link to="/demo" className={buttonClass("plain", "h-11 px-5")}>
+            <Link to="/demo" className={buttonClass("plain", "h-12 px-6 text-headline-semibold")}>
               Try it on your camera
             </Link>
           </div>
-          <p className="mt-6 text-body-regular text-text-muted">
+          <p className="mt-8 text-body-regular leading-8 text-pretty text-text-muted">
             Taking a test?{" "}
             <Link to="/sign-in" className="text-text underline">
               Sign in
@@ -178,7 +182,9 @@ export function Landing() {
             , then join your class with the code your teacher gave you.
           </p>
         </div>
-        <HeroScene />
+        <div className="drop-shadow-[0_16px_24px_rgb(20_27_45/0.14)] lg:rotate-[1.25deg]">
+          <HeroScene />
+        </div>
       </section>
 
       <section aria-labelledby="checks">
