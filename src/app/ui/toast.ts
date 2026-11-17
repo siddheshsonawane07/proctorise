@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 /*
- * Notifications in the bottom right corner: what an action did, or why it failed. Anything a
+ * Notifications in the top right corner: what an action did, or why it failed. Anything a
  * person must keep reading (a page that failed to load, a rule of a test) stays on the page.
  */
 export type Toast = { id: number; kind: "ok" | "error"; text: string };

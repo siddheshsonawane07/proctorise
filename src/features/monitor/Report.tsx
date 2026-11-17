@@ -1,8 +1,7 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Button, Loading, Message } from "../../app/ui/form";
+import { Button, Loading, LoadFailed } from "../../app/ui/form";
 import { unwrap } from "../classes/api";
 import { EVENT_LABEL } from "../proctoring/labels";
 import { useFlags } from "./api";
@@ -42,13 +41,13 @@ export function Report() {
   const flags = useFlags(attemptId);
 
   if (attempt.isPending || flags.isPending) return <Loading />;
-  if (attempt.isError) return <Message kind="error">{messageFrom(attempt.error)}</Message>;
+  if (attempt.isError) return <LoadFailed retry={attempt.refetch} />;
   const { a, actions, title, name } = attempt.data;
 
   return (
     <article className="mx-auto max-w-3xl space-y-6 print:max-w-none">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Integrity report</h1>
+        <h1 className="text-page text-text">Integrity report</h1>
         <p>
           {name} · {title}
         </p>

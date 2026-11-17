@@ -18,7 +18,7 @@ export function ConfirmAdult() {
   if (under18) {
     return (
       <div className="mx-auto max-w-md">
-        <h1 className="text-2xl font-semibold">Proctorise is for adults for now</h1>
+        <h1 className="text-page text-text">Proctorise is for adults for now</h1>
         <p className="mt-3 text-text-muted">
           We can't take tests for people under 18 yet. You can delete this account by asking your
           teacher or the site's admin.
@@ -32,7 +32,7 @@ export function ConfirmAdult() {
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-semibold">One question before you start</h1>
+      <h1 className="text-page text-text">One question before you start</h1>
       <p className="mt-3 text-text-muted">
         Tests here use your camera, so for now Proctorise is only for people aged 18 or older.
       </p>

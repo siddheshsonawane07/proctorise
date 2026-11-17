@@ -53,7 +53,13 @@ export function TabPanel({
   children: ReactNode;
 }) {
   return (
-    <div role="tabpanel" aria-label={label} hidden={!show} className="space-y-6">
+    // The tabs' own underline is the first section's rule; a second one would double it.
+    <div
+      role="tabpanel"
+      aria-label={label}
+      hidden={!show}
+      className="space-y-8 pt-2 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0"
+    >
       {children}
     </div>
   );

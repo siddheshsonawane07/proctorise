@@ -84,10 +84,23 @@ export function Message({ kind, children }: { kind: "error" | "ok"; children: Re
   );
 }
 
+/**
+ * What a page shows when its data could not load. The reason is in the corner (the QueryCache in
+ * `src/main.tsx`); the page keeps only the way to try again.
+ */
+export function LoadFailed({ retry }: { retry: () => unknown }) {
+  return (
+    <Button variant="plain" onClick={() => void retry()}>
+      Try again
+    </Button>
+  );
+}
+
+/** A part of a page: a heading under a thin rule, like a section of an exam paper. Not a box. */
 export function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border-table bg-background-primary-default p-5 shadow-xs">
-      <h2 className="text-headline-semibold text-text-primary">{title}</h2>
+    <section className="border-t border-border pt-5">
+      <h2 className="text-title-3-semibold text-text-primary">{title}</h2>
       <div className="mt-3 space-y-3">{children}</div>
     </section>
   );

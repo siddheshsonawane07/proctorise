@@ -1,24 +1,49 @@
 /* BoardUI's theme, typography and globals (Tailwind is imported there), then ours on top. */
-@import "@fontsource-variable/inter/index.css";
+@import "@fontsource-variable/atkinson-hyperlegible-next/index.css";
+@import "@fontsource-variable/atkinson-hyperlegible-mono/index.css";
 @import "../styles/globals.css";
 
 /*
- * BoardUI's accent ramp is teal, our one accent. Purple and violet are mapped to cyan and indigo to blue, so
- * no BoardUI token can show either (CLAUDE.md rule 9).
+ * The look is the exam room, not a dashboard: white paper, blue-black ink, one exam-booklet blue
+ * for what can be pressed, a red pen for what is serious, and a highlighter for what needs a look.
+ * Structure comes from thin rules and type, not from boxes and shadows.
+ *
+ * BoardUI's accent ramp is that booklet blue (hue 221, never violet). Purple and violet are mapped
+ * to cyan and indigo to blue, so no BoardUI token can show either (CLAUDE.md rule 9).
  */
 @theme {
-  /* 400 and up carry white text (buttons, badges), so they start at teal-700: 5.5:1 on white. */
-  --color-accent-50: var(--color-teal-50);
-  --color-accent-100: var(--color-teal-100);
-  --color-accent-200: var(--color-teal-200);
-  --color-accent-300: var(--color-teal-300);
-  --color-accent-400: var(--color-teal-700);
-  --color-accent-500: var(--color-teal-700);
-  --color-accent-600: var(--color-teal-800);
-  --color-accent-700: var(--color-teal-800);
-  --color-accent-800: var(--color-teal-900);
-  --color-accent-900: var(--color-teal-900);
-  --color-accent-950: var(--color-teal-950);
+  /* 400 and up carry white text (buttons, badges): #1f4fb4 is 7:1 on white. */
+  --color-accent-50: #eef3fc;
+  --color-accent-100: #dce6f8;
+  --color-accent-200: #b9cdf1;
+  --color-accent-300: #8aabe6;
+  --color-accent-400: #1f4fb4;
+  --color-accent-500: #1f4fb4;
+  --color-accent-600: #1a4398;
+  --color-accent-700: #16387f;
+  --color-accent-800: #122e68;
+  --color-accent-900: #0e2452;
+  --color-accent-950: #0a1a3b;
+
+  /* One page title everywhere; body text a step up from BoardUI's 14px, for reading questions. */
+  --text-page: 1.875rem;
+  --text-page--line-height: 2.25rem;
+  --text-page--font-weight: 700;
+  --text-page--letter-spacing: -0.015em;
+  --text-body-regular: 0.9375rem;
+  --text-body-regular--line-height: 1.4rem;
+  --text-body-medium: 0.9375rem;
+  --text-body-medium--line-height: 1.4rem;
+  --text-body-semibold: 0.9375rem;
+  --text-body-semibold--line-height: 1.4rem;
+  --text-body-bold: 0.9375rem;
+  --text-body-bold--line-height: 1.4rem;
+
+  /* Radii by rank: a chip 4, a control 7, a panel 10. Nothing floats but dialogs and notices. */
+  --radius-2lg: 7px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+  --shadow-xs: 0 0 #0000;
 
   --color-purple-50: oklch(98.4% 0.019 200.873);
   --color-purple-100: oklch(95.6% 0.045 203.388);
@@ -55,47 +80,88 @@
   --color-indigo-950: var(--color-blue-950);
 }
 
+/* BoardUI's parts name their face `--font-inter`; it is Atkinson Hyperlegible here too. */
 :root {
-  --font-inter: "Inter Variable";
+  --font-inter: "Atkinson Hyperlegible Next Variable";
 }
 
 /*
- * The app's own tokens. Neutral greys with one teal accent.
+ * The app's own tokens: paper, ink, pencil, rule and desk; booklet blue; red pen; highlighter.
  * Status colours pair with an icon or word on screen, never colour alone.
  */
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans:
+    "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  /* Only for what is read one character at a time: codes, the clock. */
+  --font-mono:
+    "Atkinson Hyperlegible Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --color-surface: #ffffff;
-  --color-surface-muted: #f4f5f6;
-  --color-border: #d9dcdf;
-  --color-text: #17191c;
-  --color-text-muted: #545a61;
+  --color-surface-muted: #f5f6f8;
+  --color-border: #e2e5eb;
+  --color-text: #141b2d;
+  --color-text-muted: #586174;
 
-  --color-accent: #0f766e;
-  --color-accent-hover: #0b5f58;
+  --color-accent: #1f4fb4;
+  --color-accent-hover: #1a4398;
   --color-accent-text: #ffffff;
 
-  --color-info: #1d5fa8;
-  --color-warn: #8a5a00;
-  --color-high: #b3261e;
+  --color-info: #1f4fb4;
+  --color-warn: #7a5300;
+  --color-high: #b4231a;
+  --color-ok: #1c7a43;
+  /* The highlighter: behind ink text only, for "needs a look". Ink on it is 15:1. */
+  --color-highlight: #ffe45c;
+}
+
+/* BoardUI's own words for the same things, so its parts wear the same ink and rules. */
+:root {
+  --color-text-primary: #141b2d;
+  --color-text-secondary: #586174;
+  --color-border-table: #e2e5eb;
+  --color-border-button-default: #cdd2db;
+  --color-background-secondary-default: #f5f6f8;
+  /* Buttons are flat ink-blue, not a gradient. */
+  --gradient-button-primary-default: linear-gradient(
+    var(--color-accent-500),
+    var(--color-accent-500)
+  );
+  --gradient-button-primary-hover: linear-gradient(
+    var(--color-accent-600),
+    var(--color-accent-600)
+  );
+  --gradient-button-primary-active: linear-gradient(
+    var(--color-accent-700),
+    var(--color-accent-700)
+  );
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-surface: #121416;
-    --color-surface-muted: #1c1f22;
-    --color-border: #33383d;
-    --color-text: #eceef0;
-    --color-text-muted: #a5acb3;
+    --color-surface: #0f131c;
+    --color-surface-muted: #171c27;
+    --color-border: #2a3140;
+    --color-text: #e8ebf2;
+    --color-text-muted: #9aa3b5;
 
-    --color-accent: #2bb3a6;
-    --color-accent-hover: #4cc7bb;
-    --color-accent-text: #0a1f1d;
+    --color-accent: #8db0f2;
+    --color-accent-hover: #adc6f6;
+    --color-accent-text: #0a1a3b;
 
-    --color-info: #7fb4ee;
-    --color-warn: #e8b453;
-    --color-high: #f2867e;
+    --color-info: #8db0f2;
+    --color-warn: #f0c451;
+    --color-high: #f38b82;
+    --color-ok: #6fd39a;
+    --color-highlight: #f0c451;
+  }
+  :root.dark {
+    --color-text-primary: #e8ebf2;
+    --color-text-secondary: #9aa3b5;
+    --color-border-table: #2a3140;
+    --color-border-button-default: #3a4253;
+    --color-background-primary-default: #0f131c;
+    --color-background-secondary-default: #171c27;
   }
 }
 
@@ -117,11 +183,28 @@ body {
   outline-offset: 2px;
 }
 
+/*
+ * The highlighter: a swipe of yellow behind ink, for the one thing a teacher should look at.
+ * Always ink on yellow, in either colour scheme, so it reads the same as on paper.
+ */
+@utility marker {
+  background-image: linear-gradient(
+    transparent 10%,
+    var(--color-highlight) 10%,
+    var(--color-highlight) 90%,
+    transparent 90%
+  );
+  color: #141b2d;
+  padding-inline: 0.3em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+}
+
 /* A notification slides up into its corner; nothing moves for someone who asked for less motion. */
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
+    transform: translateY(-0.5rem);
   }
 }
 

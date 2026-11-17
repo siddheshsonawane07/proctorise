@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
 import { formatWhen } from "../../lib/time";
 import type { Database, Json } from "../../lib/database.types";
-import { Button, Card, Loading, Message } from "../../app/ui/form";
+import { Button, Card, Loading, LoadFailed } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import { unwrap } from "../classes/api";
 import { useTest } from "../builder/api";
@@ -46,7 +45,7 @@ export function Results() {
   });
 
   if (test.isPending || results.isPending) return <Loading />;
-  if (results.isError) return <Message kind="error">{messageFrom(results.error)}</Message>;
+  if (results.isError) return <LoadFailed retry={results.refetch} />;
   const t = test.data;
   const rows = results.data;
   const toMark = rows.reduce((sum, r) => sum + r.to_mark, 0);
@@ -82,7 +81,7 @@ export function Results() {
         <Link to={`/app/tests/${testId}/edit`} className="text-sm text-accent underline">
           Back to the test
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold">Results: {t?.title}</h1>
+        <h1 className="mt-1 text-page text-text">Results: {t?.title}</h1>
       </div>
       <Card title="Releasing results">
         {t?.results_release === "manual" && !t.results_released_at && (
@@ -191,7 +190,7 @@ function AttemptAnswers({ attemptId, testId }: { attemptId: string; testId: stri
   });
 
   if (detail.isPending) return <Loading />;
-  if (detail.isError) return <Message kind="error">{messageFrom(detail.error)}</Message>;
+  if (detail.isError) return <LoadFailed retry={detail.refetch} />;
 
   return (
     <Card title="Answers">

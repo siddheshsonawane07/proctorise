@@ -3,9 +3,8 @@ import { Link, useParams } from "react-router";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
 import { formatRemaining } from "../../lib/time";
-import { Button, Card, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Card, Field, Loading, LoadFailed } from "../../app/ui/form";
 import { useTest } from "../builder/api";
 import { EVENT_LABEL } from "../proctoring/labels";
 import { MAX_LIVE_STUDENTS } from "../../lib/limits";
@@ -66,7 +65,7 @@ export function LiveGrid() {
   }, [testId, queryClient]);
 
   if (overview.isPending || test.isPending) return <Loading />;
-  if (overview.isError) return <Message kind="error">{messageFrom(overview.error)}</Message>;
+  if (overview.isError) return <LoadFailed retry={overview.refetch} />;
 
   // Needs attention first: unreviewed high flags, then unreviewed warnings, then the rest.
   const rows = [...overview.data].sort(
@@ -86,7 +85,7 @@ export function LiveGrid() {
           <Link to={`/app/tests/${testId}/edit`} className="text-body-medium text-accent">
             ← Back to the test
           </Link>
-          <h1 className="mt-1 flex items-center gap-3 text-title-1-bold tracking-tight text-text">
+          <h1 className="mt-1 flex items-center gap-3 text-page text-text">
             Live: {test.data?.title}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-high/10 px-2.5 py-1 text-caption-1-semibold text-high">
               <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-high" />
@@ -149,7 +148,7 @@ function Tile({
   const attention = Math.min(row.unreviewed, row.high_count) > 0;
   const writing = row.status === "in_progress";
   const badge = attention
-    ? { text: "Needs a look", cls: "bg-high/10 text-high" }
+    ? { text: "Needs a look", cls: "marker font-semibold" }
     : writing
       ? { text: "Writing", cls: "bg-accent/10 text-accent" }
       : { text: STATUS[row.status], cls: "bg-surface-muted text-text-muted" };
@@ -157,7 +156,7 @@ function Tile({
   return (
     <li
       className={`space-y-3 rounded-2xl border bg-surface p-4 shadow-xs transition-shadow hover:shadow-md ${
-        attention ? "border-high/60 ring-1 ring-high/30" : "border-border"
+        attention ? "border-border border-l-4 border-l-high" : "border-border"
       }`}
     >
       <div className="flex items-start gap-3">

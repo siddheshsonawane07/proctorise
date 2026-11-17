@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { Button, Message } from "../../app/ui/form";
+import { Button } from "../../app/ui/form";
 import { Preview } from "../proctoring/Preview";
 import { useCamera } from "../proctoring/useCamera";
 import { EVENT_LABEL } from "../proctoring/labels";
@@ -81,7 +81,7 @@ export function Demo() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-title-1-bold tracking-tight text-text">Try the proctoring</h1>
+        <h1 className="text-page text-text">Try the proctoring</h1>
         <p className="mt-2 max-w-3xl text-body-regular text-text-muted">
           The same checks a test runs, on your own camera. Everything happens in this browser tab:
           no pictures, no sound and no events are sent or saved. Close the tab and it's gone.
@@ -94,9 +94,6 @@ export function Demo() {
             Turn on your camera and microphone to start. The first time, the browser downloads the
             checks (about 20 MB); after that they start at once.
           </p>
-          {camera.state.status === "refused" && (
-            <Message kind="error">{camera.state.message}</Message>
-          )}
           <Button
             disabled={camera.state.status === "asking"}
             onClick={() => {

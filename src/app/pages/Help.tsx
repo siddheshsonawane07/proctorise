@@ -4,7 +4,7 @@ import { Link } from "react-router";
 export function HelpTeachers() {
   return (
     <article className="mx-auto max-w-2xl space-y-5">
-      <h1 className="text-3xl font-semibold">For teachers</h1>
+      <h1 className="text-page text-text">For teachers</h1>
       <Step n={1} title="Get teacher access">
         Create an account, then use <em>Ask for teacher access</em> on your home page. The site's
         admin approves it.
@@ -49,7 +49,7 @@ export function HelpTeachers() {
 export function HelpStudents() {
   return (
     <article className="mx-auto max-w-2xl space-y-5">
-      <h1 className="text-3xl font-semibold">For students</h1>
+      <h1 className="text-page text-text">For students</h1>
       <Step n={1} title="Before the test day">
         On <em>Classes</em>, choose <em>Join class</em> and type the code from your teacher. If your
         test checks it's you, take your photo under <em>Your photo</em>. You can leave a class from

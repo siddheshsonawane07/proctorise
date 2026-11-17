@@ -3,7 +3,8 @@ import { useParams } from "react-router";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { phoneClient } from "../../lib/phoneClient";
 import { messageFrom } from "../../lib/errors";
-import { Button, Field, Message } from "../../app/ui/form";
+import { Button, Field } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { Detector, type Detection } from "../proctoring/detector";
 import { EventSink } from "../proctoring/sink";
 import { uploadSnapshot } from "../proctoring/evidence";
@@ -16,7 +17,6 @@ import { pairingChannel, send } from "./channel";
 type Stage =
   | { kind: "code" }
   | { kind: "connecting" }
-  | { kind: "error"; message: string }
   | { kind: "connected"; student: string; title: string }
   | { kind: "setup" }
   | { kind: "waiting" }
@@ -94,7 +94,8 @@ export function PhonePage() {
       setPairingId(c.pairing_id);
       setStage({ kind: "connected", student: c.student, title: c.test_title });
     } catch (error) {
-      setStage({ kind: "error", message: messageFrom(error) });
+      toast.error(messageFrom(error));
+      setStage({ kind: "code" });
     }
   }
 
@@ -106,14 +107,7 @@ export function PhonePage() {
     }
   }, [token]);
 
-  if (stage.kind === "code" || stage.kind === "error") {
-    return (
-      <CodeEntry
-        error={stage.kind === "error" ? stage.message : null}
-        onCode={(code) => void connect({ code })}
-      />
-    );
-  }
+  if (stage.kind === "code") return <CodeEntry onCode={(code) => void connect({ code })} />;
   if (stage.kind === "connecting") return <Big title="Connecting…" />;
   if (stage.kind === "connected") {
     return (
@@ -135,14 +129,14 @@ export function PhonePage() {
   return <Camera pairingId={pairingId!} stage={stage.kind} onStage={onStage} />;
 }
 
-function CodeEntry({ error, onCode }: { error: string | null; onCode: (code: string) => void }) {
+function CodeEntry({ onCode }: { onCode: (code: string) => void }) {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onCode(String(new FormData(event.currentTarget).get("code")));
   }
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="text-2xl font-semibold">Connect your phone</h1>
+      <h1 className="text-page text-text">Connect your phone</h1>
       <p className="text-text-muted">Type the 6-character code from your test screen.</p>
       <Field
         label="Code"
@@ -152,7 +146,6 @@ function CodeEntry({ error, onCode }: { error: string | null; onCode: (code: str
         autoComplete="off"
         autoCapitalize="characters"
       />
-      {error && <Message kind="error">{error}</Message>}
       <Button type="submit" className="w-full">
         Connect
       </Button>
@@ -163,7 +156,7 @@ function CodeEntry({ error, onCode }: { error: string | null; onCode: (code: str
 function Big({ title, text }: { title: string; text?: string }) {
   return (
     <div className="space-y-2 text-center">
-      <h1 className="text-2xl font-semibold">{title}</h1>
+      <h1 className="text-page text-text">{title}</h1>
       {text && <p className="text-text-muted">{text}</p>}
     </div>
   );
@@ -183,7 +176,6 @@ function Camera({
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const [facing, setFacing] = useState<"user" | "environment">("user");
-  const [cameraError, setCameraError] = useState<string | null>(null);
   const [setupHint, setSetupHint] = useState("Looking for you and your laptop…");
   // The check is a help, not a gate (D7): after 15 s the student may go on, and the teacher is told.
   const [canSkip, setCanSkip] = useState(false);
@@ -323,7 +315,7 @@ function Camera({
       try {
         await startCamera();
       } catch {
-        setCameraError("The camera could not start. Allow it for this page, then reload.");
+        toast.error("The camera could not start. Allow it for this page, then reload.");
         return;
       }
       await keepAwake();
@@ -428,7 +420,6 @@ function Camera({
           text="Keep this page open. Don't touch your phone until the test ends."
         />
       )}
-      {cameraError && <Message kind="error">{cameraError}</Message>}
       <video
         ref={video}
         muted

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiCheckLine, RiErrorWarningLine } from "@remixicon/react";
 import { messageFrom } from "../../lib/errors";
-import { Button, Message } from "../../app/ui/form";
+import { Button } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
 import { describeAnswer } from "../questions/describe";
 import { useSaveQuestion } from "./api";
@@ -15,11 +15,15 @@ import type { ImportRow } from "./prompt";
 export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTags: string[] }) {
   const save = useSaveQuestion({ quiet: true });
   const [busy, setBusy] = useState(false);
-  const [report, setReport] = useState<{ added: number; errors: string[] } | null>(null);
+  const [saved, setSaved] = useState(false);
   const good = rows.filter(
     (r): r is { row: number; result: QuestionInput } => typeof r.result !== "string",
   );
   const bad = rows.length - good.length;
+  useEffect(() => {
+    if (rows.length === 0)
+      toast.error("No questions found. Check the text has the CSV header line.");
+  }, [rows]);
 
   async function saveGood() {
     setBusy(true);
@@ -35,17 +39,13 @@ export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTag
       }
     }
     setBusy(false);
-    setReport({ added, errors });
-    const saved = `Saved ${added} ${added === 1 ? "question" : "questions"} to your bank.`;
-    if (errors.length === 0) toast.ok(saved);
-    else toast.error(`${saved} ${errors.length} could not be saved; they are listed below.`);
+    setSaved(true);
+    const done = `Saved ${added} ${added === 1 ? "question" : "questions"} to your bank.`;
+    if (errors.length === 0) toast.ok(done);
+    else toast.error(`${done} Not saved: ${errors.join("; ")}`);
   }
 
-  if (rows.length === 0) {
-    return (
-      <Message kind="error">No questions found. Check the text has the CSV header line.</Message>
-    );
-  }
+  if (rows.length === 0) return null;
 
   return (
     <div className="space-y-3">
@@ -109,17 +109,8 @@ export function ImportPreview({ rows, extraTags }: { rows: ImportRow[]; extraTag
           </tbody>
         </table>
       </div>
-      {report && report.errors.length > 0 && (
-        <Message kind="error">
-          {report.errors.map((e) => (
-            <span key={e} className="block">
-              {e}
-            </span>
-          ))}
-        </Message>
-      )}
-      <Button onClick={saveGood} disabled={busy || report !== null || good.length === 0}>
-        {report
+      <Button onClick={saveGood} disabled={busy || saved || good.length === 0}>
+        {saved
           ? "Saved"
           : busy
             ? "Saving…"

@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
 import { router } from "./app/router";
 import { SessionProvider } from "./features/auth/SessionProvider";
@@ -13,13 +13,17 @@ followSystemColorScheme();
 
 declare module "@tanstack/react-query" {
   interface Register {
-    /** `ok`: what to say when it works. `quiet`: the page shows the failure itself. */
+    /** `ok`: what to say when it works. `quiet`: the caller reports the failure itself. */
     mutationMeta: { ok?: string; quiet?: boolean };
   }
 }
 
-// Every action reports in the corner: a failure always, a success when the action names one.
+// Every message reports in the corner: a page that could not load, an action that failed, and a
+// success when the action names one.
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => toast.error(messageFrom(error)),
+  }),
   mutationCache: new MutationCache({
     onError: (error, _args, _context, mutation) => {
       if (!mutation.meta?.quiet) toast.error(messageFrom(error));

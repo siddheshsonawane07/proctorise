@@ -10,7 +10,7 @@ import {
   RiLogoutBoxRLine,
   RiMenuLine,
   RiQuestionLine,
-  RiShieldCheckLine,
+  RiCheckboxLine,
   RiShieldUserLine,
   RiUserStarLine,
   type RemixiconComponentType,
@@ -51,14 +51,10 @@ function Shell() {
 
 function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-2 text-text no-underline">
-      <span
-        aria-hidden
-        className="grid size-8 place-items-center rounded-lg bg-accent text-accent-text"
-      >
-        <RiShieldCheckLine className="size-5" />
-      </span>
-      <span className="text-headline-semibold">Proctorise</span>
+    <Link to="/" className="flex items-center gap-1.5 text-text no-underline">
+      {/* An answer box, ticked: the one thing every test has. */}
+      <RiCheckboxLine aria-hidden className="size-6 text-accent" />
+      <span className="text-title-3-bold tracking-tight">Proctorise</span>
     </Link>
   );
 }
@@ -196,7 +192,7 @@ function AppShell() {
   const open = openOn === pathname;
 
   return (
-    <div className="min-h-dvh bg-surface-muted lg:flex">
+    <div className="min-h-dvh bg-surface lg:flex">
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-surface px-4 py-2.5 lg:hidden">
         <Logo />
         <button
@@ -217,18 +213,18 @@ function AppShell() {
       <aside
         id="app-sidebar"
         className={cx(
-          "z-20 flex w-full flex-col border-border bg-surface lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:shrink-0 lg:border-r",
+          "z-20 flex w-full flex-col border-border bg-surface-muted lg:sticky lg:top-0 lg:h-dvh lg:w-60 lg:shrink-0 lg:border-r",
           open
             ? "max-lg:fixed max-lg:inset-x-0 max-lg:top-[57px] max-lg:bottom-0"
             : "max-lg:hidden",
         )}
       >
-        <div className="hidden px-5 py-4 lg:block">
+        <div className="hidden px-4 pt-5 pb-3 lg:block">
           <Logo />
         </div>
         <Sidebar />
       </aside>
-      <main className="min-w-0 flex-1 px-4 py-6 sm:px-8 lg:py-10">
+      <main className="min-w-0 flex-1 px-4 py-6 sm:px-10 lg:py-12">
         <div className="mx-auto max-w-5xl">
           <Outlet />
         </div>
@@ -260,9 +256,9 @@ function Sidebar() {
         {navFor(profile.data, view, classes).map((group, i) => (
           <div key={group.title ?? i}>
             {group.title && (
-              <p className="px-3 pb-1.5 text-caption-1-semibold text-text-muted">{group.title}</p>
+              <p className="px-3 pb-1 text-caption-1-medium text-text-muted">{group.title}</p>
             )}
-            <ul className="space-y-0.5">
+            <ul className="space-y-px">
               {group.items.map(({ to, label, icon: Icon, band }) => (
                 <li key={to}>
                   <NavLink
@@ -270,17 +266,20 @@ function Sidebar() {
                     end={to === "/app"}
                     className={({ isActive }) =>
                       cx(
-                        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-body-medium no-underline transition-colors",
+                        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-body-medium no-underline",
                         isActive
-                          ? "bg-accent/10 text-accent"
-                          : "text-text hover:bg-surface-muted hover:text-text",
+                          ? "bg-surface text-text shadow-[inset_3px_0_0_var(--color-accent)]"
+                          : "text-text-muted hover:bg-surface hover:text-text",
                       )
                     }
                   >
                     {Icon ? (
                       <Icon aria-hidden className="size-[18px] shrink-0" />
                     ) : (
-                      <span aria-hidden className={cx("mx-[3px] size-3 shrink-0 rounded", band)} />
+                      <span
+                        aria-hidden
+                        className={cx("mx-[7px] h-4 w-1 shrink-0 rounded-sm", band)}
+                      />
                     )}
                     <span className="truncate">{label}</span>
                   </NavLink>
@@ -294,7 +293,7 @@ function Sidebar() {
         <div className="flex items-center gap-3 px-2">
           <span
             aria-hidden
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-accent/10 text-body-semibold text-accent"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border-button-default bg-surface text-body-semibold text-text"
           >
             {(name[0] ?? "?").toUpperCase()}
           </span>
@@ -306,7 +305,7 @@ function Sidebar() {
         <button
           type="button"
           onClick={signOut}
-          className="mt-3 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-body-medium text-text hover:bg-surface-muted"
+          className="mt-3 flex w-full items-center gap-2.5 rounded-md px-3 py-1.5 text-body-medium text-text-muted hover:bg-surface hover:text-text"
         >
           <RiLogoutBoxRLine aria-hidden className="size-[18px]" />
           Sign out

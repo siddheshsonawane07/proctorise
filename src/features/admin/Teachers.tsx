@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
 import type { Database } from "../../lib/database.types";
-import { Button, Loading, Message } from "../../app/ui/form";
+import { Button, Loading, LoadFailed } from "../../app/ui/form";
 
 type Status = Database["public"]["Enums"]["teacher_status"];
 type Person = Database["public"]["Functions"]["admin_list_people"]["Returns"][number];
@@ -40,7 +39,7 @@ export function Teachers() {
 
   return (
     <div>
-      <h1 className="text-title-1-bold tracking-tight text-text">Teachers</h1>
+      <h1 className="text-page text-text">Teachers</h1>
       <div
         role="tablist"
         aria-label="Teacher status"
@@ -65,7 +64,7 @@ export function Teachers() {
       </div>
       <div role="tabpanel" className="mt-6">
         {people.isPending && <Loading />}
-        {people.isError && <Message kind="error">{messageFrom(people.error)}</Message>}
+        {people.isError && <LoadFailed retry={people.refetch} />}
         {people.data?.length === 0 && <p className="text-text-muted">{current.empty}</p>}
         <ul className="space-y-3">
           {people.data?.map((person) => (

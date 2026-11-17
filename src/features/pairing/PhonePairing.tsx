@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Button, Message } from "../../app/ui/form";
+import { Button } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { unwrap } from "../classes/api";
 import { pairingChannel } from "./channel";
 
@@ -38,7 +38,6 @@ export function PhonePairing({
   const [qr, setQr] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const create = useMutation({
-    meta: { quiet: true },
     mutationFn: async () =>
       unwrap(await supabase.rpc("create_pairing", { p_test_id: testId })) as unknown as Created,
     onSuccess: async (c) => {
@@ -95,6 +94,9 @@ export function PhonePairing({
     return () => clearTimeout(timer);
   }, [created]);
   const expired = !!created && expiredFor === created.pairing_id && !pairing.data?.claimed_at;
+  useEffect(() => {
+    if (expired) toast.error("This code has expired. Make a new one.");
+  }, [expired]);
 
   if (!created) {
     return (
@@ -106,7 +108,6 @@ export function PhonePairing({
         <Button onClick={() => create.mutate()} disabled={create.isPending}>
           Connect my phone
         </Button>
-        {create.isError && <Message kind="error">{messageFrom(create.error)}</Message>}
       </div>
     );
   }
@@ -114,7 +115,8 @@ export function PhonePairing({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <div className="space-y-2">
-        {!pairing.data?.claimed_at ? (
+        {/* An expired code is not shown: the corner said so, and only "Make a new code" is left. */}
+        {expired ? null : !pairing.data?.claimed_at ? (
           <>
             {qr && (
               <img
@@ -128,7 +130,6 @@ export function PhonePairing({
               <strong>{window.location.host}/pair</strong> and type{" "}
               <strong className="font-mono tracking-widest">{created.code}</strong>.
             </p>
-            {expired && <Message kind="error">This code has expired.</Message>}
           </>
         ) : (
           <p className="text-sm">

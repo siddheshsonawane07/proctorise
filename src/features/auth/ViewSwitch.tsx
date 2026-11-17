@@ -16,7 +16,10 @@ export function ViewSwitch({ className }: { className?: string }) {
     <div
       role="group"
       aria-label="Use Proctorise as"
-      className={cx("flex rounded-xl bg-surface-muted p-1", className)}
+      className={cx(
+        "flex rounded-lg border border-border-button-default bg-surface p-0.5",
+        className,
+      )}
     >
       {(["teacher", "student"] as const).map((v) => (
         <button
@@ -28,8 +31,8 @@ export function ViewSwitch({ className }: { className?: string }) {
             navigate("/app");
           }}
           className={cx(
-            "flex-1 rounded-lg px-3 py-1.5 text-body-medium",
-            view === v ? "bg-surface text-text shadow-xs" : "text-text-muted hover:text-text",
+            "flex-1 rounded-md px-3 py-1 text-body-medium",
+            view === v ? "bg-text text-surface" : "text-text-muted hover:text-text",
           )}
         >
           {LABEL[v]}

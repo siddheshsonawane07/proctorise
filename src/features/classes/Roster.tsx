@@ -7,7 +7,7 @@ import {
   RiSearchLine,
   RiUserLine,
 } from "@remixicon/react";
-import { Button, Loading, Message } from "../../app/ui/form";
+import { Button, Loading, LoadFailed } from "../../app/ui/form";
 import { inputClass } from "../../app/ui/inputClass";
 import { toast } from "../../app/ui/toast";
 import { messageFrom } from "../../lib/errors";
@@ -53,7 +53,7 @@ export function Roster({ classId }: { classId: string }) {
   }, [roster.data, query, filter]);
 
   if (roster.isPending) return <Loading />;
-  if (roster.isError) return <Message kind="error">{messageFrom(roster.error)}</Message>;
+  if (roster.isError) return <LoadFailed retry={roster.refetch} />;
   if (roster.data.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-8 text-center">
@@ -348,7 +348,7 @@ function StudentPanel({
         </button>
       </div>
       {report.isPending && <Loading />}
-      {report.isError && <Message kind="error">{messageFrom(report.error)}</Message>}
+      {report.isError && <LoadFailed retry={report.refetch} />}
       {report.data && (
         <>
           <dl className="mt-4 grid grid-cols-3 gap-3">
@@ -382,7 +382,7 @@ function StudentPanel({
                 </div>
                 <div className="flex items-center gap-3">
                   {Number(r.high_flags) > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-high/10 px-1.5 py-0.5 text-caption-1-semibold text-high">
+                    <span className="marker inline-flex items-center gap-1 text-caption-1-semibold">
                       <RiFlagLine aria-hidden className="size-3.5" />
                       {Number(r.high_flags)} high
                     </span>

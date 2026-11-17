@@ -1,9 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
 import type { Database } from "../../lib/database.types";
-import { Button, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Field, Loading, LoadFailed } from "../../app/ui/form";
 import { Confirm } from "../../app/ui/Confirm";
 import { unwrap, useDeleteClass, useTransferClass } from "../classes/api";
 
@@ -20,14 +19,14 @@ export function Classes() {
 
   return (
     <div>
-      <h1 className="text-title-1-bold tracking-tight text-text">Classes</h1>
+      <h1 className="text-page text-text">Classes</h1>
       <p className="mt-1 text-text-muted">
         Every class on the site. You can't open a class or its tests from here; you can give it to
         another teacher, or delete it.
       </p>
       <div className="mt-6">
         {classes.isPending && <Loading />}
-        {classes.isError && <Message kind="error">{messageFrom(classes.error)}</Message>}
+        {classes.isError && <LoadFailed retry={classes.refetch} />}
         {classes.data?.length === 0 && <p className="text-text-muted">No classes yet.</p>}
         <ul className="space-y-3">
           {classes.data?.map((c) => (

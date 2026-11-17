@@ -8,7 +8,7 @@ import { Link } from "react-router";
 export function Privacy() {
   return (
     <article className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-3xl font-semibold">Privacy</h1>
+      <h1 className="text-page text-text">Privacy</h1>
       <p className="text-text-muted">Last changed 17 November 2026.</p>
 
       <Section title="What is captured during a proctored test">

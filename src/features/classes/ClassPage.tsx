@@ -1,12 +1,11 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { RiAddLine } from "@remixicon/react";
-import { Button, Card, Field, Loading, Message, TextArea } from "../../app/ui/form";
+import { Button, Card, Field, Loading, LoadFailed, TextArea } from "../../app/ui/form";
 import { buttonClass } from "../../app/ui/buttonClass";
 import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
 import { toast } from "../../app/ui/toast";
-import { messageFrom } from "../../lib/errors";
 import { formatWhen, testWindow } from "../../lib/time";
 import {
   useTeachingClasses,
@@ -34,7 +33,6 @@ import { Roster } from "./Roster";
 import { DeleteTest } from "./DeleteTest";
 import { Tabs } from "../../app/ui/Tabs";
 import { useTab } from "../../app/ui/useTab";
-import { ClassArt } from "./ClassArt";
 import { ClassCode } from "./ClassCode";
 import { TestState } from "./TestState";
 import { testState } from "./stateOfTest";
@@ -47,7 +45,7 @@ export function ClassPage() {
   const teaching = useTeachingClasses(isTeacher(profile));
 
   if (cls.isPending || (isTeacher(profile) && teaching.isPending)) return <Loading />;
-  if (cls.isError) return <Message kind="error">{messageFrom(cls.error)}</Message>;
+  if (cls.isError) return <LoadFailed retry={cls.refetch} />;
   if (!cls.data) {
     return <Notice title="Class not found">It doesn't exist, or you're not in it.</Notice>;
   }
@@ -153,13 +151,11 @@ function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }
 /** The top of a class page, in the class's colour. */
 function Banner({ cls, children }: { cls: ClassRow; children?: ReactNode }) {
   return (
-    <div
-      className={`${classBand(cls.id)} relative overflow-hidden rounded-2xl px-5 py-7 text-white sm:px-7`}
-    >
-      <ClassArt classId={cls.id} />
-      <div className="relative">
-        <h1 className="text-title-1-bold tracking-tight text-white">{cls.name}</h1>
-        {cls.description && <p className="mt-1 max-w-2xl text-white">{cls.description}</p>}
+    <div className="flex gap-4">
+      <span aria-hidden className={`${classBand(cls.id)} w-1.5 shrink-0 rounded-sm`} />
+      <div className="min-w-0 py-1">
+        <h1 className="text-page text-text">{cls.name}</h1>
+        {cls.description && <p className="mt-1 max-w-2xl text-text-muted">{cls.description}</p>}
         {children}
       </div>
     </div>
@@ -177,10 +173,10 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
   return (
     <div className="space-y-5">
       <Banner cls={cls}>
-        <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <ClassCode code={cls.join_code} onBand />
-          {!cls.join_open && <span className="text-white">Joining is closed</span>}
-          {cls.archived_at && <span className="text-white">Archived</span>}
+        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <ClassCode code={cls.join_code} />
+          {!cls.join_open && <span className="text-text-muted">Joining is closed</span>}
+          {cls.archived_at && <span className="text-text-muted">Archived</span>}
         </p>
       </Banner>
       <Tabs label="Class" tabs={TABS} tab={tab} onChange={setTab} />
@@ -232,11 +228,13 @@ function TeacherTests({ classId }: { classId: string }) {
           class.
         </p>
       )}
-      <ul className="space-y-3">
-        {tests.data?.map((test) => (
-          <TeacherTest key={test.id} test={test} />
-        ))}
-      </ul>
+      {!!tests.data?.length && (
+        <ul className="divide-y divide-border rounded-2xl border border-border">
+          {tests.data.map((test) => (
+            <TeacherTest key={test.id} test={test} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -246,10 +244,13 @@ function TeacherTest({ test }: { test: TestRow }) {
   const copy = useDuplicateTest(test.class_id);
   const navigate = useNavigate();
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-xs">
+    <li className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
       <div className="min-w-0">
         <p className="flex flex-wrap items-center gap-2">
-          <Link to={`/app/tests/${test.id}/edit`} className="text-body-semibold text-accent">
+          <Link
+            to={`/app/tests/${test.id}/edit`}
+            className="text-headline-semibold text-text no-underline hover:underline"
+          >
             {test.title}
           </Link>
           <TestState test={test} />
@@ -260,7 +261,7 @@ function TeacherTest({ test }: { test: TestRow }) {
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {testState(test) === "Open now" && (
-          <Link to={`/app/tests/${test.id}/live`} className={buttonClass("plain")}>
+          <Link to={`/app/tests/${test.id}/live`} className={buttonClass("primary")}>
             Watch live
           </Link>
         )}

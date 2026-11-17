@@ -15,10 +15,10 @@ import {
   type CardTest,
   type JoinResult,
 } from "../../features/classes/api";
-import { ClassArt } from "../../features/classes/ClassArt";
 import { ClassCode } from "../../features/classes/ClassCode";
 import { classBand } from "../../features/classes/colour";
 import { formatWhen, testWindow } from "../../lib/time";
+import { cx } from "@/utils/cx";
 import { buttonClass } from "../ui/buttonClass";
 import { Dialog } from "../ui/Dialog";
 import { Button, Field, Loading, TextArea } from "../ui/form";
@@ -54,7 +54,7 @@ export function AppHome() {
 function PageHead({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h1 className="text-title-1-bold tracking-tight text-text">{title}</h1>
+      <h1 className="text-page text-text">{title}</h1>
       {children}
     </div>
   );
@@ -129,38 +129,49 @@ function testLine(tests: CardTest[]): string {
   return tests.length === 0 ? "No tests yet" : "No tests coming up";
 }
 
-function ClassCard({
+/**
+ * One class in the register: its colour as the spine of a booklet, its name, one line about its
+ * tests, and on the right what a teacher reaches for (the count, the code). The whole row opens
+ * the class; the copy button sits above that link.
+ */
+function ClassRow({
   id,
   name,
   note,
   children,
-  footer,
+  aside,
 }: {
   id: string;
   name: string;
   note?: string | undefined;
   children: ReactNode;
-  footer?: ReactNode;
+  aside?: ReactNode;
 }) {
   return (
-    <li className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xs transition-shadow hover:shadow-md">
-      <Link
-        to={`/app/classes/${id}`}
-        className={`${classBand(id)} relative flex h-28 flex-col justify-end overflow-hidden px-4 py-3 text-white no-underline hover:underline focus-visible:outline-offset-[-3px] focus-visible:outline-white`}
-      >
-        <ClassArt classId={id} />
-        <span className="relative line-clamp-2 text-headline-semibold">{name}</span>
-        {note && <span className="relative text-caption-1-regular text-white">{note}</span>}
-      </Link>
-      <div className="flex-1 space-y-1 px-4 py-3 text-body-regular text-text">{children}</div>
-      {footer && (
-        <div className="border-t border-border px-4 py-1.5 text-body-regular">{footer}</div>
-      )}
+    <li className="relative flex hover:bg-surface-muted">
+      <span aria-hidden className={cx("my-3 ml-3 w-1.5 shrink-0 rounded-sm", classBand(id))} />
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-8 gap-y-2 px-4 py-4">
+        <div className="min-w-0 flex-1 basis-72">
+          <Link
+            to={`/app/classes/${id}`}
+            className="text-title-3-semibold text-text no-underline after:absolute after:inset-0 hover:underline"
+          >
+            {name}
+          </Link>
+          {note && <span className="ml-2 text-body-regular text-text-muted">{note}</span>}
+          <div className="mt-0.5 space-y-0.5 text-body-regular text-text-muted">{children}</div>
+        </div>
+        {aside && (
+          <div className="relative flex flex-wrap items-center gap-x-8 gap-y-1 text-body-regular">
+            {aside}
+          </div>
+        )}
+      </div>
     </li>
   );
 }
 
-const GRID = "grid gap-4 sm:grid-cols-2 xl:grid-cols-3";
+const REGISTER = "divide-y divide-border overflow-hidden rounded-2xl border border-border";
 
 function TeacherHome() {
   const classes = useTeachingClasses(true);
@@ -168,16 +179,20 @@ function TeacherHome() {
   const current = classes.data?.filter((c) => !c.archived_at) ?? [];
   const archived = classes.data?.filter((c) => c.archived_at) ?? [];
   const card = (c: (typeof current)[number]) => (
-    <ClassCard
+    <ClassRow
       key={c.id}
       id={c.id}
       name={c.name}
       note={c.kind === "co_teacher" ? "Co-teacher" : undefined}
-      footer={<ClassCode code={c.join_code} />}
+      aside={
+        <>
+          <span className="w-24 text-text tabular-nums">{count(c.students, "student")}</span>
+          <ClassCode code={c.join_code} />
+        </>
+      }
     >
-      <p>{count(c.students, "student")}</p>
-      <p className="text-text-muted">{testLine(c.tests)}</p>
-    </ClassCard>
+      <p>{testLine(c.tests)}</p>
+    </ClassRow>
   );
 
   return (
@@ -199,13 +214,13 @@ function TeacherHome() {
             Create a class, then give its code to your students so they can join.
           </Empty>
         )}
-        <ul className={GRID}>{current.map(card)}</ul>
+        {current.length > 0 && <ul className={REGISTER}>{current.map(card)}</ul>}
         {archived.length > 0 && (
           <details>
             <summary className="cursor-pointer text-body-medium text-text-muted">
               Archived classes ({archived.length})
             </summary>
-            <ul className={`${GRID} mt-4`}>{archived.map(card)}</ul>
+            <ul className={`${REGISTER} mt-4`}>{archived.map(card)}</ul>
           </details>
         )}
       </div>
@@ -300,7 +315,7 @@ function StudentHome({ teacher }: { teacher: boolean }) {
         {todo.length > 0 && (
           <section
             aria-labelledby="open-now"
-            className="rounded-2xl border border-accent/40 bg-surface p-5 shadow-xs"
+            className="rounded-2xl border border-border border-l-4 border-l-accent bg-surface px-5 py-4"
           >
             <h2 id="open-now" className="text-headline-semibold text-text">
               Open now
@@ -332,14 +347,16 @@ function StudentHome({ teacher }: { teacher: boolean }) {
             Ask your teacher for the class code, then choose Join class.
           </Empty>
         )}
-        <ul className={GRID}>
-          {classes.data?.map((c) => (
-            <ClassCard key={c.id} id={c.id} name={c.name}>
-              {c.description && <p className="line-clamp-2">{c.description}</p>}
-              <p className="text-text-muted">{testLine(c.tests)}</p>
-            </ClassCard>
-          ))}
-        </ul>
+        {!!classes.data?.length && (
+          <ul className={REGISTER}>
+            {classes.data.map((c) => (
+              <ClassRow key={c.id} id={c.id} name={c.name}>
+                {c.description && <p className="line-clamp-1">{c.description}</p>}
+                <p>{testLine(c.tests)}</p>
+              </ClassRow>
+            ))}
+          </ul>
+        )}
       </div>
       {joining && <JoinClass onClose={() => setJoining(false)} />}
     </div>

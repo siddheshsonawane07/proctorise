@@ -2,7 +2,7 @@ import { useState, type ButtonHTMLAttributes, type FormEvent, type ReactNode } f
 import { Link, useNavigate, useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { RiAddLine, RiArrowDownLine, RiArrowLeftLine, RiArrowUpLine } from "@remixicon/react";
-import { Button, Card, Field, Loading, Message, Select, TextArea } from "../../app/ui/form";
+import { Button, Card, Field, Loading, LoadFailed, Select, TextArea } from "../../app/ui/form";
 import { inputClass } from "../../app/ui/inputClass";
 import { buttonClass } from "../../app/ui/buttonClass";
 import { Tabs, TabPanel } from "../../app/ui/Tabs";
@@ -10,7 +10,6 @@ import { useTab } from "../../app/ui/useTab";
 import { toast } from "../../app/ui/toast";
 import { Confirm } from "../../app/ui/Confirm";
 import { Notice } from "../../app/ui/Notice";
-import { messageFrom } from "../../lib/errors";
 import { MAX_LIVE_STUDENTS } from "../../lib/limits";
 import { formatWhen, fromLocalInput, toLocalInput } from "../../lib/time";
 import { useBank, type BankQuestion } from "../bank/api";
@@ -47,7 +46,7 @@ export function Builder() {
   const { testId = "" } = useParams();
   const test = useTest(testId);
   if (test.isPending) return <Loading />;
-  if (test.isError) return <Message kind="error">{messageFrom(test.error)}</Message>;
+  if (test.isError) return <LoadFailed retry={test.refetch} />;
   if (!test.data)
     return <Notice title="Test not found">It doesn't exist, or it isn't yours.</Notice>;
   return test.data.status === "draft" ? (
@@ -69,7 +68,7 @@ function Header({ test }: { test: TestRow }) {
       </Link>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h1 className="text-title-1-bold tracking-tight text-text">{test.title}</h1>
+          <h1 className="text-page text-text">{test.title}</h1>
           <TestState test={test} />
         </div>
         <Link to={`/app/tests/${test.id}/preview`} className={buttonClass("plain")}>

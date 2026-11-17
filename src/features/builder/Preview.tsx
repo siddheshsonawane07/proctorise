@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-import { Loading, Message } from "../../app/ui/form";
+import { LoadFailed, Loading, Message } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
-import { messageFrom } from "../../lib/errors";
 import type { Json } from "../../lib/database.types";
 import { QuestionView } from "../questions/QuestionView";
 import { useDraftQuestions, usePublishedItems, useTest } from "./api";
@@ -18,7 +17,7 @@ export function Preview() {
   const [answers, setAnswers] = useState<Record<string, Json>>({});
 
   if (test.isPending || (test.data && items.isPending)) return <Loading />;
-  if (test.isError) return <Message kind="error">{messageFrom(test.error)}</Message>;
+  if (test.isError) return <LoadFailed retry={test.refetch} />;
   if (!test.data) return <Message kind="error">Test not found.</Message>;
 
   return (
@@ -29,7 +28,7 @@ export function Preview() {
           Back to the test
         </Link>
       </p>
-      <h1 className="text-2xl font-semibold">{test.data.title}</h1>
+      <h1 className="text-page text-text">{test.data.title}</h1>
       {test.data.instructions && <Markdown>{test.data.instructions}</Markdown>}
       <ol className="space-y-8">
         {(items.data ?? []).map((item, i) => (

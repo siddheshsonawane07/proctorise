@@ -1,5 +1,4 @@
-import { Button, Loading, Message } from "../../app/ui/form";
-import { messageFrom } from "../../lib/errors";
+import { Button, Loading, LoadFailed } from "../../app/ui/form";
 import { EVENT_LABEL } from "../proctoring/labels";
 import { useDismissKind, useFlags, useReview } from "./api";
 
@@ -13,7 +12,7 @@ export function Flags({ attemptId }: { attemptId: string }) {
   const dismissKind = useDismissKind();
 
   if (flags.isPending) return <Loading />;
-  if (flags.isError) return <Message kind="error">{messageFrom(flags.error)}</Message>;
+  if (flags.isError) return <LoadFailed retry={flags.refetch} />;
   if (flags.data.length === 0)
     return <p className="text-sm text-text-muted">Nothing was flagged.</p>;
 

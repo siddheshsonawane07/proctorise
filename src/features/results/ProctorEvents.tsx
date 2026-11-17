@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Loading, Message } from "../../app/ui/form";
+import { Loading, LoadFailed } from "../../app/ui/form";
 import { unwrap } from "../classes/api";
 import { EVENT_LABEL as LABEL } from "../proctoring/labels";
 
@@ -30,7 +29,7 @@ export function ProctorEvents({ attemptId }: { attemptId: string }) {
   });
 
   if (events.isPending) return <Loading />;
-  if (events.isError) return <Message kind="error">{messageFrom(events.error)}</Message>;
+  if (events.isError) return <LoadFailed retry={events.refetch} />;
   if (events.data.length === 0)
     return <p className="text-sm text-text-muted">Nothing was flagged.</p>;
   return (

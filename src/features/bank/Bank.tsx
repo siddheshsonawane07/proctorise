@@ -1,9 +1,8 @@
 import { useState, type ChangeEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
 import { RiAddLine, RiCheckLine } from "@remixicon/react";
-import { Button, Card, Field, Loading, Message } from "../../app/ui/form";
+import { Button, Card, Field, Loading, LoadFailed } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import { unwrap } from "../classes/api";
 import { QuestionEditor } from "./QuestionEditor";
@@ -36,7 +35,7 @@ export function Bank() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-title-1-bold tracking-tight text-text">Question bank</h1>
+        <h1 className="text-page text-text">Question bank</h1>
         <div className="flex flex-wrap gap-2">
           <Button variant="plain" aria-expanded={bulk === true} onClick={() => setBulk(!bulk)}>
             Add many at once
@@ -56,7 +55,7 @@ export function Bank() {
       )}
       {bulk && <AddQuestions />}
       {bank.isPending && <Loading />}
-      {bank.isError && <Message kind="error">{messageFrom(bank.error)}</Message>}
+      {bank.isError && <LoadFailed retry={bank.refetch} />}
       {bank.data && bank.data.length > 0 && (
         <section aria-labelledby="your-questions" className="space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-3">

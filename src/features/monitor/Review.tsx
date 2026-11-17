@@ -1,6 +1,5 @@
 import { Link, useParams } from "react-router";
-import { Button, Card, Loading, Message } from "../../app/ui/form";
-import { messageFrom } from "../../lib/errors";
+import { Button, Card, Loading, LoadFailed } from "../../app/ui/form";
 import { useTest } from "../builder/api";
 import { Flags } from "./Flags";
 import { useOverview, useSetIntegrity } from "./api";
@@ -23,7 +22,7 @@ export function Review() {
   const setIntegrity = useSetIntegrity();
 
   if (overview.isPending || test.isPending) return <Loading />;
-  if (overview.isError) return <Message kind="error">{messageFrom(overview.error)}</Message>;
+  if (overview.isError) return <LoadFailed retry={overview.refetch} />;
   const flagged = overview.data
     .filter((r) => r.warn_count + r.high_count > 0)
     .sort((a, b) => b.high_count - a.high_count || b.unreviewed - a.unreviewed);
@@ -34,7 +33,7 @@ export function Review() {
         <Link to={`/app/tests/${testId}/edit`} className="text-sm text-accent underline">
           Back to the test
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold">Review flags: {test.data?.title}</h1>
+        <h1 className="mt-1 text-page text-text">Review flags: {test.data?.title}</h1>
         <p className="text-text-muted">
           A flag is something the software noticed, not proof. Look at each one before you decide.
         </p>

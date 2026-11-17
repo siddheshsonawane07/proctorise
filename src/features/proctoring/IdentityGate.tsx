@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
-import { Button, Card, Loading, Message } from "../../app/ui/form";
+import { Button, Card, Loading } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { useSession } from "../auth/session";
 import { bestMatch, embed, imageFrom, MATCH_THRESHOLD, type Embedding } from "./identity";
 import { Liveness } from "./Liveness";
@@ -27,7 +28,6 @@ export function IdentityGate({
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const [tries, setTries] = useState(0);
   const [stage, setStage] = useState<"liveness" | "matching" | "retry">("liveness");
-  const [error, setError] = useState<string | null>(null);
 
   async function match() {
     if (!video || !userId) return;
@@ -66,7 +66,7 @@ export function IdentityGate({
     if (used >= TRIES) {
       onDone({ passed: false, score, reference });
     } else {
-      setError(message);
+      toast.error(message);
       setStage("retry");
     }
   }
@@ -91,7 +91,6 @@ export function IdentityGate({
       {stage === "matching" && <Loading />}
       {stage === "retry" && (
         <>
-          {error && <Message kind="error">{error}</Message>}
           <p className="text-sm text-text-muted">
             Try {tries + 1} of {TRIES}. After that you go on to the test, and your teacher checks.
           </p>

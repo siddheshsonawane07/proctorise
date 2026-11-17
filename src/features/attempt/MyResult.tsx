@@ -1,7 +1,6 @@
 import { Link, useParams } from "react-router";
-import { Card, Loading, Message } from "../../app/ui/form";
+import { Card, Loading, LoadFailed } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
-import { messageFrom } from "../../lib/errors";
 import { describeAnswer } from "../questions/describe";
 import { useMyResult } from "./api";
 
@@ -9,12 +8,12 @@ export function MyResult() {
   const { attemptId = "" } = useParams();
   const result = useMyResult(attemptId);
   if (result.isPending) return <Loading />;
-  if (result.isError) return <Message kind="error">{messageFrom(result.error)}</Message>;
+  if (result.isError) return <LoadFailed retry={result.refetch} />;
   const r = result.data;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-page text-text">
         {r.status === "auto_submitted"
           ? "Submitted when time ran out"
           : r.status === "terminated"

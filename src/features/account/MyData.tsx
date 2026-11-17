@@ -34,7 +34,7 @@ export function MyData() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Your data</h1>
+      <h1 className="text-page text-text">Your data</h1>
       <Card title="Download">
         <p className="text-text-muted">
           Your profile, classes, attempts, answers and every event recorded during your tests, as

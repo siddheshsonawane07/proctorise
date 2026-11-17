@@ -19,7 +19,7 @@ export function ForgotPassword() {
 
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xs sm:mt-6 sm:p-8">
-      <h1 className="text-2xl font-semibold">Reset your password</h1>
+      <h1 className="text-page text-text">Reset your password</h1>
       {done ? (
         <p className="mt-3 text-text-muted">
           If an account uses that email, we've sent it a link to set a new password.

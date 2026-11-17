@@ -3,7 +3,8 @@ import { Link } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
-import { Button, Card, Loading, Message } from "../../app/ui/form";
+import { Button, Card, Loading } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { useSession } from "../auth/session";
 import { unwrap } from "../classes/api";
 import { CONSENT_VERSION, embed } from "./identity";
@@ -22,13 +23,18 @@ export function Enrolment() {
   const queryClient = useQueryClient();
   const [stage, setStage] = useState<Stage>("consent");
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const userId = state.status === "ready" ? state.session?.user.id : undefined;
+
+  function fail(message: string) {
+    toast.error(message);
+    setFailed(true);
+  }
 
   async function capture() {
     if (!video || !userId) return;
     setStage("saving");
-    setError(null);
+    setFailed(false);
     try {
       const face = await embed(video);
       if (face === "no_face")
@@ -53,8 +59,9 @@ export function Enrolment() {
       );
       await queryClient.invalidateQueries({ queryKey: ["enrolment"] });
       setStage("done");
+      toast.ok("Your photo is saved. You're ready for tests that check identity.");
     } catch (e) {
-      setError(messageFrom(e));
+      fail(messageFrom(e));
       setStage("liveness");
     }
   }
@@ -63,7 +70,7 @@ export function Enrolment() {
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Your photo for tests</h1>
+      <h1 className="text-page text-text">Your photo for tests</h1>
       {stage === "consent" && (
         <Card title="Before we take it">
           {enrolment.data && (
@@ -94,12 +101,9 @@ export function Enrolment() {
         <Card title="Look at the camera">
           {camera.state.status === "asking" && <Loading />}
           {camera.state.status === "refused" && (
-            <>
-              <Message kind="error">{camera.state.message}</Message>
-              <Button variant="plain" onClick={() => void camera.ask()}>
-                Try again
-              </Button>
-            </>
+            <Button variant="plain" onClick={() => void camera.ask()}>
+              Try again
+            </Button>
           )}
           {camera.state.status === "on" && (
             <>
@@ -112,32 +116,24 @@ export function Enrolment() {
               {stage === "liveness" && (
                 <Liveness
                   video={video}
-                  onDone={(passed) => (passed ? void capture() : setError("The check timed out."))}
+                  onDone={(passed) => (passed ? void capture() : fail("The check timed out."))}
                 />
               )}
               {stage === "saving" && <Loading />}
-              {error && (
-                <>
-                  <Message kind="error">{error}</Message>
-                  <Button
-                    variant="plain"
-                    onClick={() => {
-                      setError(null);
-                      setStage("camera");
-                    }}
-                  >
-                    Try again
-                  </Button>
-                </>
+              {failed && (
+                <Button
+                  variant="plain"
+                  onClick={() => {
+                    setFailed(false);
+                    setStage("camera");
+                  }}
+                >
+                  Try again
+                </Button>
               )}
             </>
           )}
         </Card>
-      )}
-      {stage === "done" && (
-        <Message kind="ok">
-          Your photo is saved. You're ready for tests that check identity.
-        </Message>
       )}
       <Link to="/app" className="inline-block text-accent underline">
         Back to your classes

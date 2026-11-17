@@ -12,7 +12,7 @@ export function Toaster() {
     <div
       role="region"
       aria-label="Notifications"
-      className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-end gap-2 sm:left-auto sm:w-96 print:hidden"
+      className="pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col items-end gap-2 sm:left-auto sm:w-96 print:hidden"
     >
       {toasts.map((t) => (
         <ToastCard key={t.id} toast={t} />

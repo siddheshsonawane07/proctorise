@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { supabase } from "../../lib/supabase";
-import { Button, Card, Message } from "../../app/ui/form";
+import { Button, Card } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { needsCamera, type Proctoring } from "../builder/proctoring";
 import { Detector } from "./detector";
 import { hasSecondDisplay } from "./integrity";
@@ -48,6 +49,11 @@ export function SystemCheck({
   const enrolment = useEnrolment();
   const [screen, setScreen] = useState<MediaStream | null>(null);
   const [screenError, setScreenError] = useState<string | null>(null);
+  // The reason shows in the checklist row while it holds, and once in the corner.
+  function screenFailed(message: string) {
+    toast.error(message);
+    setScreenError(message);
+  }
   const [network, setNetwork] = useState<number | null>(null);
   const [faces, setFaces] = useState<number | null>(null);
   const [engine, setEngine] = useState<"loading" | "ok" | "slow" | "failed">("loading");
@@ -118,13 +124,13 @@ export function SystemCheck({
       const surface = s.getVideoTracks()[0]?.getSettings().displaySurface;
       if (surface && surface !== "monitor") {
         s.getTracks().forEach((t) => t.stop());
-        setScreenError("Share your entire screen, not a window or a tab.");
+        screenFailed("Share your entire screen, not a window or a tab.");
         return;
       }
       screenRef.current = s;
       setScreen(s);
     } catch {
-      setScreenError("Screen sharing was cancelled. The test needs it.");
+      screenFailed("Screen sharing was cancelled. The test needs it.");
     }
   }
 
@@ -313,7 +319,6 @@ export function SystemCheck({
           Add your photo
         </Link>
       )}
-      {screenError && <Message kind="error">{screenError}</Message>}
     </Card>
   );
 }

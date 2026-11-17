@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { messageFrom } from "../../lib/errors";
-import { Card, Loading, Message } from "../../app/ui/form";
+import { Card, Loading, LoadFailed } from "../../app/ui/form";
 import { unwrap } from "../classes/api";
 
 type Usage = {
@@ -25,11 +24,11 @@ export function Usage() {
     queryFn: async () => unwrap(await supabase.rpc("admin_usage")) as unknown as Usage,
   });
   if (usage.isPending) return <Loading />;
-  if (usage.isError) return <Message kind="error">{messageFrom(usage.error)}</Message>;
+  if (usage.isError) return <LoadFailed retry={usage.refetch} />;
   const u = usage.data;
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Usage</h1>
+      <h1 className="text-page text-text">Usage</h1>
       <div className="grid gap-4 md:grid-cols-2">
         <Meter title="Database" used={u.database_bytes} limit={LIMITS.database} />
         <Meter

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { toast } from "../../app/ui/toast";
 
 export type CameraState =
   | { status: "idle" }
@@ -29,15 +30,14 @@ export function useCamera(audio: boolean) {
       setState({ status: "on", stream: s });
     } catch (error) {
       const name = error instanceof DOMException ? error.name : "";
-      setState({
-        status: "refused",
-        message:
-          name === "NotAllowedError"
-            ? "The browser was not allowed to use the camera. Allow it in the address bar, then try again."
-            : name === "NotFoundError"
-              ? "No camera was found. Connect one, then try again."
-              : "The camera could not start. Close other apps that use it, then try again.",
-      });
+      const message =
+        name === "NotAllowedError"
+          ? "The browser was not allowed to use the camera. Allow it in the address bar, then try again."
+          : name === "NotFoundError"
+            ? "No camera was found. Connect one, then try again."
+            : "The camera could not start. Close other apps that use it, then try again.";
+      toast.error(message);
+      setState({ status: "refused", message });
     }
   }
 

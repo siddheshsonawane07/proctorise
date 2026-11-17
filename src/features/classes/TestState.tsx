@@ -2,7 +2,7 @@ import type { TestRow } from "./api";
 import { testState, type State } from "./stateOfTest";
 
 const LOOK: Partial<Record<State, string>> = {
-  "Open now": "bg-accent/10 text-accent",
+  "Open now": "bg-ok/10 text-ok",
   Scheduled: "bg-info/10 text-info",
 };
 

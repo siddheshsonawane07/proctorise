@@ -7,13 +7,13 @@
  */
 
 .art {
-  --art-wall: #eef1f3;
+  --art-wall: #f0f2f5;
   --art-wall2: #dde2e6;
   --art-window: #f8fafb;
   --art-panel: #ffffff;
   --art-line: #d4d9de;
-  --art-ink: #23272c;
-  --art-muted: #5f6770;
+  --art-ink: #141b2d;
+  --art-muted: #586174;
   --art-on: #ffffff;
   --art-screen: #ffffff;
   --art-screen-dark: #2c3a45;
@@ -22,8 +22,8 @@
   --art-desk: #e3d3bf;
   --art-keycap: #5b636c;
   --art-trousers: #39424c;
-  --art-ok: #13897f;
-  --art-ok-soft: #e3f3f1;
+  --art-ok: #1f4fb4;
+  --art-ok-soft: #e4ecfa;
   --art-warn: #e09a26;
   --art-high: #d6453b;
   --art-skin1: #f3cfb0;
@@ -35,7 +35,7 @@
   --art-hair1: #2b2420;
   --art-hair2: #6a4529;
   --art-hair3: #1d1a18;
-  --art-shirt1: #2f8f86;
+  --art-shirt1: #3b63c4;
   --art-shirt2: #e0a53f;
   --art-shirt3: #4f6f8f;
   --art-shadow: rgb(15 23 30 / 0.1);
@@ -58,8 +58,8 @@
     --art-desk: #5b4a3a;
     --art-keycap: #3d454c;
     --art-trousers: #2a3138;
-    --art-ok: #2bb3a6;
-    --art-ok-soft: #17332f;
+    --art-ok: #8db0f2;
+    --art-ok-soft: #1b2741;
     --art-warn: #e8b453;
     --art-high: #f2867e;
     --art-shadow: rgb(0 0 0 / 0.35);

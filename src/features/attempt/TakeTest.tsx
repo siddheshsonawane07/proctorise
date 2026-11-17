@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { Button, Card, Loading, Message } from "../../app/ui/form";
+import { toast } from "../../app/ui/toast";
 import { Markdown } from "../../app/ui/Markdown";
 import { Notice } from "../../app/ui/Notice";
-import { messageFrom } from "../../lib/errors";
 import type { Json } from "../../lib/database.types";
 import { formatRemaining, formatWhen } from "../../lib/time";
 import { useTest } from "../builder/api";
@@ -86,7 +86,7 @@ export function TakeTest() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold">{t.title}</h1>
+      <h1 className="text-page text-text">{t.title}</h1>
       {t.instructions && <Markdown>{t.instructions}</Markdown>}
       <Card title="Before you start">
         <ul className="list-disc space-y-1 pl-5 text-text-muted">
@@ -143,7 +143,6 @@ export function TakeTest() {
         </>
       )}
 
-      {start.isError && <Message kind="error">{messageFrom(start.error)}</Message>}
       {open ? (
         <Button onClick={begin} disabled={start.isPending || !canGo}>
           Continue the test
@@ -204,6 +203,9 @@ function TestScreen({
   }, [answers]);
   const [index, setIndex] = useState(0);
   const [save, setSave] = useState<SaveState>({ kind: "saved" });
+  useEffect(() => {
+    if (save.kind === "refused") toast.error(save.message);
+  }, [save]);
   const [confirming, setConfirming] = useState(false);
   const [flagged, setFlagged] = useState<Set<string>>(() => loadFlags(payload.attempt_id));
   // Server time minus local time, so the countdown follows the server's clock (Phase-4-Critic #1).
@@ -334,7 +336,6 @@ function TestScreen({
           {formatRemaining(remaining)}
         </p>
       </div>
-      {save.kind === "refused" && <Message kind="error">{save.message}</Message>}
       {live.viewing && (
         <p role="status" className="rounded-md border border-info p-3 text-sm">
           Your teacher is viewing your camera right now.
@@ -488,7 +489,6 @@ function TestScreen({
           </ul>
         </aside>
       </div>
-      {submit.isError && <Message kind="error">{messageFrom(submit.error)}</Message>}
     </div>
   );
 }
