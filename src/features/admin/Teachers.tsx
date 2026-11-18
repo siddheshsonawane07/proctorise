@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -39,12 +40,14 @@ export function Teachers() {
 
   return (
     <div>
-      <h1 className="text-page text-text">Teachers</h1>
-      <div
-        role="tablist"
-        aria-label="Teacher status"
-        className="mt-4 flex gap-1 overflow-x-auto border-b border-border"
-      >
+      <Stage
+        set="sky"
+        back={{ to: "/app", label: "Admin" }}
+        title="Teachers"
+        turn="Who may make tests."
+        className="mb-6"
+      />
+      <div role="tablist" aria-label="Teacher status" className="flex gap-1 overflow-x-auto pb-1">
         {TABS.map((t) => (
           <button
             key={t.status}
@@ -52,10 +55,10 @@ export function Teachers() {
             type="button"
             aria-selected={tab === t.status}
             onClick={() => setTab(t.status)}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-body-medium whitespace-nowrap ${
+            className={`rounded-full px-4 py-1.5 text-body-medium whitespace-nowrap ${
               tab === t.status
-                ? "border-accent text-accent"
-                : "border-transparent text-text-muted hover:text-text"
+                ? "bg-ink text-[#fbf8f2] dark:bg-[#efe9de] dark:text-ink"
+                : "text-text-muted hover:bg-surface-muted hover:text-text"
             }`}
           >
             {t.label}

@@ -187,7 +187,7 @@ export function QuestionEditor({
             {(Object.keys(TYPE_LABEL) as QuestionType[]).map((type) => (
               <label
                 key={type}
-                className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-body-regular text-text has-checked:border-accent has-checked:bg-accent/10 has-checked:text-accent has-focus-visible:outline-2 has-focus-visible:outline-accent"
+                className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-body-regular text-text has-checked:border-accent has-checked:bg-sky/25 has-checked:text-accent has-focus-visible:outline-2 has-focus-visible:outline-accent"
               >
                 <input
                   type="radio"

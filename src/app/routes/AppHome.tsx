@@ -17,13 +17,14 @@ import {
   type JoinResult,
 } from "../../features/classes/api";
 import { ClassCode } from "../../features/classes/ClassCode";
-import { classBand } from "../../features/classes/colour";
+import { classSet, setClass } from "../../features/classes/colour";
 import { formatWhen, testWindow } from "../../lib/time";
 import { cx } from "@/utils/cx";
 import { buttonClass } from "../ui/buttonClass";
 import { Dialog } from "../ui/Dialog";
 import { Button, Field, Loading, TextArea } from "../ui/form";
 import { toast } from "../ui/toast";
+import { Stage } from "../ui/Stage";
 
 const JOIN_REASONS: Record<Exclude<JoinResult, { joined: true }>["reason"], string> = {
   no_match: "That code didn't match an open class. Check it with your teacher.",
@@ -52,23 +53,18 @@ export function AppHome() {
   );
 }
 
-function PageHead({ title, children }: { title: string; children?: ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <h1 className="text-page text-text">{title}</h1>
-      {children}
-    </div>
-  );
+/** The sidebar holds the switch on a wide screen; on a narrow one it is on the wall. */
+function Switching() {
+  return <ViewSwitch className="mt-5 max-w-xs lg:hidden" />;
 }
 
-/** The sidebar holds the switch on a wide screen; on a narrow one it is here. */
-function Switching({ children }: { children: string }) {
-  return (
-    <div className="mt-2 space-y-3">
-      <p className="text-text-muted">{children}</p>
-      <ViewSwitch className="max-w-xs lg:hidden" />
-    </div>
-  );
+/** "No tests open", "One test open", "3 tests open": the italic line on the wall. */
+function openLine(tests: CardTest[]): string {
+  const n = tests.filter(
+    (t) => t.status === "published" && testWindow(t.opens_at, t.closes_at) === "open",
+  ).length;
+  if (n === 0) return "Nothing open right now.";
+  return n === 1 ? "One test open right now." : `${n} tests open right now.`;
 }
 
 const ADMIN_PAGES = [
@@ -89,26 +85,43 @@ const ADMIN_PAGES = [
   },
 ];
 
+const ADMIN_SETS = ["sky", "sage", "mustard"] as const;
+
 function AdminHome() {
   return (
-    <div className="space-y-6">
-      <PageHead title="Admin" />
-      <p className="text-text-muted">
-        This is the admin account. It looks after the site and doesn't teach or take tests; use a
-        separate account for those.
-      </p>
-      <div className="grid gap-4 md:grid-cols-3">
-        {ADMIN_PAGES.map((page) => (
-          <Link
+    <div>
+      <Stage
+        set="ink"
+        title="Admin"
+        turn="Looks after the site."
+        notes={["doesn't teach or take tests", "use a separate account for those"]}
+        prop="papers"
+      />
+      <ul className={REGISTER}>
+        {ADMIN_PAGES.map((page, i) => (
+          <li
             key={page.to}
-            to={page.to}
-            className="rounded-2xl border border-border-table bg-background-primary-default p-5 no-underline shadow-xs hover:border-accent"
+            className="relative flex items-center gap-5 py-5 hover:bg-surface-muted"
           >
-            <span className="text-headline-semibold text-accent">{page.title}</span>
-            <span className="mt-1 block text-body-regular text-text-muted">{page.text}</span>
-          </Link>
+            <span
+              aria-hidden
+              className={cx(
+                "size-12 shrink-0 rounded-2xl bg-[var(--wall)]",
+                setClass(ADMIN_SETS[i]!),
+              )}
+            />
+            <div className="min-w-0">
+              <Link
+                to={page.to}
+                className="font-display text-title-2-bold tracking-[-0.02em] text-text no-underline after:absolute after:inset-0 hover:underline"
+              >
+                {page.title}
+              </Link>
+              <p className="text-body-regular text-text-muted">{page.text}</p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
@@ -131,9 +144,9 @@ function testLine(tests: CardTest[]): string {
 }
 
 /**
- * One class in the register: its colour as the spine of a booklet, its name, one line about its
- * tests, and on the right what a teacher reaches for (the count, the code). The whole row opens
- * the class; the copy button sits above that link.
+ * One class in the register: a swatch of its set with its initial, its name in the grotesk, one
+ * line about its tests, and on the right what a teacher reaches for (the count, the code). The
+ * whole row opens the class; the copy button sits above that link.
  */
 function ClassRow({
   id,
@@ -149,13 +162,21 @@ function ClassRow({
   aside?: ReactNode;
 }) {
   return (
-    <li className="relative flex hover:bg-surface-muted">
-      <span aria-hidden className={cx("my-3 ml-3 w-1.5 shrink-0 rounded-sm", classBand(id))} />
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-8 gap-y-2 px-4 py-4">
+    <li className="relative flex items-center hover:bg-surface-muted">
+      <span
+        aria-hidden
+        className={cx(
+          "grid size-14 shrink-0 place-items-center rounded-2xl bg-[var(--wall)] font-display text-[1.5rem] font-extrabold on-wall",
+          setClass(classSet(id)),
+        )}
+      >
+        {name.trim()[0]?.toUpperCase()}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-8 gap-y-2 py-5 pl-5">
         <div className="min-w-0 flex-1 basis-72">
           <Link
             to={`/app/classes/${id}`}
-            className="text-title-3-semibold text-text no-underline after:absolute after:inset-0 hover:underline"
+            className="font-display text-title-2-bold tracking-[-0.02em] text-text no-underline after:absolute after:inset-0 hover:underline"
           >
             {name}
           </Link>
@@ -172,7 +193,7 @@ function ClassRow({
   );
 }
 
-const REGISTER = "divide-y divide-border overflow-hidden rounded-2xl border border-border";
+const REGISTER = "divide-y divide-border border-y border-border";
 
 function TeacherHome() {
   const classes = useTeachingClasses(true);
@@ -198,17 +219,24 @@ function TeacherHome() {
 
   return (
     <div>
-      <PageHead title="Classes">
-        <Button onClick={() => setCreating(true)}>
-          <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
-          Create class
-        </Button>
-      </PageHead>
-      <Switching>
-        You're using Proctorise as a teacher. To take a test in someone else's class, switch to
-        Student.
-      </Switching>
-      <div className="mt-6 space-y-6">
+      <Stage
+        title="Classes"
+        turn={classes.data ? openLine(current.flatMap((c) => c.tests)) : undefined}
+        notes={[
+          "you're using Proctorise as a teacher",
+          "to take a test in someone else's class, switch to Student",
+        ]}
+        prop="lamp"
+        actions={
+          <Button onClick={() => setCreating(true)}>
+            <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
+            Create class
+          </Button>
+        }
+      >
+        <Switching />
+      </Stage>
+      <div className="space-y-6">
         {classes.isPending && <Loading />}
         {classes.data?.length === 0 && (
           <Empty title="Classes you teach will appear here.">
@@ -291,36 +319,53 @@ function StudentHome({ teacher }: { teacher: boolean }) {
 
   return (
     <div>
-      <PageHead title="Classes">
-        <Button onClick={() => setJoining(true)}>
-          <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
-          Join class
-        </Button>
-      </PageHead>
-      {teacher && (
-        <Switching>
-          You're using Proctorise as a student. To run your own classes and tests, switch to
-          Teacher.
-        </Switching>
-      )}
-      <div className="mt-6 space-y-6">
+      <Stage
+        set="sky"
+        title="Classes"
+        turn={
+          todo.length === 0
+            ? "Nothing to sit right now."
+            : todo.length === 1
+              ? "One test is open for you."
+              : `${todo.length} tests are open for you.`
+        }
+        notes={
+          teacher
+            ? [
+                "you're using Proctorise as a student",
+                "to run your own classes and tests, switch to Teacher",
+              ]
+            : ["your teacher gives you a class code", "join with it, then your tests appear here"]
+        }
+        prop="plant"
+        actions={
+          <Button onClick={() => setJoining(true)}>
+            <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
+            Join class
+          </Button>
+        }
+      >
+        {teacher && <Switching />}
+      </Stage>
+      <div className="space-y-8">
         {todo.length > 0 && (
           <section
             aria-labelledby="open-now"
-            className="rounded-2xl border border-border border-l-4 border-l-accent bg-surface px-5 py-4"
+            className="set-mustard rounded-3xl bg-mustard px-6 py-5 on-wall"
           >
-            <h2 id="open-now" className="text-headline-semibold text-text">
+            <h2 id="open-now" className="font-display text-title-2-bold tracking-[-0.02em]">
               Open now
+              <span aria-hidden className="stage-dot" />
             </h2>
-            <ul className="mt-2 divide-y divide-border">
+            <ul className="mt-2 divide-y divide-black/15">
               {todo.map(({ test, className, going, again }) => (
                 <li
                   key={test.id}
                   className="flex flex-wrap items-center justify-between gap-3 py-3"
                 >
                   <div>
-                    <p className="text-body-medium text-text">{test.title}</p>
-                    <p className="text-body-regular text-text-muted">
+                    <p className="text-headline-semibold">{test.title}</p>
+                    <p className="text-body-regular on-wall-muted">
                       {className}. {test.duration_min} minutes, closes {formatWhen(test.closes_at)}
                     </p>
                   </div>

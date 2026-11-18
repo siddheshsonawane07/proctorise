@@ -1,10 +1,17 @@
 import { Link } from "react-router";
+import { Stage } from "../ui/Stage";
 
 /** One page each, for teachers and for students (PHASE_8 § 8.3, step 12). */
 export function HelpTeachers() {
   return (
-    <article className="mx-auto max-w-2xl space-y-5">
-      <h1 className="text-page text-text">For teachers</h1>
+    <article className="mx-auto max-w-2xl space-y-8">
+      <Stage
+        set="cobalt"
+        title="For teachers"
+        turn="From a class to a fair result."
+        notes={["the software notices; you decide"]}
+        prop="lamp"
+      />
       <Step n={1} title="Get teacher access">
         Create an account, then use <em>Ask for teacher access</em> on your home page. The site's
         admin approves it.
@@ -48,8 +55,14 @@ export function HelpTeachers() {
 
 export function HelpStudents() {
   return (
-    <article className="mx-auto max-w-2xl space-y-5">
-      <h1 className="text-page text-text">For students</h1>
+    <article className="mx-auto max-w-2xl space-y-8">
+      <Stage
+        set="sky"
+        title="For students"
+        turn="What to expect on the day."
+        notes={["a flag is never a fail; your teacher looks at each one"]}
+        prop="plant"
+      />
       <Step n={1} title="Before the test day">
         On <em>Classes</em>, choose <em>Join class</em> and type the code from your teacher. If your
         test checks it's you, take your photo under <em>Your photo</em>. You can leave a class from
@@ -91,8 +104,9 @@ export function HelpStudents() {
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="text-lg font-semibold">
-        {n}. {title}
+      <h2 className="section-title flex items-baseline gap-3 text-text">
+        <span className="font-serif text-[1.75rem] font-normal italic">{n}.</span>
+        {title}
       </h2>
       <p className="mt-1 text-text-muted">{children}</p>
     </section>

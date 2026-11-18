@@ -144,7 +144,7 @@ function Choice({
         "relative flex items-center gap-4 rounded-xl border px-4 py-3.5 text-headline-regular text-text",
         "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent",
         checked
-          ? "border-accent bg-accent/8"
+          ? "border-accent bg-sky/20"
           : "border-border-button-default hover:border-text-muted/60 hover:bg-surface-muted",
       )}
     >

@@ -727,7 +727,7 @@ const PREVIEW = [
 ] as const;
 
 const TONE = {
-  ok: "bg-accent/10 text-accent",
+  ok: "bg-sky/25 text-accent",
   warn: "bg-warn/10 text-warn",
   high: "bg-high/10 text-high",
   done: "bg-surface-muted text-text-muted",

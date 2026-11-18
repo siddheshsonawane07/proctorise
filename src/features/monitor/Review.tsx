@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router";
-import { BackLink } from "../../app/ui/BackLink";
+import { Stage } from "../../app/ui/Stage";
 import { Button, Card, Loading, LoadFailed } from "../../app/ui/form";
 import { useTest } from "../builder/api";
 import { Flags } from "./Flags";
@@ -30,13 +30,24 @@ export function Review() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
-        <h1 className="mt-1 text-page text-text">Review flags: {test.data?.title}</h1>
-        <p className="text-text-muted">
-          A flag is something the software noticed, not proof. Look at each one before you decide.
-        </p>
-      </div>
+      <Stage
+        set="mustard"
+        back={{ to: `/app/tests/${testId}/edit`, label: "Back to the test" }}
+        title={`Review flags: ${test.data?.title ?? ""}`}
+        turn={
+          flagged.length === 0
+            ? "Nothing to look at."
+            : flagged.length === 1
+              ? "One attempt to look at."
+              : `${flagged.length} attempts to look at.`
+        }
+        notes={[
+          "a flag is something the software noticed, not proof",
+          "look at each one before you decide",
+        ]}
+        prop="lamp"
+        className="mb-6"
+      />
       {flagged.length === 0 && <p className="text-text-muted">No attempt has any flags.</p>}
       {flagged.map((r) => (
         <Card key={r.attempt_id} title={r.full_name || "Student"}>

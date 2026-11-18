@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -19,12 +20,18 @@ export function Classes() {
 
   return (
     <div>
-      <h1 className="text-page text-text">Classes</h1>
-      <p className="mt-1 text-text-muted">
-        Every class on the site. You can't open a class or its tests from here; you can give it to
-        another teacher, or delete it.
-      </p>
-      <div className="mt-6">
+      <Stage
+        set="sage"
+        back={{ to: "/app", label: "Admin" }}
+        title="Classes"
+        turn="Every class on the site."
+        notes={[
+          "you can't open a class or its tests from here",
+          "you can give it to another teacher, or delete it",
+        ]}
+        className="mb-6"
+      />
+      <div>
         {classes.isPending && <Loading />}
         {classes.isError && <LoadFailed retry={classes.refetch} />}
         {classes.data?.length === 0 && <p className="text-text-muted">No classes yet.</p>}

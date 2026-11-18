@@ -7,7 +7,7 @@ export function buttonClass(variant: "primary" | "plain" = "primary", className?
     buttonStyles.base,
     buttonStyles.size.medium,
     buttonStyles.variant[variant === "primary" ? "primary" : "secondary"],
-    "px-3 no-underline",
+    "px-4 no-underline",
     className,
   );
 }

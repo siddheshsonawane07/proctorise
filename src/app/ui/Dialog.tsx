@@ -44,7 +44,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-40 grid place-items-center bg-[#141b2d]/40 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-40 grid place-items-center bg-ink/45 p-4 backdrop-blur-[2px]"
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
       <div
@@ -54,16 +54,20 @@ export function Dialog({
         aria-labelledby={titleId}
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className="w-full max-w-md space-y-5 rounded-2xl border border-border bg-surface p-6 shadow-xl focus:outline-none"
+        className="w-full max-w-md space-y-5 rounded-3xl bg-surface p-7 shadow-xl focus:outline-none"
       >
         <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-title-2-semibold tracking-tight text-text">
+          <h2
+            id={titleId}
+            className="font-display text-[1.625rem] leading-tight font-bold tracking-[-0.025em] text-text"
+          >
             {title}
+            <span aria-hidden className="stage-dot" />
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-muted hover:text-text"
+            className="grid size-8 shrink-0 place-items-center rounded-full text-text-muted hover:bg-surface-muted hover:text-text"
           >
             <RiCloseLine aria-hidden className="size-5" />
             <span className="sr-only">Close</span>

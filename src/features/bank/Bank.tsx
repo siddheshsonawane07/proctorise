@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useState, type ChangeEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -34,22 +35,25 @@ export function Bank() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-page text-text">Question bank</h1>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="plain" aria-expanded={bulk === true} onClick={() => setBulk(!bulk)}>
-            Add many at once
-          </Button>
-          <Button onClick={() => setEditing("new")}>
-            <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
-            New question
-          </Button>
-        </div>
-      </div>
-      <p className="text-text-muted">
-        Your questions, for any of your tests. Changing one here never changes a test that is
-        already published.
-      </p>
+      <Stage
+        set="sage"
+        title="Question bank"
+        turn="Write it once, use it in any test."
+        notes={["changing a question here never changes a test that is already published"]}
+        prop="papers"
+        className="mb-6"
+        actions={
+          <>
+            <Button onClick={() => setEditing("new")}>
+              <RiAddLine aria-hidden className="mr-1 -ml-0.5 size-4" />
+              New question
+            </Button>
+            <Button variant="plain" aria-expanded={bulk === true} onClick={() => setBulk(!bulk)}>
+              Add many at once
+            </Button>
+          </>
+        }
+      />
       {editing === "new" && (
         <QuestionEditor question={null} another onDone={() => setEditing(null)} />
       )}
@@ -59,7 +63,7 @@ export function Bank() {
       {bank.data && bank.data.length > 0 && (
         <section aria-labelledby="your-questions" className="space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <h2 id="your-questions" className="text-title-3-semibold text-text">
+            <h2 id="your-questions" className="section-title text-text">
               Your questions ({bank.data.length})
             </h2>
             <div className="w-full sm:w-80">
@@ -73,7 +77,7 @@ export function Bank() {
             </div>
           </div>
           {shown.length === 0 && <p className="text-text-muted">No question matches that.</p>}
-          <ul className="divide-y divide-border rounded-2xl border border-border">
+          <ul className="divide-y divide-border border-y border-border">
             {shown.map((q) =>
               editing !== "new" && editing?.id === q.id ? (
                 <li key={q.id} className="bg-surface-muted p-3 sm:p-4">
@@ -179,7 +183,7 @@ function AddQuestions() {
   return (
     <section aria-labelledby="add-questions" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="add-questions" className="text-title-3-semibold text-text">
+        <h2 id="add-questions" className="section-title text-text">
           Add questions in bulk
         </h2>
         <div className="flex rounded-xl bg-surface-muted p-1" role="group" aria-label="How to add">

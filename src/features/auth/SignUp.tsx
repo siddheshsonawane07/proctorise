@@ -6,6 +6,7 @@ import { Button, Field, Loading } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
 import { GoogleButton } from "./GoogleButton";
+import { AuthSet } from "./AuthSet";
 
 export function SignUp() {
   const state = useSession();
@@ -38,23 +39,23 @@ export function SignUp() {
 
   if (sentTo) {
     return (
-      <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
-        <h1 className="text-page text-text">Check your email</h1>
-        <p className="mt-3 text-text-muted">
+      <AuthSet set="pink" title="Check your email" turn="One more step.">
+        <p className="text-text-muted">
           We sent a link to <strong className="text-text">{sentTo}</strong>. Open it to finish
           creating your account.
         </p>
-      </div>
+      </AuthSet>
     );
   }
 
   return (
-    <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
-      <h1 className="text-page text-text">Create an account</h1>
-      <p className="mt-2 text-sm text-text-muted">
-        Everyone starts as a student. Teachers ask for teacher access after signing up.
-      </p>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <AuthSet
+      set="cobalt"
+      title="Create an account"
+      turn="Everyone starts as a student."
+      notes={["teachers ask for teacher access after signing up"]}
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Your name" name="full_name" autoComplete="name" required maxLength={120} />
         <Field label="Email" name="email" type="email" autoComplete="email" required />
         <Field
@@ -81,6 +82,6 @@ export function SignUp() {
           Sign in
         </Link>
       </p>
-    </div>
+    </AuthSet>
   );
 }

@@ -6,6 +6,7 @@ import { Button, Field, Loading } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
 import { GoogleButton } from "./GoogleButton";
+import { AuthSet } from "./AuthSet";
 
 export function SignIn() {
   const state = useSession();
@@ -31,9 +32,13 @@ export function SignIn() {
   }
 
   return (
-    <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
-      <h1 className="text-page text-text">Sign in</h1>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <AuthSet
+      set="sky"
+      title="Sign in"
+      turn="Welcome back."
+      notes={["taking a test? sign in, then join your class with its code"]}
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Email" name="email" type="email" autoComplete="email" required />
         <Field
           label="Password"
@@ -58,6 +63,6 @@ export function SignIn() {
           Create an account
         </Link>
       </p>
-    </div>
+    </AuthSet>
   );
 }

@@ -14,11 +14,7 @@ export function Tabs<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div
-      role="tablist"
-      aria-label={label}
-      className="flex gap-1 overflow-x-auto border-b border-border"
-    >
+    <div role="tablist" aria-label={label} className="flex gap-1 overflow-x-auto pb-1">
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -26,10 +22,10 @@ export function Tabs<T extends string>({
           type="button"
           aria-selected={tab === t.id}
           onClick={() => onChange(t.id)}
-          className={`-mb-px border-b-2 px-4 py-2.5 text-body-medium whitespace-nowrap ${
+          className={`rounded-full px-4 py-1.5 text-body-medium whitespace-nowrap ${
             tab === t.id
-              ? "border-accent text-accent"
-              : "border-transparent text-text-muted hover:text-text"
+              ? "bg-ink text-[#fbf8f2] dark:bg-[#efe9de] dark:text-ink"
+              : "text-text-muted hover:bg-surface-muted hover:text-text"
           }`}
         >
           {t.label}
@@ -53,12 +49,12 @@ export function TabPanel({
   children: ReactNode;
 }) {
   return (
-    // The tabs' own underline is the first section's rule; a second one would double it.
+    // The first section sits right under the pills; its rule would only separate it from them.
     <div
       role="tabpanel"
       aria-label={label}
       hidden={!show}
-      className="space-y-8 pt-2 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0"
+      className="space-y-10 pt-6 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0"
     >
       {children}
     </div>

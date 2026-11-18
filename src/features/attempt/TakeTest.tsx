@@ -25,6 +25,7 @@ import {
   type AttemptPayload,
 } from "./api";
 import { SaveQueue, type SaveState } from "./saveQueue";
+import { Stage } from "../../app/ui/Stage";
 
 type ProctorDevices = CheckedDevices & { identity: IdentityResult | null };
 
@@ -86,7 +87,12 @@ export function TakeTest() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className="text-page text-text">{t.title}</h1>
+      <Stage
+        title={t.title}
+        turn="Take a breath. Then begin."
+        prop="clock"
+        className="-mt-6 mb-6"
+      />
       {t.instructions && <Markdown>{t.instructions}</Markdown>}
       <Card title="Before you start">
         <ul className="list-disc space-y-1 pl-5 text-text-muted">
@@ -321,15 +327,19 @@ function TestScreen({
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface/95 px-4 py-3 shadow-xs backdrop-blur">
-        <h1 className="text-headline-semibold text-text">{payload.title}</h1>
+      <div className="sticky top-2 z-10 flex flex-wrap items-center justify-between gap-3 rounded-full border border-border bg-surface/95 py-2 pr-2 pl-5 backdrop-blur">
+        <h1 className="font-display text-title-3-bold tracking-[-0.015em] text-text">
+          {payload.title}
+        </h1>
         <p role="status" aria-live="polite" className="text-caption-1-regular text-text-muted">
           {SAVE_TEXT[save.kind]}
           {status && ` · ${statusText(status)}`}
         </p>
         <p
-          className={`rounded-full px-3 py-1 font-mono text-headline-semibold tabular-nums ${
-            remaining < 60_000 ? "bg-high/10 text-high" : "bg-surface-muted text-text"
+          className={`rounded-full px-4 py-1.5 font-mono text-headline-semibold tabular-nums ${
+            remaining < 60_000
+              ? "bg-tomato text-ink"
+              : "bg-ink text-[#fbf8f2] dark:bg-[#efe9de] dark:text-ink"
           }`}
           aria-label={`Time left: ${formatRemaining(remaining)}`}
         >
@@ -349,7 +359,7 @@ function TestScreen({
           className="fixed inset-0 z-50 flex items-center justify-center bg-surface/95 p-6"
         >
           <div className="max-w-md space-y-4 text-center">
-            <h2 id="teacher-message" className="text-xl font-semibold">
+            <h2 id="teacher-message" className="section-title">
               A message from your teacher
             </h2>
             <p>{teacherMessage}</p>
@@ -393,7 +403,8 @@ function TestScreen({
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_18rem]">
         <div className="space-y-4">
-          <section className="rounded-2xl border border-border bg-surface p-6 shadow-xs">
+          {/* The question on a white sheet laid on the warm paper: the calmest thing on screen. */}
+          <section className="rounded-3xl border border-border bg-white p-6 sm:p-8 dark:bg-surface-muted">
             <QuestionView
               item={item}
               number={index + 1}
@@ -437,7 +448,7 @@ function TestScreen({
             )}
           </div>
         </div>
-        <aside className="space-y-4 rounded-2xl border border-border bg-surface p-4 shadow-xs lg:sticky lg:top-24">
+        <aside className="space-y-4 rounded-3xl bg-surface-muted p-5 lg:sticky lg:top-24">
           <div>
             <p className="text-caption-1-semibold text-text-muted">
               {items.filter((it) => !isBlank(answers[it.id])).length} of {items.length} answered
@@ -604,7 +615,7 @@ function Cover({
       className="fixed inset-0 z-50 flex items-center justify-center bg-surface p-6"
     >
       <div className="max-w-md space-y-4 text-center">
-        <h2 id="cover-title" className="text-xl font-semibold">
+        <h2 id="cover-title" className="section-title">
           {title}
         </h2>
         <p className="text-text-muted">{text}</p>

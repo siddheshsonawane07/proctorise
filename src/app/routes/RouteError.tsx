@@ -5,7 +5,9 @@ export function RouteError() {
   const detail = isRouteErrorResponse(error) ? `${error.status} ${error.statusText}` : null;
   return (
     <main className="mx-auto max-w-md p-8">
-      <h1 className="text-xl font-semibold">Something went wrong</h1>
+      <h1 className="font-display text-[2rem] leading-none font-extrabold tracking-[-0.03em]">
+        Something went wrong
+      </h1>
       <p className="mt-2 text-text-muted">
         Reload the page to try again. If you were taking a test, your saved answers are safe.
       </p>

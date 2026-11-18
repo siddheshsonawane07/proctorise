@@ -1,5 +1,5 @@
+import { Stage } from "../../app/ui/Stage";
 import { useState } from "react";
-import { BackLink } from "../../app/ui/BackLink";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { messageFrom } from "../../lib/errors";
@@ -69,73 +69,82 @@ export function Enrolment() {
   if (enrolment.isPending) return <Loading />;
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
-      <h1 className="text-page text-text">Your photo for tests</h1>
-      {stage === "consent" && (
-        <Card title="Before we take it">
-          {enrolment.data && (
-            <p className="text-text-muted">
-              You already have a photo on file. Taking a new one replaces it.
-            </p>
-          )}
-          <ul className="list-disc space-y-1 pl-5 text-text-muted">
-            <li>Tests that check identity compare your face with this photo.</li>
-            <li>Your teachers can see the photo. No one else can.</li>
-            <li>It is kept until you replace it or delete your account.</li>
-            <li>
-              The comparison happens in your browser. A failed match never fails a test: your
-              teacher checks.
-            </li>
-          </ul>
-          <Button
-            onClick={() => {
-              setStage("camera");
-              void camera.ask();
-            }}
-          >
-            I agree, start the camera
-          </Button>
-        </Card>
-      )}
-      {stage !== "consent" && stage !== "done" && (
-        <Card title="Look at the camera">
-          {camera.state.status === "asking" && <Loading />}
-          {camera.state.status === "refused" && (
-            <Button variant="plain" onClick={() => void camera.ask()}>
-              Try again
+    <div className="space-y-6">
+      <Stage
+        set="pink"
+        back={{ to: "/app", label: "Back to your classes" }}
+        title="Your photo for tests"
+        turn="So a test knows it's you."
+        notes={["taken once, compared in the browser at the start of a test"]}
+        prop="lamp"
+        className="mb-6"
+      />
+      <div className="max-w-xl space-y-6">
+        {stage === "consent" && (
+          <Card title="Before we take it">
+            {enrolment.data && (
+              <p className="text-text-muted">
+                You already have a photo on file. Taking a new one replaces it.
+              </p>
+            )}
+            <ul className="list-disc space-y-1 pl-5 text-text-muted">
+              <li>Tests that check identity compare your face with this photo.</li>
+              <li>Your teachers can see the photo. No one else can.</li>
+              <li>It is kept until you replace it or delete your account.</li>
+              <li>
+                The comparison happens in your browser. A failed match never fails a test: your
+                teacher checks.
+              </li>
+            </ul>
+            <Button
+              onClick={() => {
+                setStage("camera");
+                void camera.ask();
+              }}
+            >
+              I agree, start the camera
             </Button>
-          )}
-          {camera.state.status === "on" && (
-            <>
-              <div ref={(el) => setVideo(el?.querySelector("video") ?? null)}>
-                <Preview stream={camera.state.stream} />
-              </div>
-              {stage === "camera" && (
-                <Button onClick={() => setStage("liveness")}>I'm ready</Button>
-              )}
-              {stage === "liveness" && (
-                <Liveness
-                  video={video}
-                  onDone={(passed) => (passed ? void capture() : fail("The check timed out."))}
-                />
-              )}
-              {stage === "saving" && <Loading />}
-              {failed && (
-                <Button
-                  variant="plain"
-                  onClick={() => {
-                    setFailed(false);
-                    setStage("camera");
-                  }}
-                >
-                  Try again
-                </Button>
-              )}
-            </>
-          )}
-        </Card>
-      )}
-      <BackLink to="/app">Back to your classes</BackLink>
+          </Card>
+        )}
+        {stage !== "consent" && stage !== "done" && (
+          <Card title="Look at the camera">
+            {camera.state.status === "asking" && <Loading />}
+            {camera.state.status === "refused" && (
+              <Button variant="plain" onClick={() => void camera.ask()}>
+                Try again
+              </Button>
+            )}
+            {camera.state.status === "on" && (
+              <>
+                <div ref={(el) => setVideo(el?.querySelector("video") ?? null)}>
+                  <Preview stream={camera.state.stream} />
+                </div>
+                {stage === "camera" && (
+                  <Button onClick={() => setStage("liveness")}>I'm ready</Button>
+                )}
+                {stage === "liveness" && (
+                  <Liveness
+                    video={video}
+                    onDone={(passed) => (passed ? void capture() : fail("The check timed out."))}
+                  />
+                )}
+                {stage === "saving" && <Loading />}
+                {failed && (
+                  <Button
+                    variant="plain"
+                    onClick={() => {
+                      setFailed(false);
+                      setStage("camera");
+                    }}
+                  >
+                    Try again
+                  </Button>
+                )}
+              </>
+            )}
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

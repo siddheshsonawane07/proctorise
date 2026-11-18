@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { Card, Loading, LoadFailed } from "../../app/ui/form";
@@ -28,7 +29,14 @@ export function Usage() {
   const u = usage.data;
   return (
     <div className="space-y-6">
-      <h1 className="text-page text-text">Usage</h1>
+      <Stage
+        set="mustard"
+        back={{ to: "/app", label: "Admin" }}
+        title="Usage"
+        turn="Against the free plan."
+        prop="clock"
+        className="mb-6"
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <Meter title="Database" used={u.database_bytes} limit={LIMITS.database} />
         <Meter
@@ -66,7 +74,7 @@ function Figure({ value, label }: { value: number; label: string }) {
   return (
     <div>
       <dt className="sr-only">{label}</dt>
-      <dd className="text-[2rem] leading-10 font-bold tracking-tight text-text tabular-nums">
+      <dd className="font-display text-[2.75rem] leading-none font-extrabold tracking-[-0.04em] text-text tabular-nums">
         {value}
       </dd>
       <dd aria-hidden className="text-caption-1-regular text-text-muted">
@@ -100,7 +108,7 @@ function Meter({
         className="h-3 overflow-hidden rounded-full bg-surface-muted"
       >
         <div
-          className={`h-full ${share > 0.8 ? "bg-high" : "bg-accent"}`}
+          className={`h-full rounded-full ${share > 0.8 ? "bg-tomato" : "bg-cobalt"}`}
           style={{ width: `${share * 100}%` }}
         />
       </div>

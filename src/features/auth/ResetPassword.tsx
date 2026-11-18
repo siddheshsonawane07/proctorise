@@ -5,6 +5,7 @@ import { messageFrom } from "../../lib/errors";
 import { Button, Field, Loading } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
 import { useSession } from "./session";
+import { AuthSet } from "./AuthSet";
 
 /** Reached from the reset email; the client has already exchanged the link for a session. */
 export function ResetPassword() {
@@ -14,15 +15,14 @@ export function ResetPassword() {
   if (state.status === "loading") return <Loading />;
   if (!state.session) {
     return (
-      <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
-        <h1 className="text-page text-text">This link has expired</h1>
-        <p className="mt-3 text-text-muted">
+      <AuthSet set="tomato" title="This link has expired">
+        <p className="text-text-muted">
           <Link to="/forgot-password" className="text-accent underline">
             Ask for a new link
           </Link>
           .
         </p>
-      </div>
+      </AuthSet>
     );
   }
 
@@ -35,9 +35,8 @@ export function ResetPassword() {
   }
 
   return (
-    <div className="sheet sheet-blank sheet-x mx-auto max-w-lg py-8 sm:mt-6">
-      <h1 className="text-page text-text">Set a new password</h1>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <AuthSet set="mustard" title="Set a new password" turn="One you'll remember.">
+      <form onSubmit={onSubmit} className="space-y-4">
         <Field
           label="New password"
           name="password"
@@ -50,6 +49,6 @@ export function ResetPassword() {
           Save password
         </Button>
       </form>
-    </div>
+    </AuthSet>
   );
 }

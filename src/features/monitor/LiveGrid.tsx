@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router";
 import { Empty } from "../../app/ui/Empty";
-import { BackLink } from "../../app/ui/BackLink";
+import { Stage } from "../../app/ui/Stage";
+import { buttonClass } from "../../app/ui/buttonClass";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -82,28 +83,33 @@ export function LiveGrid() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
-          <h1 className="mt-1 flex items-center gap-3 text-page text-text">
-            Live: {test.data?.title}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-high/10 px-2.5 py-1 text-caption-1-semibold text-high">
-              <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-high" />
+      {/* The control room: a dark wall, the one place a red light means "on air". */}
+      <Stage
+        set="ink"
+        back={{ to: `/app/tests/${testId}/edit`, label: "Back to the test" }}
+        title={`Live: ${test.data?.title ?? ""}`}
+        turn={
+          live === 0 ? "No one is taking it now." : `${live} taking it now, ${rows.length} started.`
+        }
+        notes={
+          live > MAX_LIVE_STUDENTS * 0.8
+            ? [`near the free plan's ${MAX_LIVE_STUDENTS} at once`]
+            : ["a flag is something the software noticed, not proof"]
+        }
+        prop="clock"
+        className="mb-6"
+        actions={
+          <>
+            <span className="pill gap-2 bg-tomato text-caption-1-semibold text-ink">
+              <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-ink" />
               Live
             </span>
-          </h1>
-          <p className="text-body-regular text-text-muted">
-            {live} taking it now · {rows.length} started
-            {live > MAX_LIVE_STUDENTS * 0.8 && ` · near the free plan's ${MAX_LIVE_STUDENTS}`}
-          </p>
-        </div>
-        <Link
-          to={`/app/tests/${testId}/review`}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-body-medium text-text no-underline shadow-xs hover:bg-surface-muted"
-        >
-          Review flags
-        </Link>
-      </div>
+            <Link to={`/app/tests/${testId}/review`} className={buttonClass("plain")}>
+              Review flags
+            </Link>
+          </>
+        }
+      />
       {!connected && (
         <p
           role="status"
@@ -150,7 +156,7 @@ function Tile({
   const badge = attention
     ? { text: "Needs a look", cls: "marker font-semibold" }
     : writing
-      ? { text: "Writing", cls: "bg-accent/10 text-accent" }
+      ? { text: "Writing", cls: "bg-sky/25 text-accent" }
       : { text: STATUS[row.status], cls: "bg-surface-muted text-text-muted" };
   const name = row.full_name || "Student";
   return (

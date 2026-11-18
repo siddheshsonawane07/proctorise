@@ -1,35 +1,38 @@
 /* BoardUI's theme, typography and globals (Tailwind is imported there), then ours on top. */
 @import "@fontsource-variable/atkinson-hyperlegible-next/index.css";
 @import "@fontsource-variable/atkinson-hyperlegible-mono/index.css";
+@import "@fontsource-variable/bricolage-grotesque/index.css";
+@import "@fontsource/instrument-serif/400-italic.css";
 @import "../styles/globals.css";
 
 /*
- * The look is the exam room, not a dashboard: white paper, blue-black ink, one exam-booklet blue
- * for what can be pressed, a red pen for what is serious, and a highlighter for what needs a look.
- * Structure comes from thin rules and type, not from boxes and shadows.
+ * The look is a set, after HUMAN.md (human-md.ai): every page opens on a flat, saturated wall
+ * standing on a floor, with a heavy grotesk title, one word in an italic serif, a red-orange dot,
+ * and mono captions. Below the floor line is warm paper, calm enough to work and to sit a test on.
+ * What can be pressed is a pill. Structure on the paper comes from rules and type, not boxes.
  *
- * BoardUI's accent ramp is that booklet blue (hue 221, never violet). Purple and violet are mapped
- * to cyan and indigo to blue, so no BoardUI token can show either (CLAUDE.md rule 9).
+ * BoardUI's accent ramp is cobalt (hue 228, never violet). Purple and violet are mapped to cyan
+ * and indigo to blue, so no BoardUI token can show either (CLAUDE.md rule 9).
  */
 @theme {
-  /* 400 and up carry white text (buttons, badges): #1f4fb4 is 7:1 on white. */
-  --color-accent-50: #eef3fc;
-  --color-accent-100: #dce6f8;
-  --color-accent-200: #b9cdf1;
-  --color-accent-300: #8aabe6;
-  --color-accent-400: #1f4fb4;
-  --color-accent-500: #1f4fb4;
-  --color-accent-600: #1a4398;
-  --color-accent-700: #16387f;
-  --color-accent-800: #122e68;
-  --color-accent-900: #0e2452;
-  --color-accent-950: #0a1a3b;
+  /* 400 and up carry white text (buttons, badges): #1036c8 is 8:1 on white. */
+  --color-accent-50: #eef2fd;
+  --color-accent-100: #dbe3fb;
+  --color-accent-200: #b7c6f6;
+  --color-accent-300: #8199ec;
+  --color-accent-400: #1036c8;
+  --color-accent-500: #1036c8;
+  --color-accent-600: #0d2da8;
+  --color-accent-700: #0b258a;
+  --color-accent-800: #091e6f;
+  --color-accent-900: #071855;
+  --color-accent-950: #04103b;
 
-  /* One page title everywhere; body text a step up from BoardUI's 14px, for reading questions. */
-  --text-page: 1.875rem;
-  --text-page--line-height: 2.25rem;
-  --text-page--font-weight: 700;
-  --text-page--letter-spacing: -0.015em;
+  /* One page title everywhere: the grotesk, heavy and tight, as on a HUMAN.md wall. */
+  --text-page: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  --text-page--line-height: 1;
+  --text-page--font-weight: 800;
+  --text-page--letter-spacing: -0.035em;
   --text-body-regular: 0.9375rem;
   --text-body-regular--line-height: 1.4rem;
   --text-body-medium: 0.9375rem;
@@ -39,10 +42,10 @@
   --text-body-bold: 0.9375rem;
   --text-body-bold--line-height: 1.4rem;
 
-  /* Radii by rank: a chip 4, a control 7, a panel 10. Nothing floats but dialogs and notices. */
-  --radius-2lg: 7px;
-  --radius-xl: 8px;
-  --radius-2xl: 10px;
+  /* Radii by rank: a chip 6, a field 10, a panel 14. Buttons are pills (button.tsx). */
+  --radius-2lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
   --shadow-xs: 0 0 #0000;
 
   --color-purple-50: oklch(98.4% 0.019 200.873);
@@ -86,87 +89,95 @@
 }
 
 /*
- * The app's own tokens: paper, ink, pencil, rule and desk; booklet blue; red pen; highlighter.
+ * The app's own tokens. Paper and ink for working; the set colours for walls and floors.
  * Status colours pair with an icon or word on screen, never colour alone.
  */
 @theme {
+  /* Body and questions: legible under stress, which is the subject. */
   --font-sans:
     "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
-  /* Only for what is read one character at a time: codes, the clock. */
+  /* Titles on the wall. */
+  --font-display: "Bricolage Grotesque Variable", var(--font-sans);
+  /* The one word that turns: "checked *fairly*". Never a whole sentence. */
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  /* Captions, codes and the clock. */
   --font-mono:
     "Atkinson Hyperlegible Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
-  --color-surface: #ffffff;
-  --color-surface-muted: #f5f6f8;
-  --color-border: #e2e5eb;
-  --color-text: #141b2d;
-  --color-text-muted: #586174;
+  --color-surface: #fbf8f2;
+  --color-surface-muted: #f2ece1;
+  --color-border: #e2dacb;
+  --color-text: #17181c;
+  --color-text-muted: #5f5a52;
 
-  --color-accent: #1f4fb4;
-  --color-accent-hover: #1a4398;
+  --color-accent: #1036c8;
+  --color-accent-hover: #0d2da8;
   --color-accent-text: #ffffff;
 
-  --color-info: #1f4fb4;
+  --color-info: #1036c8;
   --color-warn: #7a5300;
-  --color-high: #b4231a;
+  --color-high: #b8290f;
   --color-ok: #1c7a43;
-  /* The highlighter: behind ink text only, for "needs a look". Ink on it is 15:1. */
-  --color-highlight: #ffe45c;
-  /* Exam paper: pale blue rules and a red margin line. */
-  --color-ruling: #d2def3;
-  --color-margin: #e8968f;
+  /* The highlighter: behind ink text only, for "needs a look". Ink on it is 14:1. */
+  --color-highlight: #ffd84a;
+
+  /* The set colours, flat and saturated. Same in both colour schemes: a lit stage. */
+  --color-cobalt: #1036c8;
+  --color-sky: #6aa5d4;
+  --color-sage: #b3c585;
+  --color-mustard: #e8b848;
+  --color-pink: #f5abc9;
+  --color-tomato: #f1542b;
+  --color-sand: #e4d7c1;
+  --color-terracotta: #c9603f;
+  --color-ink: #17181c;
+  /* The dot: decoration only, never text. */
+  --color-dot: #ff4b1f;
 }
 
 /* BoardUI's own words for the same things, so its parts wear the same ink and rules. */
 :root {
-  --color-text-primary: #141b2d;
-  --color-text-secondary: #586174;
-  --color-border-table: #e2e5eb;
-  --color-border-button-default: #cdd2db;
-  --color-background-secondary-default: #f5f6f8;
-  /* Buttons are flat ink-blue, not a gradient. */
-  --gradient-button-primary-default: linear-gradient(
-    var(--color-accent-500),
-    var(--color-accent-500)
-  );
-  --gradient-button-primary-hover: linear-gradient(
-    var(--color-accent-600),
-    var(--color-accent-600)
-  );
-  --gradient-button-primary-active: linear-gradient(
-    var(--color-accent-700),
-    var(--color-accent-700)
-  );
+  --color-text-primary: #17181c;
+  --color-text-secondary: #5f5a52;
+  --color-border-table: #e2dacb;
+  --color-border-button-default: #cfc6b5;
+  --color-background-secondary-default: #f2ece1;
+  /* The primary button is an ink pill, which reads on paper and on every wall. */
+  --gradient-button-primary-default: linear-gradient(#17181c, #17181c);
+  --gradient-button-primary-hover: linear-gradient(#33353c, #33353c);
+  --gradient-button-primary-active: linear-gradient(#000000, #000000);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-surface: #0f131c;
-    --color-surface-muted: #171c27;
-    --color-border: #2a3140;
-    --color-text: #e8ebf2;
-    --color-text-muted: #9aa3b5;
+    --color-surface: #141418;
+    --color-surface-muted: #1c1c21;
+    --color-border: #2e2d33;
+    --color-text: #efe9de;
+    --color-text-muted: #aaa398;
 
-    --color-accent: #8db0f2;
-    --color-accent-hover: #adc6f6;
-    --color-accent-text: #0a1a3b;
+    --color-accent: #9db2ff;
+    --color-accent-hover: #bccbff;
+    --color-accent-text: #04103b;
 
-    --color-info: #8db0f2;
+    --color-info: #9db2ff;
     --color-warn: #f0c451;
-    --color-high: #f38b82;
+    --color-high: #ff8d70;
     --color-ok: #6fd39a;
     --color-highlight: #f0c451;
-    --color-ruling: #1e2636;
-    --color-margin: #6e3b38;
   }
   :root.dark {
-    --color-text-primary: #e8ebf2;
-    --color-text-secondary: #9aa3b5;
-    --color-border-table: #2a3140;
-    --color-border-button-default: #3a4253;
-    --color-background-primary-default: #0f131c;
-    --color-background-secondary-default: #171c27;
+    --color-text-primary: #efe9de;
+    --color-text-secondary: #aaa398;
+    --color-border-table: #2e2d33;
+    --color-border-button-default: #403e46;
+    --color-background-primary-default: #141418;
+    --color-background-secondary-default: #1c1c21;
+    /* Ink would vanish on dark paper; in the dark the pill is cobalt, still carrying white. */
+    --gradient-button-primary-default: linear-gradient(#1036c8, #1036c8);
+    --gradient-button-primary-hover: linear-gradient(#2a4fe0, #2a4fe0);
+    --gradient-button-primary-active: linear-gradient(#0d2da8, #0d2da8);
   }
 }
 
@@ -189,54 +200,132 @@ body {
 }
 
 /*
- * The highlighter: a swipe of yellow behind ink, for the one thing a teacher should look at.
- * Always ink on yellow, in either colour scheme, so it reads the same as on paper.
+ * A set: what a wall is painted, what its floor is, and the ink that reads on the wall. A page
+ * names one (`set-cobalt`) and the stage, its props and the landing drawings take it from there.
+ * Ink on every light wall is 6:1 or better; paper on cobalt is 8:1.
  */
+@utility set-cobalt {
+  --wall: var(--color-cobalt);
+  --floor: var(--color-sand);
+  --on-wall: #fbf8f2;
+  --on-wall-muted: #d6defb;
+}
+@utility set-sky {
+  --wall: var(--color-sky);
+  --floor: var(--color-pink);
+  --on-wall: #17181c;
+  --on-wall-muted: #1f2a3a;
+}
+@utility set-sage {
+  --wall: var(--color-sage);
+  --floor: var(--color-terracotta);
+  --on-wall: #17181c;
+  --on-wall-muted: #2c3320;
+}
+@utility set-mustard {
+  --wall: var(--color-mustard);
+  --floor: var(--color-cobalt);
+  --on-wall: #17181c;
+  --on-wall-muted: #3d2f0e;
+}
+@utility set-pink {
+  --wall: var(--color-pink);
+  --floor: var(--color-sand);
+  --on-wall: #17181c;
+  --on-wall-muted: #46253a;
+}
+@utility set-tomato {
+  --wall: var(--color-tomato);
+  --floor: var(--color-sand);
+  --on-wall: #17181c;
+  --on-wall-muted: #3a160b;
+  --dot: #17181c;
+}
+@utility set-ink {
+  --wall: #17181c;
+  --floor: #2b2b31;
+  --on-wall: #fbf8f2;
+  --on-wall-muted: #c9c2b6;
+  --gradient-button-primary-default: linear-gradient(#1036c8, #1036c8);
+}
+
+/* Inside any set the primary pill is ink in both colour schemes, which reads on every wall. */
+@layer base {
+  :root {
+    --dot: var(--color-dot);
+  }
+  .set-cobalt,
+  .set-sky,
+  .set-sage,
+  .set-mustard,
+  .set-pink,
+  .set-tomato {
+    --gradient-button-primary-default: linear-gradient(#17181c, #17181c);
+    --gradient-button-primary-hover: linear-gradient(#33353c, #33353c);
+    --gradient-button-primary-active: linear-gradient(#000000, #000000);
+  }
+}
+
+/* The red-orange dot after a title, as in "HUMAN.md". */
+.stage-dot {
+  display: inline-block;
+  width: 0.19em;
+  height: 0.19em;
+  margin-left: 0.07em;
+  border-radius: 9999px;
+  background: var(--dot);
+}
+
 /*
- * A sheet of exam paper, for the front door only (the landing hero, signing in): ruled every 2rem,
- * a red margin line 2.75rem in. Content clears the margin with `sheet-x`. It is a sheet lying on
- * the desk, so it is the one thing in the page with a soft shadow.
+ * Paint the wall out to both edges of the window from inside a centred column, without changing
+ * the markup: a border-image that fills far past the box. The shell clips it at its own edge.
  */
-@utility sheet {
-  --sheet-margin: 2.75rem;
-  @media (width < 40rem) {
-    --sheet-margin: 1.5rem;
-  }
-  background-color: var(--color-surface);
-  background-image:
-    linear-gradient(
-      to right,
-      transparent var(--sheet-margin),
-      var(--color-margin) var(--sheet-margin),
-      var(--color-margin) calc(var(--sheet-margin) + 1.5px),
-      transparent calc(var(--sheet-margin) + 1.5px)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(2rem - 1px),
-      var(--sheet-ruling, var(--color-ruling)) calc(2rem - 1px),
-      var(--sheet-ruling, var(--color-ruling)) 2rem
-    );
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-2xl);
-  box-shadow:
-    0 1px 2px rgb(20 27 45 / 0.05),
-    0 24px 48px -24px rgb(20 27 45 / 0.25);
+@utility bleed {
+  background-color: var(--wall);
+  border-image: conic-gradient(var(--wall) 0 0) fill 0 / /0 100vw;
 }
 
-/* A cover sheet: the margin, no ruling (forms are busy enough on their own). */
-@utility sheet-blank {
-  --sheet-ruling: transparent;
+/* Text on a wall, and its quieter line. */
+@utility on-wall {
+  color: var(--on-wall);
+}
+@utility on-wall-muted {
+  color: var(--on-wall-muted);
 }
 
-@utility sheet-x {
-  padding-left: calc(var(--sheet-margin, 2.75rem) + 1.75rem);
-  padding-right: 2rem;
-  @media (width < 40rem) {
-    padding-left: calc(var(--sheet-margin, 1.5rem) + 1rem);
-    padding-right: 1.25rem;
-  }
+/*
+ * The floor the wall stands on: a band across the bottom of a stage, painted out to the edges too.
+ * Props drawn standing on it share its colour through `--floor`.
+ */
+@utility floor {
+  background-color: var(--floor);
+  border-image: conic-gradient(var(--floor) 0 0) fill 0 / /0 100vw;
+}
+
+/* A section's heading on the paper: the grotesk, a size under the wall's title. */
+@utility section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* A mono caption with a red-orange marker: "> one still picture, never a video". */
+@utility caption {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.06em;
+}
+
+/* The pill a word sits in, as HUMAN.md sets its quotes. */
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.35em 0.95em;
+  line-height: 1.15;
 }
 
 @utility marker {
@@ -246,13 +335,13 @@ body {
     var(--color-highlight) 90%,
     transparent 90%
   );
-  color: #141b2d;
+  color: #17181c;
   padding-inline: 0.3em;
   border-radius: 2px;
   box-decoration-break: clone;
 }
 
-/* A notification slides up into its corner; nothing moves for someone who asked for less motion. */
+/* A notification slides into its corner; nothing moves for someone who asked for less motion. */
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -264,8 +353,20 @@ body {
   animation: toast-in 160ms ease-out;
 }
 
+/* A stage's title rises onto the wall once. No fade: text at part opacity would read too faint. */
+@keyframes stage-in {
+  from {
+    transform: translateY(0.6rem);
+  }
+}
+
+.stage-in {
+  animation: stage-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .toast-in {
+  .toast-in,
+  .stage-in {
     animation: none;
   }
 }
@@ -305,7 +406,7 @@ body {
   }
 }
 
-/* Tick boxes and round buttons in the app's teal, a size a finger or a tired eye can find. */
+/* Tick boxes and round buttons in cobalt, a size a finger or a tired eye can find. */
 input[type="checkbox"],
 input[type="radio"] {
   width: 1.05rem;

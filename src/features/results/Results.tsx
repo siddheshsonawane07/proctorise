@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { BackLink } from "../../app/ui/BackLink";
+import { Stage } from "../../app/ui/Stage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { formatWhen } from "../../lib/time";
@@ -78,10 +78,20 @@ export function Results() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <BackLink to={`/app/tests/${testId}/edit`}>Back to the test</BackLink>
-        <h1 className="mt-1 text-page text-text">Results: {t?.title}</h1>
-      </div>
+      <Stage
+        set="sage"
+        back={{ to: `/app/tests/${testId}/edit`, label: "Back to the test" }}
+        title={`Results: ${t?.title ?? ""}`}
+        turn={
+          rows.length === 0
+            ? "No one has started yet."
+            : rows.length === 1
+              ? "One attempt so far."
+              : `${rows.length} attempts so far.`
+        }
+        prop="papers"
+        className="mb-6"
+      />
       <Card title="Releasing results">
         {t?.results_release === "manual" && !t.results_released_at && (
           <>

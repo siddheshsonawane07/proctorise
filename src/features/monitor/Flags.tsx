@@ -22,7 +22,7 @@ export function Flags({ attemptId }: { attemptId: string }) {
     <div className="space-y-3">
       {/* One list per attempt. The edge says how serious (red pen, highlighter); a flag already
           decided steps back, so what is left to judge stands out. */}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+      <ul className="divide-y divide-border border-y border-border">
         {flags.data.map((f) => {
           const seconds = f.ended_at
             ? Math.round((Date.parse(f.ended_at) - Date.parse(f.started_at)) / 1000)

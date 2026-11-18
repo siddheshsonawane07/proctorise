@@ -2,8 +2,8 @@ import type { TestRow } from "./api";
 import { testState, type State } from "./stateOfTest";
 
 const LOOK: Partial<Record<State, string>> = {
-  "Open now": "bg-ok/10 text-ok",
-  Scheduled: "bg-info/10 text-info",
+  "Open now": "bg-sage text-ink",
+  Scheduled: "bg-[#d3e4f3] text-ink",
 };
 
 /** Where a test stands, in a word. The word carries it; the colour only helps. */

@@ -911,3 +911,23 @@
     animation: none !important;
   }
 }
+
+/*
+ * A drawing inside a set takes the set's wall and floor, so each one is a little HUMAN.md stage:
+ * people at their cameras in front of a cobalt or sage wall, desks on the set's floor.
+ */
+.set-cobalt .art,
+.set-sky .art,
+.set-sage .art,
+.set-mustard .art,
+.set-pink .art,
+.set-tomato .art {
+  --art-wall: var(--wall);
+  --art-desk: var(--floor);
+}
+
+/* The hero's drawing stands straight on the cobalt wall: no backdrop of its own. */
+.hero-scene .art > rect:first-child,
+.hero-scene .art > circle:nth-of-type(-n + 2) {
+  display: none;
+}

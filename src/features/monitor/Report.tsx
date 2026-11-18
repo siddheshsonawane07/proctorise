@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -46,22 +47,25 @@ export function Report() {
 
   return (
     <article className="mx-auto max-w-3xl space-y-6 print:max-w-none">
-      <header className="space-y-1">
-        <h1 className="text-page text-text">Integrity report</h1>
-        <p>
-          {name} · {title}
-        </p>
-        <p className="text-sm text-text-muted">
-          Started {new Date(a.started_at).toLocaleString()}
-          {a.submitted_at && `, finished ${new Date(a.submitted_at).toLocaleString()}`} ·{" "}
-          {a.status.replace("_", " ")} · verdict: {a.integrity.replace("_", " ")}
-        </p>
-        <Button variant="plain" className="print:hidden" onClick={() => window.print()}>
-          Print or save as PDF
-        </Button>
-      </header>
+      <Stage
+        set="sky"
+        title="Integrity report"
+        turn={`${name} · ${title}`}
+        notes={[
+          `started ${new Date(a.started_at).toLocaleString()}${
+            a.submitted_at ? `, finished ${new Date(a.submitted_at).toLocaleString()}` : ""
+          }`,
+          `${a.status.replace("_", " ")} · verdict: ${a.integrity.replace("_", " ")}`,
+        ]}
+        className="mb-6 print:[border-image:none] print:text-ink"
+        actions={
+          <Button variant="plain" className="print:hidden" onClick={() => window.print()}>
+            Print or save as PDF
+          </Button>
+        }
+      />
       <section>
-        <h2 className="font-semibold">Flags</h2>
+        <h2 className="section-title text-text">Flags</h2>
         <table className="mt-2 w-full text-left text-sm">
           <thead className="text-text-muted">
             <tr>
@@ -89,7 +93,7 @@ export function Report() {
         </table>
       </section>
       <section>
-        <h2 className="font-semibold">Actions by teachers</h2>
+        <h2 className="section-title text-text">Actions by teachers</h2>
         {actions.length === 0 ? (
           <p className="text-sm text-text-muted">None.</p>
         ) : (

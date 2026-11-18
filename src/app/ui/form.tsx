@@ -72,10 +72,10 @@ export function Message({ kind, children }: { kind: "error" | "ok"; children: Re
     <p
       role={kind === "error" ? "alert" : "status"}
       className={cx(
-        "flex items-start gap-2 rounded-xl border p-3 text-body-regular",
+        "flex items-start gap-2 rounded-2xl border p-3 text-body-regular",
         kind === "error"
           ? "border-high/40 bg-high/5 text-high"
-          : "border-accent/30 bg-accent/5 text-text",
+          : "border-border bg-surface-muted text-text",
       )}
     >
       <Icon aria-hidden className="mt-0.5 size-4 shrink-0" />
@@ -96,12 +96,12 @@ export function LoadFailed({ retry }: { retry: () => unknown }) {
   );
 }
 
-/** A part of a page: a heading under a thin rule, like a section of an exam paper. Not a box. */
+/** A part of a page: a heading in the grotesk under a thin rule. Not a box. */
 export function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="border-t border-border pt-5">
-      <h2 className="text-title-3-semibold text-text-primary">{title}</h2>
-      <div className="mt-3 space-y-3">{children}</div>
+    <section className="border-t border-border pt-6">
+      <h2 className="section-title text-text-primary">{title}</h2>
+      <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
 }

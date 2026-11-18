@@ -11,6 +11,7 @@ import { QuestionView, type ViewItem } from "../questions/QuestionView";
 import type { Json } from "../../lib/database.types";
 import { DemoSession, type DemoState, type Signals } from "./session";
 import type { DemoEvent } from "./events";
+import { Stage } from "../../app/ui/Stage";
 
 const LIMITS = PRESET_THRESHOLDS.standard;
 
@@ -80,16 +81,21 @@ export function Demo() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-page text-text">Try the proctoring</h1>
-        <p className="mt-2 max-w-3xl text-body-regular text-text-muted">
-          The same checks a test runs, on your own camera. Everything happens in this browser tab:
-          no pictures, no sound and no events are sent or saved. Close the tab and it's gone.
-        </p>
-      </div>
+      <Stage
+        set="tomato"
+        title="Try the proctoring"
+        turn="The same checks a test runs, on your own camera."
+        notes={[
+          "everything happens in this browser tab",
+          "no pictures, no sound and no events are sent or saved",
+          "close the tab and it's gone",
+        ]}
+        prop="lamp"
+        className="mb-6"
+      />
 
       {!stream ? (
-        <section className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface-muted p-6">
+        <section className="max-w-xl space-y-4 rounded-3xl bg-surface-muted p-7">
           <p className="text-body-regular text-text">
             Turn on your camera and microphone to start. The first time, the browser downloads the
             checks (about 20 MB); after that they start at once.
@@ -192,7 +198,7 @@ function Running({
           </section>
 
           <section aria-labelledby="try" className="rounded-2xl border border-border p-5">
-            <h2 id="try" className="text-headline-semibold text-text">
+            <h2 id="try" className="section-title text-text">
               Things to try
             </h2>
             <ul className="mt-3 space-y-2">
@@ -241,7 +247,7 @@ function SignalList({ signals }: { signals: Signals }) {
   const objectLimit = Math.round(LIMITS.objectScore * 100);
   return (
     <section aria-labelledby="signals" className="rounded-2xl border border-border p-4">
-      <h2 id="signals" className="text-headline-semibold text-text">
+      <h2 id="signals" className="section-title text-text">
         What the checks see
       </h2>
       <dl className="mt-3 space-y-3">
@@ -316,7 +322,7 @@ function TeacherList({ events, onClear }: { events: DemoEvent[]; onClear: () => 
   return (
     <section aria-labelledby="teacher" className="rounded-2xl border border-border p-5">
       <div className="flex items-center justify-between gap-4">
-        <h2 id="teacher" className="text-headline-semibold text-text">
+        <h2 id="teacher" className="section-title text-text">
           What your teacher would see
         </h2>
         {events.length > 0 && (

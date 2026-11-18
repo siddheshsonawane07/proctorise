@@ -31,17 +31,20 @@ function ToastCard({ toast: t }: { toast: Toast }) {
   return (
     <div
       role={t.kind === "error" ? "alert" : "status"}
-      className="toast-in pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-border bg-surface py-3 pr-2 pl-4 shadow-lg"
+      className="toast-in pointer-events-auto flex w-full items-start gap-3 rounded-2xl bg-ink py-3 pr-2 pl-4 text-[#fbf8f2] shadow-lg dark:bg-[#efe9de] dark:text-ink"
     >
       <Icon
         aria-hidden
-        className={cx("mt-0.5 size-5 shrink-0", t.kind === "error" ? "text-high" : "text-accent")}
+        className={cx(
+          "mt-0.5 size-5 shrink-0",
+          t.kind === "error" ? "text-tomato" : "text-sage dark:text-ok",
+        )}
       />
-      <p className="min-w-0 flex-1 py-0.5 text-body-regular text-text">{t.text}</p>
+      <p className="min-w-0 flex-1 py-0.5 text-body-regular">{t.text}</p>
       <button
         type="button"
         onClick={() => toast.dismiss(t.id)}
-        className="grid size-7 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-muted hover:text-text"
+        className="grid size-7 shrink-0 place-items-center rounded-full opacity-70 hover:bg-white/10 hover:opacity-100 dark:hover:bg-black/10"
       >
         <RiCloseLine aria-hidden className="size-4" />
         <span className="sr-only">Dismiss</span>

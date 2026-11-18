@@ -1,3 +1,4 @@
+import { Stage } from "../../app/ui/Stage";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
@@ -33,8 +34,15 @@ export function MyData() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-page text-text">Your data</h1>
+    <div className="space-y-8">
+      <Stage
+        set="sage"
+        title="Your data"
+        turn="Yours to take, or to delete."
+        notes={["pictures are kept for days, not forever"]}
+        prop="papers"
+        className="mb-6"
+      />
       <Card title="Download">
         <p className="text-text-muted">
           Your profile, classes, attempts, answers and every event recorded during your tests, as

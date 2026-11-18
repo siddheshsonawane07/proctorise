@@ -157,7 +157,7 @@ export function Roster({ classId }: { classId: string }) {
       </div>
 
       {pickedShown.length > 0 && (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/30 bg-sky/15 px-4 py-2.5">
           <span className="text-body-medium text-text">{pickedShown.length} selected</span>
           <label className="flex items-center gap-2 text-body-regular">
             Extra time
@@ -240,7 +240,7 @@ export function Roster({ classId }: { classId: string }) {
               <tr
                 key={r.student_id}
                 className={cx(
-                  picked.has(r.student_id) && "bg-accent/5",
+                  picked.has(r.student_id) && "bg-sky/15",
                   r.status !== "active" && "text-text-muted",
                 )}
               >
@@ -324,7 +324,7 @@ function StudentPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-title-3-semibold text-text">{name || "Student"}</h2>
+          <h2 className="section-title text-text">{name || "Student"}</h2>
           <p className="text-body-regular text-text-muted">Every published test in this class.</p>
         </div>
         <button

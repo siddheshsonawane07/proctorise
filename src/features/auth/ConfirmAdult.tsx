@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { Button } from "../../app/ui/form";
+import { Stage } from "../../app/ui/Stage";
 
 /** Asked once of anyone who signed up without the 18+ box, e.g. with Google (ADR 005). */
 export function ConfirmAdult() {
@@ -17,9 +18,9 @@ export function ConfirmAdult() {
 
   if (under18) {
     return (
-      <div className="mx-auto max-w-md">
-        <h1 className="text-page text-text">Proctorise is for adults for now</h1>
-        <p className="mt-3 text-text-muted">
+      <div>
+        <Stage set="tomato" title="Proctorise is for adults for now" className="mb-6" />
+        <p className="max-w-xl text-text-muted">
           We can't take tests for people under 18 yet. You can delete this account by asking your
           teacher or the site's admin.
         </p>
@@ -31,12 +32,15 @@ export function ConfirmAdult() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="text-page text-text">One question before you start</h1>
-      <p className="mt-3 text-text-muted">
-        Tests here use your camera, so for now Proctorise is only for people aged 18 or older.
-      </p>
-      <div className="mt-6 flex gap-3">
+    <div>
+      <Stage
+        set="pink"
+        title="One question before you start"
+        notes={["tests here use your camera, so for now Proctorise is only for people 18 or older"]}
+        prop="plant"
+        className="mb-6"
+      />
+      <div className="flex gap-3">
         <Button onClick={() => confirm.mutate()} disabled={confirm.isPending}>
           I am 18 or older
         </Button>

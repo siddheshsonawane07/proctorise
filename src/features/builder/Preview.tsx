@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { LoadFailed, Loading, Message } from "../../app/ui/form";
 import { Markdown } from "../../app/ui/Markdown";
 import type { Json } from "../../lib/database.types";
 import { QuestionView } from "../questions/QuestionView";
+import { Stage } from "../../app/ui/Stage";
+import { classSet } from "../classes/colour";
 import { useDraftQuestions, usePublishedItems, useTest } from "./api";
 
 /** The test as a student will see it. Nothing is saved and no attempt is created. */
@@ -22,17 +24,24 @@ export function Preview() {
 
   return (
     <div className="space-y-6">
-      <p role="status" className="rounded-md border border-border bg-surface-muted p-3 text-sm">
-        Preview. Answers here are not saved, and proctoring is off.{" "}
-        <Link to={`/app/tests/${testId}/edit`} className="text-accent underline">
-          Back to the test
-        </Link>
-      </p>
-      <h1 className="text-page text-text">{test.data.title}</h1>
+      <Stage
+        set={classSet(test.data.class_id)}
+        back={{ to: `/app/tests/${testId}/edit`, label: "Back to the test" }}
+        title={test.data.title}
+        turn="As a student will see it."
+        className="mb-6"
+      >
+        <p role="status" className="caption mt-5 on-wall-muted">
+          Preview. Answers here are not saved, and proctoring is off.
+        </p>
+      </Stage>
       {test.data.instructions && <Markdown>{test.data.instructions}</Markdown>}
       <ol className="space-y-8">
         {(items.data ?? []).map((item, i) => (
-          <li key={item.id} className="rounded-lg border border-border p-5">
+          <li
+            key={item.id}
+            className="rounded-3xl border border-border bg-white p-6 dark:bg-surface-muted"
+          >
             <QuestionView
               item={item}
               number={i + 1}

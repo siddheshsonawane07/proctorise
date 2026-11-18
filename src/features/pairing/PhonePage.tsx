@@ -136,7 +136,10 @@ function CodeEntry({ onCode }: { onCode: (code: string) => void }) {
   }
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="text-page text-text">Connect your phone</h1>
+      <h1 className="font-display text-page text-text">
+        Connect your phone
+        <span aria-hidden className="stage-dot" />
+      </h1>
       <p className="text-text-muted">Type the 6-character code from your test screen.</p>
       <Field
         label="Code"
@@ -156,7 +159,10 @@ function CodeEntry({ onCode }: { onCode: (code: string) => void }) {
 function Big({ title, text }: { title: string; text?: string }) {
   return (
     <div className="space-y-2 text-center">
-      <h1 className="text-page text-text">{title}</h1>
+      <h1 className="font-display text-page text-text">
+        {title}
+        <span aria-hidden className="stage-dot" />
+      </h1>
       {text && <p className="text-text-muted">{text}</p>}
     </div>
   );

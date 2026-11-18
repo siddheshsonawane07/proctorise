@@ -83,9 +83,10 @@ const styles = sortCx({
 
   // Base shape per size (used when label is present OR medium icon-only).
   size: {
-    medium: "h-9 rounded-2lg p-2 text-body-medium",
-    small: "h-8 rounded-lg px-2 py-1.5 text-body-medium",
-    xs: "h-6 rounded-sm px-2 text-caption-1-semibold",
+    // Proctorise: every button is a pill (theme.css, after HUMAN.md).
+    medium: "h-9 rounded-full px-3.5 py-2 text-body-medium",
+    small: "h-8 rounded-full px-3 py-1.5 text-body-medium",
+    xs: "h-6 rounded-full px-2.5 text-caption-1-semibold",
   },
 
   // Icon-only override:
@@ -95,7 +96,7 @@ const styles = sortCx({
   //   Xs     → forces 24×24, content-centered — used for the calendar
   //            template's edit-icon buttons (timezone/participants/reminder).
   iconOnlySize: {
-    medium: "", // base size already produces 36×36 with a 20px icon
+    medium: "size-9 p-0", // a 36px circle around the 20px icon
     small: "size-8 p-0", // hard 32×32, content-centered
     xs: "size-6 p-0", // hard 24×24, content-centered
   },

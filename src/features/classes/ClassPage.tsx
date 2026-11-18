@@ -37,7 +37,8 @@ import { useTab } from "../../app/ui/useTab";
 import { ClassCode } from "./ClassCode";
 import { TestState } from "./TestState";
 import { testState } from "./stateOfTest";
-import { classBand } from "./colour";
+import { classSet } from "./colour";
+import { Stage } from "../../app/ui/Stage";
 
 export function ClassPage() {
   const { classId = "" } = useParams();
@@ -76,7 +77,18 @@ function StudentClass({ cls }: { cls: ClassRow }) {
 
   return (
     <div className="space-y-6">
-      <Banner cls={cls} />
+      <Banner
+        cls={cls}
+        turn={
+          tests.data
+            ? groups.open.length === 0
+              ? "Nothing open right now."
+              : groups.open.length === 1
+                ? "One test open now."
+                : `${groups.open.length} tests open now.`
+            : undefined
+        }
+      />
       {tests.isPending && <Loading />}
       {tests.data?.length === 0 && <p className="text-text-muted">No tests yet.</p>}
       <TestGroup title="Open now" tests={groups.open} />
@@ -109,7 +121,9 @@ function TestGroup({ title, tests }: { title: string; tests: TestRow[] }) {
         {tests.map((test) => (
           <li key={test.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div>
-              <p className="text-body-medium text-text">{test.title}</p>
+              <p className="font-display text-title-3-bold tracking-[-0.015em] text-text">
+                {test.title}
+              </p>
               <p className="text-body-regular text-text-muted">
                 {formatWhen(test.opens_at)} to {formatWhen(test.closes_at)}, {test.duration_min}{" "}
                 minutes
@@ -149,17 +163,28 @@ function TestAction({ test, attempts }: { test: TestRow; attempts: MyAttempt[] }
   );
 }
 
-/** The top of a class page, in the class's colour. */
-function Banner({ cls, children }: { cls: ClassRow; children?: ReactNode }) {
+/** The top of a class page: the class's own set, its name on the wall. */
+function Banner({
+  cls,
+  turn,
+  children,
+}: {
+  cls: ClassRow;
+  turn?: string | undefined;
+  children?: ReactNode;
+}) {
   return (
-    <div className="flex gap-4">
-      <span aria-hidden className={`${classBand(cls.id)} w-1.5 shrink-0 rounded-sm`} />
-      <div className="min-w-0 py-1">
-        <h1 className="text-page text-text">{cls.name}</h1>
-        {cls.description && <p className="mt-1 max-w-2xl text-text-muted">{cls.description}</p>}
-        {children}
-      </div>
-    </div>
+    <Stage
+      set={classSet(cls.id)}
+      back={{ to: "/app", label: "Classes" }}
+      title={cls.name}
+      turn={turn}
+      notes={cls.description ? [cls.description] : undefined}
+      prop="papers"
+      className="mb-6"
+    >
+      {children}
+    </Stage>
   );
 }
 
@@ -174,10 +199,14 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
   return (
     <div className="space-y-5">
       <Banner cls={cls}>
-        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+        <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1">
           <ClassCode code={cls.join_code} />
-          {!cls.join_open && <span className="text-text-muted">Joining is closed</span>}
-          {cls.archived_at && <span className="text-text-muted">Archived</span>}
+          {!cls.join_open && (
+            <span className="pill bg-[var(--on-wall)] text-[var(--wall)]">Joining is closed</span>
+          )}
+          {cls.archived_at && (
+            <span className="pill bg-[var(--on-wall)] text-[var(--wall)]">Archived</span>
+          )}
         </p>
       </Banner>
       <Tabs label="Class" tabs={TABS} tab={tab} onChange={setTab} />
@@ -186,13 +215,13 @@ function TeacherClass({ cls, owner }: { cls: ClassRow; owner: boolean }) {
         {tab === "people" && (
           <div className="space-y-8">
             <section aria-labelledby="teachers-title" className="space-y-3">
-              <h2 id="teachers-title" className="text-title-3-semibold text-text">
+              <h2 id="teachers-title" className="section-title text-text">
                 Teachers
               </h2>
               <Teachers classId={cls.id} owner={owner} />
             </section>
             <section aria-labelledby="students-title" className="space-y-3">
-              <h2 id="students-title" className="text-title-3-semibold text-text">
+              <h2 id="students-title" className="section-title text-text">
                 Students
               </h2>
               <Roster classId={cls.id} />
@@ -229,7 +258,7 @@ function TeacherTests({ classId }: { classId: string }) {
         </Empty>
       )}
       {!!tests.data?.length && (
-        <ul className="divide-y divide-border rounded-2xl border border-border">
+        <ul className="divide-y divide-border border-y border-border">
           {tests.data.map((test) => (
             <TeacherTest key={test.id} test={test} />
           ))}
@@ -244,12 +273,12 @@ function TeacherTest({ test }: { test: TestRow }) {
   const copy = useDuplicateTest(test.class_id);
   const navigate = useNavigate();
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+    <li className="flex flex-wrap items-center justify-between gap-3 py-5">
       <div className="min-w-0">
-        <p className="flex flex-wrap items-center gap-2">
+        <p className="flex flex-wrap items-center gap-2.5">
           <Link
             to={`/app/tests/${test.id}/edit`}
-            className="text-headline-semibold text-text no-underline hover:underline"
+            className="font-display text-title-3-bold tracking-[-0.015em] text-text no-underline hover:underline"
           >
             {test.title}
           </Link>
@@ -303,9 +332,9 @@ function Teachers({ classId, owner }: { classId: string; owner: boolean }) {
     <div className="space-y-4">
       {teachers.isPending && <Loading />}
       {/* The same register as the students below: one row each, the role beside the name. */}
-      <ul className="divide-y divide-border rounded-2xl border border-border">
+      <ul className="divide-y divide-border border-y border-border">
         {teachers.data?.map((t) => (
-          <li key={t.teacher_id} className="flex items-center justify-between gap-3 px-5 py-3">
+          <li key={t.teacher_id} className="flex items-center justify-between gap-3 py-3">
             <span className="text-body-medium text-text">
               {t.full_name || t.email}
               <span className="ml-2 text-body-regular text-text-muted">

@@ -151,7 +151,7 @@ export function PromptBuilder() {
             {ALL_TYPES.map((t) => (
               <label
                 key={t}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-body-regular has-checked:border-accent has-checked:bg-accent/5"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-body-regular has-checked:border-accent has-checked:bg-sky/15"
               >
                 <input
                   type="checkbox"

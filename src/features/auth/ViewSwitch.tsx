@@ -17,7 +17,7 @@ export function ViewSwitch({ className }: { className?: string }) {
       role="group"
       aria-label="Use Proctorise as"
       className={cx(
-        "flex rounded-lg border border-border-button-default bg-surface p-0.5",
+        "flex rounded-full border border-border-button-default bg-surface p-0.5",
         className,
       )}
     >
@@ -31,8 +31,8 @@ export function ViewSwitch({ className }: { className?: string }) {
             navigate("/app");
           }}
           className={cx(
-            "flex-1 rounded-md px-3 py-1 text-body-medium",
-            view === v ? "bg-text text-surface" : "text-text-muted hover:text-text",
+            "flex-1 rounded-full px-3 py-1 text-body-medium",
+            view === v ? "bg-pink text-ink" : "text-text-muted hover:text-text",
           )}
         >
           {LABEL[v]}

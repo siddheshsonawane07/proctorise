@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Stage } from "../ui/Stage";
 
 /**
  * The privacy notice (PHASE_8 § 8.1). Written from what the code captures, line by line
@@ -7,9 +8,14 @@ import { Link } from "react-router";
  */
 export function Privacy() {
   return (
-    <article className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-page text-text">Privacy</h1>
-      <p className="text-text-muted">Last changed 17 November 2026.</p>
+    <article className="mx-auto max-w-2xl space-y-8">
+      <Stage
+        set="sage"
+        title="Privacy"
+        turn="What is kept, and for how long."
+        notes={["last changed 17 November 2026"]}
+        prop="papers"
+      />
 
       <Section title="What is captured during a proctored test">
         <li>
@@ -97,7 +103,7 @@ export function Privacy() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="text-xl font-semibold">{title}</h2>
+      <h2 className="section-title text-text">{title}</h2>
       <ul className="mt-2 list-disc space-y-2 pl-5">{children}</ul>
     </section>
   );
