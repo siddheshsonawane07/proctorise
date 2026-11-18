@@ -417,23 +417,6 @@ export function Landing() {
           </Link>
         </div>
       </section>
-
-      <Wall set="mustard" className="-mb-16">
-        <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
-          <div>
-            <h2 className={H2}>What it can't do</h2>
-            <p className={TURN}>Said plainly.</p>
-            <p className="mt-6 max-w-2xl text-body-regular on-wall-muted">
-              A web page can't see a second computer out of view, block your computer's own
-              shortcuts, or stop someone helping from outside the camera's view. The phone camera
-              covers some of that. The rest is why a teacher reviews every flag.
-            </p>
-          </div>
-          <div className="overflow-hidden rounded-3xl bg-surface">
-            <Picture name="ArtBlindSpots" ratio="aspect-[8/5]" />
-          </div>
-        </div>
-      </Wall>
     </div>
   );
 }

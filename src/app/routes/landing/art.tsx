@@ -658,55 +658,6 @@ export function ArtStepReview() {
   );
 }
 
-/* ---------- What it can't do ---------- */
-
-/** Seen from above: what the webcam and the phone cover, and what neither does. */
-export function ArtBlindSpots() {
-  return (
-    <Art w={320} h={200}>
-      <rect className="a-wall" width={320} height={200} rx={16} />
-      <rect
-        className="a-panel s-muted"
-        strokeDasharray="4 5"
-        strokeWidth={1.5}
-        opacity={0.9}
-        x={222}
-        y={14}
-        width={84}
-        height={84}
-        rx={10}
-      />
-      <rect
-        className="a-device2 il-ghost"
-        opacity={0.35}
-        x={244}
-        y={36}
-        width={40}
-        height={26}
-        rx={3}
-      />
-      <text className="a-t-xs a-muted" x={264} y={84} textAnchor="middle">
-        Out of view
-      </text>
-      <polygon className="a-ok" opacity={0.16} points="150,86 98,186 202,186" />
-      <polygon className="a-ok" opacity={0.12} points="36,150 210,112 210,196" />
-      <rect className="a-desk" x={70} y={44} width={160} height={70} rx={6} />
-      <rect className="a-device" x={118} y={64} width={64} height={22} rx={3} />
-      <rect className="a-device2" x={118} y={84} width={64} height={4} rx={2} />
-      <circle className="a-ok" cx={150} cy={87} r={2.5} />
-      <ellipse className="a-shirt1" cx={150} cy={150} rx={34} ry={16} />
-      <circle className="a-hair1" cx={150} cy={146} r={14} />
-      <rect className="a-device" x={26} y={140} width={14} height={22} rx={3} />
-      <text className="a-t-xs a-muted" x={104} y={196}>
-        Webcam
-      </text>
-      <text className="a-t-xs a-muted" x={22} y={178}>
-        Phone
-      </text>
-    </Art>
-  );
-}
-
 /* ---------- The teacher's live view ---------- */
 
 const PREVIEW = [

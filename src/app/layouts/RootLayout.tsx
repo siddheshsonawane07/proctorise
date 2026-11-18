@@ -43,8 +43,13 @@ export function RootLayout() {
 
 function Shell() {
   const { pathname } = useLocation();
+  const state = useSession();
   if (pathname.startsWith("/app/take/") || pathname.startsWith("/pair")) return <FocusShell />;
   if (pathname === "/app" || pathname.startsWith("/app/")) return <AppShell />;
+  // Help is in the menu, so someone signed in reads it with the menu still there.
+  if (pathname.startsWith("/help/") && state.status === "ready" && state.session) {
+    return <AppShell />;
+  }
   return <PublicShell />;
 }
 

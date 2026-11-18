@@ -794,18 +794,6 @@
     transform: none;
   }
 }
-.art .il-ghost {
-  animation: il-ghost 2.6s ease-in-out infinite alternate;
-}
-@keyframes il-ghost {
-  from {
-    opacity: 0.15;
-  }
-  to {
-    opacity: 0.45;
-  }
-}
-
 /* The hero: face tracking, and events arriving one by one. */
 .art .il-dots {
   animation: il-blink 1.6s ease-in-out infinite alternate;

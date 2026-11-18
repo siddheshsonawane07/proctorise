@@ -35,7 +35,12 @@ export function Stage({
   return (
     <header className={cx(setClass(set), "bleed on-wall relative mb-10", className)}>
       {prop && <StageProp name={prop} />}
-      <div className={cx("relative pt-8 pb-10 lg:pt-12 lg:pb-14", prop && "md:pr-48")}>
+      <div
+        className={cx(
+          "relative pt-8 pb-10 lg:pt-12 lg:pb-14",
+          prop && "md:min-h-64 md:pr-48 lg:min-h-76",
+        )}
+      >
         {back && (
           <Link
             to={back.to}
