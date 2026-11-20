@@ -34,8 +34,9 @@ export function Privacy() {
         <li>
           <strong>Events</strong>: what was noticed and when (a face missing, another person, a
           phone in view, looking away from the screen for several seconds, talking, leaving the test
-          page or full screen, a keyboard shortcut). Looking away is worked out in your browser from
-          how your head and eyes are turned; only the event is kept, not the measurements.
+          page or full screen, leaving the test before submitting and coming back to it, a keyboard
+          shortcut). Looking away is worked out in your browser from how your head and eyes are
+          turned; only the event is kept, not the measurements.
         </li>
         <li>
           <strong>Your answers</strong>, and when you started and submitted.

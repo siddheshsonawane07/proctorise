@@ -59,6 +59,20 @@ describe("Voice", () => {
     expect(voice.isTalking()).toBe(false);
   });
 
+  it("says nothing while muted, and remembers it", () => {
+    const { voice, spoken } = setup();
+    voice.setMuted(true);
+    voice.say("Your test has started.");
+    expect(voice.warn("speech", "Please don't talk during the test.")).toBe(false);
+    expect(spoken).toHaveLength(0);
+    expect(voice.isTalking()).toBe(false);
+    expect(setup().voice.muted).toBe(true);
+    voice.setMuted(false);
+    expect(setup().voice.muted).toBe(false);
+    voice.say("Your test has started.");
+    expect(spoken).toHaveLength(1);
+  });
+
   it("does nothing where the browser has no speech", () => {
     const voice = new Voice(null);
     expect(() => voice.say("hello")).not.toThrow();

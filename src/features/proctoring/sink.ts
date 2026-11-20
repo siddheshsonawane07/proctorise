@@ -14,7 +14,8 @@ export class EventSink {
   private rows: Row[] = [];
   private updates: Update[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
-  private sending = false;
+  /** The send under way, so stop() can wait for it and then send what came in meanwhile. */
+  private sending: Promise<void> | null = null;
 
   constructor(
     private readonly intervalMs = 5_000,
@@ -41,31 +42,32 @@ export class EventSink {
     this.updates.push(update);
   }
 
-  async flush(): Promise<void> {
-    if (this.sending) return;
-    this.sending = true;
-    try {
-      if (this.rows.length) {
-        const batch = this.rows.slice(0, 50);
-        const { error } = await this.client
-          .from("proctor_events")
-          .upsert(batch, { onConflict: "client_id", ignoreDuplicates: true });
-        if (!error) this.rows = this.rows.slice(batch.length);
-      }
-      // Updates only once every row they could refer to is stored.
-      if (this.updates.length && this.rows.length === 0) {
-        const batch = this.updates.slice(0, 100);
-        const { error } = await this.client.rpc("update_proctor_events", { p_updates: batch });
-        if (!error) this.updates = this.updates.slice(batch.length);
-      }
-    } finally {
-      this.sending = false;
+  flush(): Promise<void> {
+    this.sending ??= this.send().finally(() => (this.sending = null));
+    return this.sending;
+  }
+
+  private async send(): Promise<void> {
+    if (this.rows.length) {
+      const batch = this.rows.slice(0, 50);
+      const { error } = await this.client
+        .from("proctor_events")
+        .upsert(batch, { onConflict: "client_id", ignoreDuplicates: true });
+      if (!error) this.rows = this.rows.slice(batch.length);
+    }
+    // Updates only once every row they could refer to is stored.
+    if (this.updates.length && this.rows.length === 0) {
+      const batch = this.updates.slice(0, 100);
+      const { error } = await this.client.rpc("update_proctor_events", { p_updates: batch });
+      if (!error) this.updates = this.updates.slice(batch.length);
     }
   }
 
   async stop(): Promise<void> {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
+    // A send already under way took only the rows it had; the last ones go after it.
+    await this.sending;
     await this.flush();
   }
 }

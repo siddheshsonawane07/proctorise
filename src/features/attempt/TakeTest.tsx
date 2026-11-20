@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useBlocker, useNavigate, useParams } from "react-router";
+import { RiVolumeMuteLine, RiVolumeUpLine } from "@remixicon/react";
 import { Button, Card, Loading, Message } from "../../app/ui/form";
 import { toast } from "../../app/ui/toast";
 import { Markdown } from "../../app/ui/Markdown";
@@ -39,6 +40,8 @@ export function TakeTest() {
   const [handOver, setHandOver] = useState(false);
   const [consented, setConsented] = useState(false);
   const [identity, setIdentity] = useState<IdentityResult | null>(null);
+  // Coming back to an attempt already in progress, after leaving, a reload or a crash.
+  const [resumed, setResumed] = useState(false);
   const clock = useClock(30_000);
   const onDevices = useCallback((d: CheckedDevices | null) => setDevices(d), []);
 
@@ -47,7 +50,13 @@ export function TakeTest() {
     if (devices?.camera && p.identity_check && !identity) {
       return <IdentityGate camera={devices.camera} onDone={setIdentity} />;
     }
-    return <TestScreen payload={payload} proctor={devices ? { ...devices, identity } : null} />;
+    return (
+      <TestScreen
+        payload={payload}
+        proctor={devices ? { ...devices, identity } : null}
+        resumed={resumed}
+      />
+    );
   }
   if (test.isPending || attempts.isPending) return <Loading />;
   if (!test.data || test.data.status === "draft") {
@@ -69,6 +78,7 @@ export function TakeTest() {
   function begin() {
     // Speech is allowed only after a tap, so it is unlocked here (Phase-9-Critic #8).
     if (speaksWarnings(settings)) voice.unlock();
+    setResumed(!!open);
     if (needsChecks) {
       // Full screen must be asked for inside the click itself.
       void document.documentElement.requestFullscreen?.().catch(() => {});
@@ -196,9 +206,11 @@ const SAVE_TEXT: Record<SaveState["kind"], string> = {
 function TestScreen({
   payload,
   proctor,
+  resumed,
 }: {
   payload: AttemptPayload;
   proctor: ProctorDevices | null;
+  resumed: boolean;
 }) {
   const navigate = useNavigate();
   const submit = useSubmitAttempt();
@@ -220,10 +232,29 @@ function TestScreen({
   // The teacher can move it (extra time), so it is state, refreshed from the server.
   const [deadline, setDeadline] = useState(() => Date.parse(payload.deadline_at));
   const [teacherMessage, setTeacherMessage] = useState<string | null>(null);
+  const [muted, setMuted] = useState(voice.muted);
   const remaining = deadline - (useClock(1000) + offset);
   // Set below, once `finish` exists: a teacher's automatic rule may end the attempt (D7).
   const autoSubmit = useRef<() => void>(() => {});
-  const proctoring = useProctorSession(payload, proctor, offset, () => autoSubmit.current());
+  const proctoring = useProctorSession(payload, proctor, offset, resumed, () =>
+    autoSubmit.current(),
+  );
+
+  // Leaving before submitting asks first and is recorded; the clock runs on either way. Set once
+  // the attempt has ended, so going to the result isn't held up.
+  const ended = useRef(false);
+  const leaving = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !ended.current && currentLocation.pathname !== nextLocation.pathname,
+  );
+  const [goingOut, setGoingOut] = useState(false);
+  useEffect(() => {
+    const ask = (event: BeforeUnloadEvent) => {
+      if (!ended.current) event.preventDefault();
+    };
+    window.addEventListener("beforeunload", ask);
+    return () => window.removeEventListener("beforeunload", ask);
+  }, []);
 
   // One queue for the life of this attempt's screen.
   const [queue] = useState(
@@ -253,7 +284,10 @@ function TestScreen({
     await queue.flush();
     await stop();
     submit.mutate(payload.attempt_id, {
-      onSuccess: () => navigate(`/app/results/${payload.attempt_id}`, { replace: true }),
+      onSuccess: () => {
+        ended.current = true;
+        navigate(`/app/results/${payload.attempt_id}`, { replace: true });
+      },
     });
   }, [queue, stop, submit, payload.attempt_id, navigate]);
 
@@ -276,6 +310,7 @@ function TestScreen({
     onWarning: setTeacherMessage,
     onDeadline: (iso) => setDeadline(Date.parse(iso)),
     onEnded: () => {
+      ended.current = true;
       void proctoring.stop();
       navigate(`/app/results/${payload.attempt_id}`, { replace: true });
     },
@@ -335,6 +370,24 @@ function TestScreen({
           {SAVE_TEXT[save.kind]}
           {status && ` · ${statusText(status)}`}
         </p>
+        {speaksWarnings(payload.proctoring) && (
+          <button
+            type="button"
+            aria-pressed={muted}
+            onClick={() => {
+              voice.setMuted(!muted);
+              setMuted(!muted);
+            }}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption-1-semibold text-text-muted hover:bg-surface-muted hover:text-text"
+          >
+            {muted ? (
+              <RiVolumeMuteLine aria-hidden className="size-4" />
+            ) : (
+              <RiVolumeUpLine aria-hidden className="size-4" />
+            )}
+            {muted ? "Sound off" : "Sound on"}
+          </button>
+        )}
         <p
           className={`rounded-full px-4 py-1.5 font-mono text-headline-semibold tabular-nums ${
             remaining < 60_000
@@ -364,6 +417,46 @@ function TestScreen({
             </h2>
             <p>{teacherMessage}</p>
             <Button onClick={() => setTeacherMessage(null)}>I understand</Button>
+          </div>
+        </div>
+      )}
+      {leaving.state === "blocked" && (
+        // Above the full-screen and screen-share covers, which a press of Back can come over.
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="leave-title"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-surface/95 p-6"
+        >
+          <div className="max-w-md space-y-4 text-center">
+            <h2 id="leave-title" className="section-title">
+              Leave the test?
+            </h2>
+            <p className="text-text-muted">
+              The clock keeps running while you're away. Your teacher will see that you left, and
+              that you came back.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button onClick={() => leaving.reset()} disabled={goingOut}>
+                Stay in the test
+              </Button>
+              <Button
+                variant="plain"
+                disabled={goingOut}
+                onClick={() => {
+                  setGoingOut(true);
+                  proctoring.recordMoment("left_test");
+                  // Answers from the last second and the events go before the page changes, so
+                  // closing the tab straight after loses nothing.
+                  void queue
+                    .flush()
+                    .then(() => proctoring.stop())
+                    .finally(() => leaving.proceed());
+                }}
+              >
+                Leave
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -540,6 +633,7 @@ function useProctorSession(
   payload: AttemptPayload,
   proctor: ProctorDevices | null,
   offset: number,
+  resumed: boolean,
   onAutoSubmit: () => void,
 ) {
   const [value, setValue] = useState<SessionStatus | null>(null);
@@ -569,12 +663,13 @@ function useProctorSession(
       started.current = true;
       void session.start().then(() => {
         if (identity) session.recordIdentity(identity.passed, identity.score);
+        if (resumed) session.recordMoment("resumed_test");
       });
     }
     return () => {
       pendingStop.current = setTimeout(() => void session.stop(), 0);
     };
-  }, [session, identity]);
+  }, [session, identity, resumed]);
 
   const stop = useCallback(async () => {
     await session?.stop();
@@ -587,6 +682,7 @@ function useProctorSession(
     value,
     stop,
     switchPairing,
+    recordMoment: (kind: "left_test" | "resumed_test") => session?.recordMoment(kind),
     reshare: async () => {
       const s = await navigator.mediaDevices
         .getDisplayMedia({ video: { displaySurface: "monitor" } as MediaTrackConstraints })

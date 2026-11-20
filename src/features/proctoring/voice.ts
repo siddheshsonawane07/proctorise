@@ -5,9 +5,12 @@
  * - The same warning is spoken at most once per COOLDOWN_MS, so it stays worth listening to.
  * - The laptop's speaker plays into its own microphone, so isTalking() is true while speaking and
  *   for QUIET_AFTER_MS after; the speech detector ignores those samples (Phase-9-Critic #7).
+ * - The student can mute it from the test screen; that is remembered on the computer. Warnings
+ *   still show on screen and are still recorded.
  */
 export const COOLDOWN_MS = 20_000;
 export const QUIET_AFTER_MS = 500;
+const MUTED_KEY = "proctorise.muted";
 
 type Synth = Pick<SpeechSynthesis, "speak" | "cancel" | "getVoices" | "speaking">;
 
@@ -15,6 +18,7 @@ export class Voice {
   private readonly last = new Map<string, number>();
   private talkingUntil = 0;
   private context: AudioContext | null = null;
+  private mutedNow = readMuted();
 
   constructor(
     private readonly synth: Synth | null = typeof window !== "undefined" &&
@@ -37,12 +41,31 @@ export class Voice {
     }
   }
 
+  get muted(): boolean {
+    return this.mutedNow;
+  }
+
+  /** Silences the voice and the chime, at once and from now on, on this computer. */
+  setMuted(muted: boolean): void {
+    this.mutedNow = muted;
+    if (muted) {
+      this.synth?.cancel();
+      this.talkingUntil = 0;
+    }
+    try {
+      if (muted) localStorage.setItem(MUTED_KEY, "1");
+      else localStorage.removeItem(MUTED_KEY);
+    } catch {
+      // Not remembering it only means asking again next time.
+    }
+  }
+
   isTalking(): boolean {
     return (this.synth?.speaking ?? false) || this.now() < this.talkingUntil;
   }
 
   say(text: string): void {
-    if (!this.synth) return;
+    if (!this.synth || this.mutedNow) return;
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-IN";
     const voice = this.synth
@@ -60,6 +83,7 @@ export class Voice {
 
   /** A chime and one sentence, unless the same kind was spoken in the last COOLDOWN_MS. */
   warn(kind: string, text: string): boolean {
+    if (this.mutedNow) return false;
     const t = this.now();
     const before = this.last.get(kind);
     if (before !== undefined && t - before < COOLDOWN_MS) return false;
@@ -93,6 +117,14 @@ export class Voice {
       osc.start(ctx.currentTime + at);
       osc.stop(ctx.currentTime + at + 0.14);
     }
+  }
+}
+
+function readMuted(): boolean {
+  try {
+    return localStorage.getItem(MUTED_KEY) === "1";
+  } catch {
+    return false;
   }
 }
 

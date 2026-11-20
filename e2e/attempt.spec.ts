@@ -157,6 +157,58 @@ test("answers survive closing the browser, and the server keeps the time", async
   }
 });
 
+test("leaving mid-test asks first, and leaving and coming back are recorded", async ({ page }) => {
+  const { studentEmail, testId } = await setUp(10);
+  await page.goto("/sign-in");
+  await page.getByLabel("Email").fill(studentEmail);
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("heading", { name: /^(Classes|Admin)$/ })).toBeVisible();
+  await page.goto(`/app/take/${testId}`);
+  await enter(page, "Start the test");
+  await page.getByLabel("H2O").check();
+  await expect(page.getByText("All answers saved")).toBeVisible();
+
+  // The voice can be muted, and stays muted.
+  await page.getByRole("button", { name: "Sound on" }).click();
+  await expect(page.getByRole("button", { name: "Sound off" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  // A link out is held: staying keeps the test on screen.
+  await page.getByRole("link", { name: "Proctorise" }).click();
+  const leave = page.getByRole("alertdialog", { name: "Leave the test?" });
+  await expect(leave).toBeVisible();
+  await leave.getByRole("button", { name: "Stay in the test" }).click();
+  await expect(leave).toBeHidden();
+  await expect(page.getByLabel("H2O")).toBeChecked();
+
+  // Leaving goes, and coming back is the same attempt with its answers.
+  await page.getByRole("link", { name: "Proctorise" }).click();
+  await leave.getByRole("button", { name: "Leave" }).click();
+  await expect(page).not.toHaveURL(/\/app\/take\//);
+  await page.goto(`/app/take/${testId}`);
+  await enter(page, "Continue the test");
+  await expect(page.getByLabel("H2O")).toBeChecked();
+  await expect(page.getByRole("button", { name: "Sound off" })).toBeVisible();
+
+  await expect
+    .poll(
+      async () => {
+        const rows = (await (
+          await asService(
+            "/rest/v1/proctor_events?select=kind,attempts!inner(test_id)" +
+              `&attempts.test_id=eq.${testId}&kind=in.(left_test,resumed_test)`,
+          )
+        ).json()) as { kind: string }[];
+        return rows.map((r) => r.kind).sort();
+      },
+      { timeout: 30_000, intervals: [1_000] },
+    )
+    .toEqual(["left_test", "resumed_test"]);
+});
+
 test("a late answer is refused, and a closed browser is submitted on time", async ({ browser }) => {
   const { teacher, student, testId } = await setUp(30);
   const payload = await rpcAs<{ attempt_id: string; items: { id: string }[] }>(

@@ -35,7 +35,9 @@ export type EventKind =
   | "phone_person"
   | "phone_object"
   | "phone_camera_lost"
-  | "phone_setup_unconfirmed";
+  | "phone_setup_unconfirmed"
+  | "left_test"
+  | "resumed_test";
 
 /** Conditions that last: the browser reports them turning on and off. */
 export type BrowserCondition =
@@ -333,7 +335,13 @@ export class Rules {
 
   /** Something that happens at a moment: a paste, a right-click, a blocked shortcut. */
   instant(
-    kind: "copy_paste" | "context_menu" | "shortcut" | "identity_mismatch",
+    kind:
+      | "copy_paste"
+      | "context_menu"
+      | "shortcut"
+      | "identity_mismatch"
+      | "left_test"
+      | "resumed_test",
     t: number,
     severity: Severity = "info",
     details: Record<string, unknown> = {},

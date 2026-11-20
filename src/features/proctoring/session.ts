@@ -178,6 +178,12 @@ export class ProctorSession {
     }
   }
 
+  /** Leaving the test before submitting, or coming back to it: a moment for the teacher. */
+  recordMoment(kind: "left_test" | "resumed_test") {
+    if (this.stopped) return;
+    this.apply(this.rules.instant(kind, this.now(), "warn"));
+  }
+
   /** A new phone after the old one went: watch its channel instead. */
   switchPairing(pairingId: string) {
     if (this.phoneChannel) void supabase.removeChannel(this.phoneChannel);

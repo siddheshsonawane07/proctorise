@@ -25,4 +25,6 @@ export const EVENT_LABEL: Record<string, string> = {
   phone_camera_lost: "Phone camera stopped",
   phone_replaced: "Phone replaced",
   phone_setup_unconfirmed: "Phone view not confirmed at setup",
+  left_test: "Left the test before submitting",
+  resumed_test: "Came back to the test",
 };
